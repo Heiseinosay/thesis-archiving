@@ -22,11 +22,11 @@
                                 <div class="mb-3">
                                   </div>
                                 <div class="mb-3">
-                                    {% if invalid %}
+                                    {% if result['invalid'] %}
                                     
                                         <div class="alert alert-danger" role="alert">
                                             
-                                            {% for k,v in invalid.items() %}
+                                            {% for k,v in result['invalid'].items() %}
                                                 <small>
                                                     {{k}} : {{v}}
                                                     

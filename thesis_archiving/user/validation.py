@@ -9,16 +9,18 @@ def validate_input(data, schema):
         can only take single dictionary of data
     '''
 
-    valid = {}
-    invalid = {}
+    result = {
+        'valid' : {},
+        'invalid' : {}
+    }
 
     try:
-        valid = schema().load(data)
+        result['valid'] = schema().load(data)
 
     except ValidationError as err:
-        invalid = err.messages
+        result['invalid'] = err.messages
 
-    return valid, invalid
+    return result
 
 class LoginSchema(Schema):
     username = fields.Str(required=True, validate=validate_empty)
