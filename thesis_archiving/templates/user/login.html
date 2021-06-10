@@ -18,16 +18,30 @@
                     <p class="lead text-center">CCSS Thesis Archiving</p>
                     <div class="card py-1">
                         <div class="card-body">
-                            <form action="">
+                            <form action="" method="POST">
                                 <div class="mb-3">
                                   </div>
                                 <div class="mb-3">
+                                    {% if invalid %}
+                                    
+                                        <div class="alert alert-danger" role="alert">
+                                            
+                                            {% for k,v in invalid.items() %}
+                                                <small>
+                                                    {{k}} : {{v}}
+                                                    
+                                                </small>
+                                            {% endfor %}
+                                          </div>
+                                    
+                                    
+                                    {% endif %}
                                     <label for="exampleFormControlInput1" class="form-label small">Username</label>
-                                    <input type="email" class="form-control form-control-sm" id="exampleFormControlInput1">
+                                    <input type="text" class="form-control form-control-sm" id="exampleFormControlInput1" name="username" >
                                   </div>
                                   <div class="mb-3">
                                     <label for="exampleFormControlTextarea1" class="form-label small">Password</label>
-                                    <input type="password" class="form-control form-control-sm" id="exampleFormControlInput1">
+                                    <input type="password" class="form-control form-control-sm" id="exampleFormControlInput1" name="password">
                                     <p class="small text-muted">Leave blank if you don't have a password.</p>
                                   </div>
                                   <div class="d-grid gap-2">
