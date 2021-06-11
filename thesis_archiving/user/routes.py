@@ -1,8 +1,7 @@
 from types import resolve_bases
 from flask import Blueprint, url_for, redirect, render_template, request
 from thesis_archiving.user.validation import LoginSchema, validate_input
-from pprint import pprint
-import copy
+# from pprint import pprint
 
 user = Blueprint('user', __name__, url_prefix="/user")
 
