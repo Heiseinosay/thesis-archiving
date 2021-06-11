@@ -2,7 +2,7 @@ from types import resolve_bases
 from flask import Blueprint, url_for, redirect, render_template, request
 from thesis_archiving.user.validation import LoginSchema, validate_input
 from pprint import pprint
-
+import copy
 
 user = Blueprint('user', __name__, url_prefix="/user")
 
@@ -10,8 +10,9 @@ user = Blueprint('user', __name__, url_prefix="/user")
 def login():
 
     result = {}
-
+    
     if request.method == "POST":
+
         result = validate_input(request.form, LoginSchema)
         
         if not result['invalid']:
