@@ -25,6 +25,7 @@ def validate_input(data, schema):
     return result
 
 class LoginSchema(Schema):
+    csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
     username = fields.Str(required=True, validate=validate_empty)
     password = fields.Str(required=True, validate=validate_empty)
     # file = fields.Raw(required=True)

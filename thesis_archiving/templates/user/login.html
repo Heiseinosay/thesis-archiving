@@ -20,7 +20,7 @@
                     <div class="card py-1">
                         <div class="card-body">
                             <form action=" " method="POST">
-                                
+                              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                 <div class="mb-3">
                                     {% if result['invalid'] %}
                                     
