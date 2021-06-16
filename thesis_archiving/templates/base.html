@@ -1,0 +1,29 @@
+<!doctype html>
+
+<html lang="en">
+	<head>
+
+		<!-- Required meta tags -->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<!-- Bootstrap/Bootstrap Icon CSS -->
+		<link href="{{ url_for('static', filename='bootstrap/bootstrap.css') }}" rel="stylesheet">
+		<link href="{{ url_for('static', filename='bootstrap/bootstrap-icons.css') }}" rel="stylesheet">
+
+		<title>Thesis Archiving</title>
+
+	</head>
+
+	<body class="bg-light">
+
+        
+		{% block body %}
+			
+        {% endblock %}
+		
+		<!-- bootstrap js -->
+		<script src="{{ url_for('static', filename='bootstrap/bootstrap.bundle.min.js') }}"></script>
+
+	</body>
+</html>

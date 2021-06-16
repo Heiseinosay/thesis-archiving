@@ -1,0 +1,46 @@
+{% macro crud_link(user, name, link="#") %}
+
+    {% if name == "Thesis" %}
+        <li class="nav-item">
+            <a class="nav-link link-ueccss" aria-current="page" href="{{ link }}">{{ name }}</a>
+        </li>
+    
+    <!-- check if authorized user -->
+    {% elif True %}
+        <li class="nav-item">
+            <a class="nav-link link-ueccss disabled" aria-current="page" href="#">{{ name }}</a>
+        </li>
+    
+    {% endif %}
+
+{% endmacro %}
+
+<div class="container-fluid bg-white shadow-sm overflow-auto py-1">
+    <div class="row">
+        <div class="col">
+            <div class="container-md">
+                <ul class="nav" style="min-width: 768px;">
+                    
+                    {{ crud_link("test", "Thesis", url_for('thesis.read')) }}
+                    
+                    {{ crud_link("test", "User") }}
+
+                    {{ crud_link("test", "Subject") }}
+                    
+                    {{ crud_link("test", "Program") }}
+                    
+                    <li class="nav-item ms-auto d-flex align-items-center">
+                        <form>
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
+                                <button class="btn btn-ueccss" type="button" id="button-addon1"><i class="bi bi-search"></i> Search</button>
+                              </div>
+                        </form>
+                    </li>
+
+                </ul>
+               
+            </div>
+        </div>
+    </div>
+</div>

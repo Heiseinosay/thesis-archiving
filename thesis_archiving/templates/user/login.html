@@ -1,86 +1,40 @@
-<!doctype html>
-<html lang="en">
-	<head>
-		<!-- Required meta tags -->
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
+{% extends "base.html" %}
 
-		<!-- Bootstrap CSS -->
-		<link href="{{ url_for('static', filename='bootstrap/bootstrap.css') }}" rel="stylesheet">
-		<link href="{{ url_for('static', filename='bootstrap/bootstrap-icons.css') }}" rel="stylesheet">
+{% block body %}
 
-		<title>Hello, world!</title>
-	</head>
-	<body class="bg-light">
-		
-        <div class="container mt-5">
-            <div class="row justify-content-center">
-                <div class="col-8 col-sm-7 col-md-6 col-lg-5 col-xl-3">
-                    <p class="lead text-center">CCSS Thesis Archiving</p>
-                    <div class="card py-1">
-                        <div class="card-body">
-                            <form action=" " method="POST">
-                              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                                <div class="mb-3">
-                                    {% if result['invalid'] %}
-                                    
-                                        <div class="alert alert-danger" role="alert">
-                                            
-                                            {% for k,v in result['invalid'].items() %}
-                                                <small>
-                                                    {{k}} : {{v}}
-                                                    
-                                                </small>
-                                            {% endfor %}
-                                          </div>
-                                    
-                                    
-                                    {% endif %}
-                                    
-                                </div>
-                                
-                                <p>Username</p>
-                                <input type="text" name="username">
-                                
-                                <p>Password</p>
-                                <input type="password" name="password">
-                                
-                                <input type="submit" value="Submit">
-  
-                            </form>
-                              <!-- Button trigger modal -->
-<button type="button" class="btn btn-uered" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Launch demo modal
-  </button>
-  
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          ...
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-uered">Save changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-                        </div>
-                      </div>
-                </div>
-            </div>
-        </div>
+<div class="container-fluid py-5">
+	<!-- <p class="text-center lead" style="min-width: 300px;">CCSS Thesis Archiving</p> -->
+	<div class="card shadow-sm mx-auto border-0" style="min-width: 350px; max-width: 350px;">
+		<div class="card-body p-4 py-5">
+			<h1 class="display-4 text-center"><i class="bi bi-book-fill"></i></h1>
+			<p class="text-center mb-4">CCSS Thesis Archiving</p>
+			
+			<form class="row">
+				<div class="mb-3">
+					<label for="formGroupExampleInput2" class="form-label">Username</label>
+					<div class="input-group input-group-sm">
+						<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+						<input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
+					</div>
+				</div>
 
+				<div class="mb-3">
+					<label for="formGroupExampleInput2" class="form-label">Password</label>
+					<div class="input-group input-group-sm">
+						<span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+						<input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
+					</div>
+					<a href="#" class="link-primary" style="text-decoration: none;"><small>Forgot your password?</small></a>
+				</div>
 
-		<!-- bootstrap js -->
-		<script src="{{ url_for('static', filename='bootstrap/bootstrap.bundle.min.js') }}"></script>
+				<div class="d-grid gap-2">
+					<button type="submit" class="btn btn-sm btn-ueccss">Sign in</button>
+					<small>Don't have an account? <a href="#" class="link-primary" style="text-decoration: none;">Contact R&D.</a></small>
+				</div>
+			</form>
+			
+		</div>
+	</div>
+</div>
 
-
-	</body>
-</html>
+{% endblock %}
