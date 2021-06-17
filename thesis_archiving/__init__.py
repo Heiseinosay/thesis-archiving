@@ -21,6 +21,9 @@ def create_app(config_class=Config):
     from thesis_archiving.main.routes import main
     from thesis_archiving.thesis.routes import thesis
     from thesis_archiving.user.routes import user
+
+    # import models for flask migrate
+    from thesis_archiving.models import User
     
     app.register_blueprint(main)
     app.register_blueprint(thesis)

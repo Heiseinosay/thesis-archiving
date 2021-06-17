@@ -12,6 +12,22 @@
 		<link href="{{ url_for('static', filename='bootstrap/bootstrap-icons.css') }}" rel="stylesheet">
 
 		<title>Thesis Archiving</title>
+		
+		<style>
+			
+			{% block css %}
+
+				body {
+					background-image: url("{{ url_for('static', filename='bg-white.png') }}");
+					background-repeat: no-repeat;
+					background-attachment: fixed;
+					background-size: cover;
+					background-position: center;
+				}
+
+			{% endblock %}
+
+		</style>
 
 	</head>
 

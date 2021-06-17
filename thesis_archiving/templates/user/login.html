@@ -1,17 +1,29 @@
 {% extends "base.html" %}
 
+{% block css %}
+
+	body {
+		background-image: url("{{ url_for('static', filename='bg.png') }}");
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		background-size: cover;
+		background-position: center;
+	}
+
+{% endblock %}
+
 {% block body %}
 
 <div class="container-fluid py-5">
-	<!-- <p class="text-center lead" style="min-width: 300px;">CCSS Thesis Archiving</p> -->
-	<div class="card shadow-sm mx-auto border-0" style="min-width: 350px; max-width: 350px;">
+	
+	<div class="card shadow mx-auto border-0" style="min-width: 350px; max-width: 350px;">
 		<div class="card-body p-4 py-5">
-			<h1 class="display-4 text-center"><i class="bi bi-book-fill"></i></h1>
+			<img src="{{ url_for('static', filename='ccss.png') }}" width="100" class="d-block mx-auto">
 			<p class="text-center mb-4">CCSS Thesis Archiving</p>
 			
 			<form class="row">
 				<div class="mb-3">
-					<label for="formGroupExampleInput2" class="form-label">Username</label>
+					<label for="formGroupExampleInput2" class="form-label h6">Username</label>
 					<div class="input-group input-group-sm">
 						<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
 						<input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
@@ -19,7 +31,7 @@
 				</div>
 
 				<div class="mb-3">
-					<label for="formGroupExampleInput2" class="form-label">Password</label>
+					<label for="formGroupExampleInput2" class="form-label h6">Password</label>
 					<div class="input-group input-group-sm">
 						<span class="input-group-text"><i class="bi bi-key-fill"></i></span>
 						<input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
