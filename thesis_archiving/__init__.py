@@ -3,11 +3,13 @@ from flask_wtf.csrf import CSRFProtect
 from thesis_archiving.config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_bcrypt import Bcrypt
 
 # extensions
 csrf = CSRFProtect()
 db = SQLAlchemy()
 migrate = Migrate()
+bcrypt = Bcrypt()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -17,6 +19,7 @@ def create_app(config_class=Config):
     csrf.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db, compare_type=True)
+    bcrypt.init_app(app)
 
     from thesis_archiving.main.routes import main
     from thesis_archiving.thesis.routes import thesis

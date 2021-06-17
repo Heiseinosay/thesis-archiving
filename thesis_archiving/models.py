@@ -9,9 +9,9 @@ class User(db.Model):
 	full_name = db.Column(db.String(64), nullable=False)
 	email = db.Column(db.String(64), unique=True)
 	password = db.Column(db.String(60), nullable=False)
-	is_adviser = db.Column(BOOLEAN())
-	is_admin = db.Column(BOOLEAN())
-	is_superuser = db.Column(BOOLEAN())
+	is_adviser = db.Column(BOOLEAN(), default=False)
+	is_admin = db.Column(BOOLEAN(), default=False)
+	is_superuser = db.Column(BOOLEAN(), default=False)
 	date_registered = db.Column(db.DateTime, nullable=False, default=lambda:datetime.now(tz=pytz.timezone('Asia/Manila')))
 
 	def __repr__(self):

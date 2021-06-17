@@ -12,6 +12,9 @@ flask-migrate = "*"
 flask-login = "*"
 mysql-connector-python = "*"
 pytz = "*"
+pandas = "*"
+openpyxl = "*"
+flask-bcrypt = "*"
 
 [dev-packages]
 
