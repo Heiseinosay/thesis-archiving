@@ -8,7 +8,7 @@
         <input type="{{type}}" name="{{name}}" value="{{value}}" class="form-control is-invalid">
         <div class="invalid-feedback">
             {% for msg in result["invalid"][name] %}
-                <p>{{msg}}</p>
+                <p class="mb-0"><small>{{msg}}</small></p>
             {% endfor %}
         </div>
 
@@ -17,9 +17,7 @@
         
         <!-- feedback div for ajax -->
         <div class="">
-            {% for msg in result["invalid"][name] %}
-                <p>{{msg}}</p>
-            {% endfor %}
+            
         </div>
         
     {% endif %}

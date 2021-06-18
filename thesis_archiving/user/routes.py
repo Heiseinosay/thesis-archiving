@@ -1,5 +1,5 @@
 from flask import Blueprint, url_for, redirect, render_template, request, flash
-from flask_login import login_user, current_user, login_required
+from flask_login import login_user, current_user, login_required, logout_user
 from thesis_archiving import bcrypt
 from thesis_archiving.user.validation import LoginSchema, validate_input
 from thesis_archiving.models import User
@@ -30,12 +30,21 @@ def login():
             
             if user and bcrypt.check_password_hash(user.password, data["password"]):
                 login_user(user)
-                return redirect(url_for("thesis.read")) # arg next
+                
+                next_page = request.args.get('next')
+                return redirect(next_page) if next_page else redirect(url_for("thesis.read"))
+
             else:
                 result["valid"] = {}
                 flash("Login credentials are invalid or do not match.","danger")
 
     return render_template("user/login.html", result = result)
+
+@user.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("user.login"))
 
 @user.route("/read")
 @login_required

@@ -3,6 +3,7 @@ from flask_login import login_required
 
 thesis = Blueprint("thesis", __name__, url_prefix="/thesis")
 
+# wrap whole blueprint to be login required
 @thesis.before_request
 @login_required
 
