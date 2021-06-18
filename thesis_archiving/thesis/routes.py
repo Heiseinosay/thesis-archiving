@@ -1,6 +1,10 @@
 from flask import Blueprint, render_template
+from flask_login import login_required
 
 thesis = Blueprint("thesis", __name__, url_prefix="/thesis")
+
+@thesis.before_request
+@login_required
 
 @thesis.route("/read")
 def read():

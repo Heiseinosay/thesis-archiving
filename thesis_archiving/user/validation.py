@@ -1,10 +1,5 @@
 from flask import current_app
-from marshmallow import Schema, fields, validates, ValidationError, validate, validates_schema 
-import os
-
-def validate_empty(data):
-    if len(data.strip()) == 0:
-        raise ValidationError("Field cannot be empty.")
+from marshmallow import Schema, fields, validates, ValidationError, validate, validates_schema, pre_load
 
 def validate_input(data, schema):
     '''
@@ -20,15 +15,27 @@ def validate_input(data, schema):
         result['valid'] = schema().load(data)
 
     except ValidationError as err:
+        result['valid'] = err.valid_data
         result['invalid'] = err.messages
 
     return result
+
+def validate_empty(data):
+    if len(data) == 0:
+        raise ValidationError("Field cannot be empty.")
 
 class LoginSchema(Schema):
     csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
     username = fields.Str(required=True, validate=validate_empty)
     password = fields.Str(required=True, validate=validate_empty)
     # file = fields.Raw(required=True)
+
+    @pre_load
+    def strip_fields(self, in_data, **kwargs):
+        # dont strip password kasi baka may mag set ng spaces yung first and last lmao
+        in_data["username"] = in_data["username"].strip()
+
+        return in_data
 
     # @validates("file")
     # def testfile(self, data):
@@ -53,10 +60,3 @@ class LoginSchema(Schema):
     #     # it may be possible na tanggalin tong part na to dito? and ilipat ang saving logic elsewhere?
     #     data.seek(0)
     #     data.save(os.path.join(current_app.root_path,'path','to','file','filename.ext'))
-
-    @validates_schema
-    def validate_user(self, data, **kwargs):
-
-        # check user encrypted password
-        if not(data["username"] and data["password"]):
-            raise ValidationError("User credentials does not match or exist.")

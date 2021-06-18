@@ -1,0 +1,28 @@
+<!-- general field -->
+{% macro field(type, name, result, value="") %}
+
+    {% if result["valid"][name] %}
+        <input type="{{type}}" name="{{name}}" value="{{value}}" class="form-control is-valid">
+
+    {% elif result["invalid"][name] %}
+        <input type="{{type}}" name="{{name}}" value="{{value}}" class="form-control is-invalid">
+        <div class="invalid-feedback">
+            {% for msg in result["invalid"][name] %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <input type="{{type}}" name="{{name}}" value="{{value}}" class="form-control">
+        
+        <!-- feedback div for ajax -->
+        <div class="">
+            {% for msg in result["invalid"][name] %}
+                <p>{{msg}}</p>
+            {% endfor %}
+        </div>
+        
+    {% endif %}
+
+{% endmacro %}
+

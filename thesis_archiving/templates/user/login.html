@@ -1,3 +1,5 @@
+{% from "components/_fields.html" import field %}
+
 {% extends "base.html" %}
 
 {% block css %}
@@ -16,32 +18,41 @@
 
 <div class="container-fluid py-5">
 	
+	{% with messages = get_flashed_messages(with_categories=true) %}
+		{% if messages %}
+			{% for category, message in messages %}
+				<div class="alert alert-{{category}} mx-auto" role="alert" style="min-width: 350px; max-width: 350px;">
+					<i class="bi bi-exclamation-triangle-fill"></i><small> {{message}}</small>
+				</div>
+			{% endfor %}
+		{% endif %}
+	{% endwith %}
+
 	<div class="card shadow mx-auto border-0" style="min-width: 350px; max-width: 350px;">
 		<div class="card-body p-4 py-5">
 			<img src="{{ url_for('static', filename='ccss.png') }}" width="100" class="d-block mx-auto">
 			<p class="text-center mb-4">CCSS Thesis Archiving</p>
 			
-			<form class="row">
+			<form class="row" method="POST" action="">
+				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+				
+				<!-- username -->
 				<div class="mb-3">
-					<label for="formGroupExampleInput2" class="form-label h6">Username</label>
-					<div class="input-group input-group-sm">
-						<span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-						<input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
-					</div>
+					<label class="form-label h6">Username</label>
+					{{ field("text", "username", result, request.form["username"]) }}
 				</div>
-
+				
+				<!-- pw -->
 				<div class="mb-3">
-					<label for="formGroupExampleInput2" class="form-label h6">Password</label>
-					<div class="input-group input-group-sm">
-						<span class="input-group-text"><i class="bi bi-key-fill"></i></span>
-						<input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1">
-					</div>
+					<label class="form-label h6">Password</label>
+					{{ field("password", "password", result) }}
 					<a href="#" class="link-primary" style="text-decoration: none;"><small>Forgot your password?</small></a>
 				</div>
 
+				<!-- submit -->
 				<div class="d-grid gap-2">
 					<button type="submit" class="btn btn-sm btn-ueccss">Sign in</button>
-					<small>Don't have an account? <a href="#" class="link-primary" style="text-decoration: none;">Contact R&D.</a></small>
+					<small>Don't have an account? <a href="https://www.facebook.com/CCSSRnD/" class="link-primary" style="text-decoration: none;" target="_blank">Contact R&D.</a></small>
 				</div>
 			</form>
 			
