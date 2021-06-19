@@ -1,5 +1,5 @@
 from thesis_archiving import db, login_manager
-from sqlalchemy.dialects.mysql import INTEGER, BOOLEAN
+from sqlalchemy.dialects.mysql import INTEGER, BOOLEAN, BIGINT
 from flask_login import UserMixin
 from datetime import datetime
 import pytz
@@ -7,6 +7,24 @@ import pytz
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
+
+
+'''
+	syntax i followed for creating models w/ relationships
+
+	one to many
+
+	class Parent():
+		...
+
+		children = db.relationship()
+		
+	class Child():
+		...
+
+		parent_id = db.Column()
+
+'''
 
 class Program(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
@@ -24,14 +42,6 @@ class Category(db.Model):
 	def __repr__(self):
 		return f"[{self.id}] {self.name} - {self.code}"
 
-# class Logs(db.Model):
-# 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
-# 	description = db.Column(db.String(60), unique=True, nullable=False)
-# 	date = db.Column(db.DateTime, nullable=False, default=lambda:datetime.now(tz=pytz.timezone('Asia/Manila')))
-
-# 	def __repr__(self):
-# 		return f"[{self.id}] {self.description} - {self.date}"
-
 class User(db.Model, UserMixin):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
 	username = db.Column(db.String(20), unique=True, nullable=False)
@@ -43,8 +53,20 @@ class User(db.Model, UserMixin):
 	is_superuser = db.Column(BOOLEAN(), default=False)
 	date_registered = db.Column(db.DateTime, nullable=False, default=lambda:datetime.now(tz=pytz.timezone('Asia/Manila')))
 
+	logs = db.relationship('Log', backref='user', lazy='dynamic')
+
 	def __repr__(self):
-		return f"[{self.id}] {self.username} - {self.email}"
+		return f"[{self.id}] {self.username} - {self.full_name}"
+
+class Log(db.Model):
+	id = db.Column(BIGINT(unsigned=True), primary_key=True)
+	description = db.Column(db.String(60), nullable=False)
+	date = db.Column(db.DateTime, nullable=False, default=lambda:datetime.now(tz=pytz.timezone('Asia/Manila')))
+
+	user_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
+
+	def __repr__(self):
+		return f"[{self.id}] {self.description} - {self.date}"
 
 # class Thesis(db.Model):
 # 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
