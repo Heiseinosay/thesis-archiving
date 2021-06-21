@@ -31,6 +31,8 @@ class Program(db.Model):
 	name = db.Column(db.String(20), unique=True, nullable=False)
 	code = db.Column(db.String(10), unique=True, nullable=False)
 
+	theses = db.relationship('Thesis', backref='program', lazy='dynamic')
+
 	def __repr__(self):
 		return f"[{self.id}] {self.name} - {self.code}"
 
@@ -39,8 +41,16 @@ class Category(db.Model):
 	name = db.Column(db.String(30), unique=True, nullable=False)
 	code = db.Column(db.String(10), unique=True, nullable=False)
 
+	theses = db.relationship('Thesis', backref='category', lazy='dynamic')
+
 	def __repr__(self):
 		return f"[{self.id}] {self.name} - {self.code}"
+
+# user to thesis many to many helper table
+proponents = db.Table('proponents', 
+	db.Column('user_id', INTEGER(unsigned=True), db.ForeignKey('user.id')),
+	db.Column('thesis_id', INTEGER(unsigned=True), db.ForeignKey('thesis.id'))
+)
 
 class User(db.Model, UserMixin):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
@@ -54,6 +64,7 @@ class User(db.Model, UserMixin):
 	date_registered = db.Column(db.DateTime, nullable=False, default=lambda:datetime.now(tz=pytz.timezone('Asia/Manila')))
 
 	logs = db.relationship('Log', backref='user', lazy='dynamic')
+	advisees = db.relationship('Thesis', backref='adviser', lazy='dynamic')
 
 	def __repr__(self):
 		return f"[{self.id}] {self.username} - {self.full_name}"
@@ -68,34 +79,44 @@ class Log(db.Model):
 	def __repr__(self):
 		return f"[{self.id}] {self.description} - {self.date}"
 
-# class Thesis(db.Model):
-# 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
-# 	title = db.Column(db.String(250), unique=True, nullable=False)
-# 	sy_start = db.Column(db.Integer)
-# 	sem = db.Column(db.Integer)
-# 	number = db.Column(db.Integer)
-# 	area = db.Column(db.String(120))
-# 	program_id
-# 	adviser_id
-# 	proponents_id
-# 	overview = db.Column(db.String(500))
-# 	keywords = db.Column(db.String(120))
-# 	category_id
-# 	date_deployed = db.Column(db.DateTime)
-# 	date_registered = db.Column(db.DateTime, nullable=False, default=lambda:datetime.now(tz=pytz.timezone('Asia/Manila')))
-# 	is_old = db.Column(BOOLEAN(), default=False)
 
-# 	def __repr__(self):
-# 		return f"[{self.id}] {self.title[0: 20 if len(self.title) > 20 else len(self.title)]}{ '...' if len(self.title) > 20 else '' }"
+class Thesis(db.Model):
+	id = db.Column(INTEGER(unsigned=True), primary_key=True)
+	title = db.Column(db.String(250), nullable=False)
+	is_old = db.Column(BOOLEAN(), nullable=False, default=False)
+	overview = db.Column(db.String(500))
+	area = db.Column(db.String(120))
+	keywords = db.Column(db.String(120))
+	sy_start = db.Column(db.Integer)
+	semester = db.Column(db.Integer)
+	number = db.Column(db.Integer, unique=True)
+	date_deployed = db.Column(db.DateTime)
+	date_registered = db.Column(db.DateTime, nullable=False, default=lambda:datetime.now(tz=pytz.timezone('Asia/Manila')))
+
+	adviser_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
+	category_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('category.id'), nullable=False)
+	program_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('program.id'), nullable=False)
+	proponents = db.relationship('User', secondary=proponents, lazy='dynamic', backref=db.backref('theses', lazy='dynamic'))
+
+	def __repr__(self):
+		title = self.title[0: (50 if len(self.title) > 50 else len(self.title))] + ('...' if len(self.title) > 50 else '')
+		old_or_number = "old" if self.is_old else f"{self.sy_start}-{self.semester}-{self.category.code}{self.program.code}-{self.number}"
+
+		return f"[{self.id}] {old_or_number} {title}"
 	
-	# @staticmethod
-	# def thesis_number():
-	# 	'''
-	# 		Get the number of latest new thesis
+	@staticmethod
+	def thesis_number():
+		'''
+			Get the number of latest NEW thesis
 
-	# 		(old theses are those written before the start of this system's development)
-	# 	'''
+			notes:
+				OLD theses are those written before the start of this system's development
 
-	# 	thesis = Thesis.query.filter_by(is_old=False).order_by(Thesis.date_registered.desc()).first()
+				important yung id sorting dahil nadedefault na ascending maski descending yung ibang column
+
+				finilter yung is_old=False kasi baka may ma add na number sa hindi naman old
+		'''
+
+		thesis = Thesis.query.filter_by(is_old=False).filter(Thesis.number.isnot(None)).order_by(Thesis.date_registered.desc()).order_by(Thesis.id.desc()).first()
 		
-	# 	return thesis.number + 1 if thesis else 1 
+		return thesis.number + 1 if (thesis and thesis.number) else 1 
