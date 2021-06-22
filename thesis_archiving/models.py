@@ -84,9 +84,9 @@ class Thesis(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
 	title = db.Column(db.String(250), nullable=False)
 	is_old = db.Column(BOOLEAN(), nullable=False, default=False)
-	overview = db.Column(db.String(500))
+	overview = db.Column(db.String(10000))
 	area = db.Column(db.String(120))
-	keywords = db.Column(db.String(120))
+	keywords = db.Column(db.String(250))
 	sy_start = db.Column(db.Integer)
 	semester = db.Column(db.Integer)
 	number = db.Column(db.Integer, unique=True)
@@ -117,6 +117,6 @@ class Thesis(db.Model):
 				finilter yung is_old=False kasi baka may ma add na number sa hindi naman old
 		'''
 
-		thesis = Thesis.query.filter_by(is_old=False).filter(Thesis.number.isnot(None)).order_by(Thesis.date_registered.desc()).order_by(Thesis.id.desc()).first()
+		thesis = Thesis.query.filter_by(is_old=False).filter(Thesis.number.isnot(None)).order_by(Thesis.date_registered.desc()).order_by(Thesis.id.desc()).order_by(Thesis.number.desc()).first()
 		
 		return thesis.number + 1 if (thesis and thesis.number) else 1 

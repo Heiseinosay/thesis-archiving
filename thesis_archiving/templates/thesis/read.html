@@ -1,9 +1,8 @@
+{% from "components/_pagination.html" import pagination %}
+
 {% extends "base.html" %}
 
 {% block body %}
-
-	{% include "components/navbar.html" %}
-	{% include "components/crudbar.html" %}
 
 	<div class="container">
 			
@@ -11,22 +10,79 @@
 			<div class="col-12 col-xl-10 py-3">
 				<div class="d-grid gap-3">
 					
-					{% for t in thesis %}
-						<div class="card shadow-sm border-0">
+					{% for thesis in theses.items %}
+						<div class="card shadow-sm border-0 overflow-auto">
 							<div class="card-body">
-								<h5 class="card-title">{{t.title}}</h5>
-								<h6 class="card-subtitle mb-2">
-									{{t.program_name}}
-									<small class="text-muted">{{t.category_name}}</small>
-								</h6>
-								<span class="badge bg-dark">{{t.research_area}}</span>
 
-								{% for k in t.research_keywords %}
-									<span class="badge rounded-pill bg-light text-dark">{{k}}</span>
-								{% endfor %}
+								<h5 class="card-title">
+									<div class="d-flex justify-content-between">
+										<!-- title -->
+										<div>
+											{{thesis.title}}
+										</div>
+
+										<!-- action buttons -->
+										{% if current_user.is_superuser or current_user.is_admin %}
+											<div class="d-flex flex-nowrap">
+												<a class="btn btn-sm btn-primary bi bi-pencil align-self-start mx-1" href="#" role="button"></a>
+												<a class="btn btn-sm btn-danger bi bi-trash align-self-start" href="#" role="button"></a>
+											</div>
+										{% endif %}
+
+									</div>
+								</h5>
 								
+								<!-- call number -->
+								{% if current_user.is_superuser or current_user.is_admin %}
+									{% if  thesis.sy_start and thesis.semester and thesis.number %}
+										<h6 class="card-subtitle mb-2">
+											{{thesis.sy_start}}-{{thesis.semester}}-{{thesis.category.code}}{{thesis.program.code}}-{{thesis.number}}
+										</h6>
+
+									{% endif %}
+
+								{% endif %}
+
+								<!-- program and category -->
+								<h6 class="card-subtitle mb-2">
+									{{thesis.program.name}}
+									<small class="text-muted">{{thesis.category.name}}</small>
+								</h6>
+
+								<h6 class="card-subtitle mb-2">
+									<!-- area -->
+									<span class="badge bg-dark">{{thesis.area if thesis.area else ''}}</span>
+									
+									<!-- keywords -->
+									{% if thesis.keywords %}
+										{% for keyword in thesis.keywords.split(',') %}
+											<span class="badge rounded-pill bg-light text-dark">{{keyword}}</span>
+										{% endfor %}
+									{% endif %}
+								</h6>
+								
+
+								{% if current_user.is_superuser or current_user.is_admin %}
+									<h6 class="card-subtitle mb-2">
+										<!-- adviser -->
+										<span class="badge bg-ueccss">{{thesis.adviser.full_name}}</span>
+										
+										<!-- proponents -->
+										{% for proponent in thesis.proponents %}
+											<span class="badge rounded-pill bg-secondary text-light">{{proponent.full_name}}</span>
+										{% endfor %}
+									</h6>
+								{% endif %}
+
+								<!-- overview -->
 								<p class="card-text small">
-									{{t.overview}}
+									{% if thesis.overview %}
+										{% if thesis.overview|length > 500 %}
+											{{thesis.overview[0:500]}}...
+										{% else %}
+											{{thesis.overview}}
+										{% endif %}
+									{% endif %}
 								</p>
 								
 							</div>
@@ -37,23 +93,10 @@
 			</div>
 		</div>
 
-		<nav aria-label="Page navigation example">
-			<ul class="pagination justify-content-center ">
-			  <li class="page-item">
-				<a class="page-link link-ueccss" href="#" aria-label="Previous">
-				  <span aria-hidden="true">&laquo;</span>
-				</a>
-			  </li>
-			  <li class="page-item"><a class="page-link link-ueccss" href="#">1</a></li>
-			  <li class="page-item"><a class="page-link link-ueccss" href="#">2</a></li>
-			  <li class="page-item"><a class="page-link link-ueccss" href="#">3</a></li>
-			  <li class="page-item">
-				<a class="page-link link-ueccss" href="#" aria-label="Next">
-				  <span aria-hidden="true">&raquo;</span>
-				</a>
-			  </li>
-			</ul>
-		  </nav>
-		  
+		
+		
 	</div>
+	
+	{{ pagination(theses, "thesis.read") }}
+	
 {% endblock %}

@@ -1,17 +1,8 @@
-{% macro crud_link(user, name, link="#") %}
+{% macro crud_link(name, link="#") %}
 
-    {% if name == "Thesis" %}
-        <li class="nav-item">
-            <a class="nav-link link-ueccss" aria-current="page" href="{{ link }}">{{ name }}</a>
-        </li>
-    
-    <!-- check if authorized user -->
-    {% elif True %}
-        <li class="nav-item">
-            <a class="nav-link link-ueccss disabled" aria-current="page" href="#">{{ name }}</a>
-        </li>
-    
-    {% endif %}
+    <li class="nav-item">
+        <a class="nav-link link-ueccss" aria-current="page" href="{{ link }}">{{ name }}</a>
+    </li>
 
 {% endmacro %}
 
@@ -21,13 +12,22 @@
             <div class="container-md">
                 <ul class="nav" style="min-width: 768px;">
                     
-                    {{ crud_link("test", "Thesis", url_for('thesis.read')) }}
+                    {{ crud_link("Thesis", url_for('thesis.read')) }}
                     
-                    {{ crud_link("test", "User") }}
+                    {% if current_user.is_superuser %}
+                        {{ crud_link("User", url_for('user.read')) }}
 
-                    {{ crud_link("test", "Subject") }}
+                    {% endif %}
                     
-                    {{ crud_link("test", "Program") }}
+                    {% if current_user.is_superuser or current_user.is_admin %}
+                        {{ crud_link("Program") }}
+
+                    {% endif %}
+
+                    {% if current_user.is_superuser or current_user.is_admin %}
+                        {{ crud_link("Category") }}
+
+                    {% endif %}
                     
                     <li class="nav-item ms-auto d-flex align-items-center">
                         <form>

@@ -15,15 +15,16 @@
 		
 		<style>
 			
+			body {
+				background-image: url("{{ url_for('static', filename='bg-white.png') }}");
+				background-repeat: no-repeat;
+				background-attachment: fixed;
+				background-size: cover;
+				background-position: center;
+			}
+			
 			{% block css %}
 
-				body {
-					background-image: url("{{ url_for('static', filename='bg-white.png') }}");
-					background-repeat: no-repeat;
-					background-attachment: fixed;
-					background-size: cover;
-					background-position: center;
-				}
 
 			{% endblock %}
 
@@ -32,12 +33,17 @@
 	</head>
 
 	<body class="bg-light">
-
-        
+		
+		{% if current_user.is_authenticated %}
+			{% include "components/navbar.html" %}
+			{% include "components/crudbar.html" %}
+			{% include "components/flash.html" %}
+        {% endif %}
+		
 		{% block body %}
 			
         {% endblock %}
-		
+
 		<!-- bootstrap js -->
 		<script src="{{ url_for('static', filename='bootstrap/bootstrap.bundle.min.js') }}"></script>
 

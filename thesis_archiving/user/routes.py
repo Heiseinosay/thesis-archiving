@@ -69,5 +69,8 @@ def logout():
 @user.route("/read")
 @login_required
 def read():
-    # login req
-    return "list of user"
+    # login 
+    page = request.args.get('page', 1, type=int)
+    users = User.query.order_by(User.full_name).paginate()
+
+    return render_template("user/read.html", users=users)

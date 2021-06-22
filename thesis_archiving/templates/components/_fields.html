@@ -3,7 +3,11 @@
 
     {% if result["valid"][name] %}
         <input type="{{type}}" name="{{name}}" value="{{value}}" class="form-control is-valid">
-
+        <!-- feedback div for ajax -->
+        <div class="">
+            
+        </div>
+        
     {% elif result["invalid"][name] %}
         <input type="{{type}}" name="{{name}}" value="{{value}}" class="form-control is-invalid">
         <div class="invalid-feedback">
