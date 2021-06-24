@@ -1,0 +1,65 @@
+{% from "components/_pagination.html" import pagination %}
+
+{% extends "base.html" %}
+
+{% block body %}
+
+	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-8 py-3">
+				<div class="card px-3">
+					<div class="card-body">
+						
+						<!-- title and create -->
+						<h3 class="card-title">
+							<div class="d-flex flex-wrap justify-content-between">
+								<span>
+									Log
+								</span>
+								<div class="d-flex flex-wrap align-items-start">
+									<a class="btn btn-sm btn-secondary me-1 bi bi-download" href="#" role="button"> Export</a>
+								</div>
+							</div>
+						</h3>
+
+						<!-- total -->
+						<h6 class="card-subtitle mb-2">
+							Total: {{logs.total}}
+						</h6>
+
+						<!-- table -->
+						<div class="table-responsive">
+
+							<table class="table table-borderless table-striped table-hover">
+								<thead>
+									<tr>
+										<th scope="col">#</th>
+										<th scope="col">Date</th>
+										<th scope="col">Username</th>
+										<th scope="col">Full Name</th>
+										<th scope="col">Description</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for log in logs.items %}
+										<tr>
+											<th scope="row">{{ logs.page * logs.per_page - logs.per_page + loop.index }}</th>
+											<td>{{ log.date }}</td>
+											<td>{{ log.user.username }}</td>
+											<td>{{ log.user.full_name }}</td>
+											<td>{{ log.description }}</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	{{ pagination(logs, "log.read") }}
+	
+{% endblock %}

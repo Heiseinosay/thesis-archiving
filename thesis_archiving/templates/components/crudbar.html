@@ -20,14 +20,12 @@
                     {% endif %}
                     
                     {% if current_user.is_superuser or current_user.is_admin %}
-                        {{ crud_link("Program") }}
+                        {{ crud_link("Program", url_for('program.read')) }}
+                        {{ crud_link("Category", url_for('category.read')) }}
+                        {{ crud_link("Log", url_for('log.read')) }}
 
                     {% endif %}
 
-                    {% if current_user.is_superuser or current_user.is_admin %}
-                        {{ crud_link("Category") }}
-
-                    {% endif %}
                     
                     <li class="nav-item ms-auto d-flex align-items-center">
                         <form>

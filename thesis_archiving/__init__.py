@@ -30,10 +30,16 @@ def create_app(config_class=Config):
     from thesis_archiving.main.routes import main
     from thesis_archiving.thesis.routes import thesis
     from thesis_archiving.user.routes import user
+    from thesis_archiving.log.routes import log
+    from thesis_archiving.program.routes import program
+    from thesis_archiving.category.routes import category
 
     app.register_blueprint(main)
     app.register_blueprint(thesis)
     app.register_blueprint(user)
+    app.register_blueprint(log)
+    app.register_blueprint(program)
+    app.register_blueprint(category)
     
     # import models for flask migrate
     from thesis_archiving.models import User

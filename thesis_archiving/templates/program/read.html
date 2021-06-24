@@ -1,20 +1,12 @@
 {% from "components/_pagination.html" import pagination %}
 
-{% macro role(attr) %}
-	{% if attr %}
-		<span class="text-success h6"><strong>{{attr}}</strong></span>
-	{% else %}
-		{{attr}}
-	{% endif %}
-{% endmacro %}
-
 {% extends "base.html" %}
 
 {% block body %}
 
 	<div class="container">
 		<div class="row justify-content-center">
-			<div class="col py-3">
+			<div class="col-12 col-md-8 col-xl-6 py-3">
 				<div class="card px-3">
 					<div class="card-body">
 						
@@ -22,19 +14,19 @@
 						<h3 class="card-title">
 							<div class="d-flex flex-wrap justify-content-between">
 								<span>
-									User
+									Program
 								</span>
 								<div class="d-flex flex-wrap align-items-start">
 									<a class="btn btn-sm btn-outline-secondary me-1 bi bi-upload" href="#" role="button"> Import</a>
 									<a class="btn btn-sm btn-secondary me-1 bi bi-download" href="#" role="button"> Export</a>
-									<a class="btn btn-sm btn-dark bi bi-plus-circle" href="#" role="button"> New User</a>
+									<a class="btn btn-sm btn-dark bi bi-plus-circle" href="#" role="button"> New Program</a>
 								</div>
 							</div>
 						</h3>
 
 						<!-- total -->
 						<h6 class="card-subtitle mb-2">
-							Total: {{users.total}}
+							Total: {{programs.total}}
 						</h6>
 
 						<!-- table -->
@@ -44,27 +36,17 @@
 								<thead>
 									<tr>
 										<th scope="col">#</th>
-										<th scope="col">Username</th>
-										<th scope="col">Full Name</th>
-										<th scope="col">Email</th>
-										<th scope="col">is_adviser</th>
-										<th scope="col">is_admin</th>
-										<th scope="col">is_superuser</th>
-										<th scope="col">Date Registered</th>
+										<th scope="col">Name</th>
+										<th scope="col">Code</th>
 										<th scope="col">Action</th>
 									</tr>
 								</thead>
 								<tbody>
-									{% for user in users.items %}
+									{% for program in programs.items %}
 										<tr>
-											<th scope="row">{{ users.page * users.per_page - users.per_page + loop.index }}</th>
-											<td>{{ user.username }}</td>
-											<td>{{ user.full_name }}</td>
-											<td>{{ user.email }}</td>
-											<td>{{ role(user.is_adviser) }}</td>
-											<td>{{ role(user.is_admin) }}</td>
-											<td>{{ role(user.is_superuser) }}</td>
-											<td>{{ user.date_registered }}</td>
+											<th scope="row">{{ programs.page * programs.per_page - programs.per_page + loop.index }}</th>
+											<td>{{ program.name }}</td>
+											<td>{{ program.code }}</td>
 											<td>
 												<a class="btn btn-sm btn-primary bi bi-pencil align-self-start mr-1" href="#" role="button"></a>
 												<a class="btn btn-sm btn-danger bi bi-trash align-self-start" href="#" role="button"></a>
@@ -81,6 +63,6 @@
 		</div>
 	</div>
 	
-	{{ pagination(users, "user.read") }}
+	{{ pagination(programs, "program.read") }}
 	
 {% endblock %}
