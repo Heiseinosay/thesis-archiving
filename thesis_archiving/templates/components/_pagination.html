@@ -2,15 +2,15 @@
     <div class="container-fluid overflow-auto mb-3">
         <nav>
             <ul class="pagination justify-content-center">
-                <li class="page-item"><a class="page-link link-ueccss" href="{{ url_for(route, page = 1 if paginate_obj.page == 1 else paginate_obj.page - 1) }}">&lsaquo;</a></li>
+                <li class="page-item"><a class="page-link link-ueccss" href="{{ url_for(route, page = (1 if paginate_obj.page == 1 else paginate_obj.page - 1), search = request.args.get('search','')) }}">&lsaquo;</a></li>
                 
                 {% for page in paginate_obj.iter_pages(right_current=3, left_edge=1, right_edge=1) %}
                     {% if page %}
                         {% if paginate_obj.page == page %}
-                            <li class="page-item"><a class="page-link link-light bg-ueccss" href="{{ url_for(route, page=page) }}">{{page}}</a></li>
+                            <li class="page-item"><a class="page-link link-light bg-ueccss" href="{{ url_for(route, page=page, search = request.args.get('search','')) }}">{{page}}</a></li>
 
                         {% else %}
-                            <li class="page-item"><a class="page-link link-ueccss" href="{{ url_for(route, page=page) }}">{{page}}</a></li>
+                            <li class="page-item"><a class="page-link link-ueccss" href="{{ url_for(route, page=page, search = request.args.get('search','')) }}">{{page}}</a></li>
 
                         {% endif %}
 
@@ -21,7 +21,7 @@
 
                 {% endfor %}
                 
-                <li class="page-item"><a class="page-link link-ueccss" href="{{ url_for(route, page = paginate_obj.pages if paginate_obj.page == paginate_obj.pages else paginate_obj.page + 1) }}">&rsaquo;</a></li>
+                <li class="page-item"><a class="page-link link-ueccss" href="{{ url_for(route, page = (paginate_obj.pages if paginate_obj.page == paginate_obj.pages else paginate_obj.page + 1), search = request.args.get('search','')) }}">&rsaquo;</a></li>
             </ul>
         </nav>
     </div>
