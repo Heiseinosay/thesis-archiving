@@ -9,7 +9,7 @@
 		<div class="row justify-content-center">
 			<div class="col-12 col-xl-10 py-3">
 				<div class="d-grid gap-3">
-					
+					<a class="btn btn-sm btn-secondary me-1 bi bi-download" href="{{ url_for('thesis.export') }}" role="button"> Export</a>
 					{% for thesis in theses.items %}
 						<div class="card shadow-sm border-0 overflow-auto">
 							<div class="card-body">

@@ -1,10 +1,10 @@
-from flask import Blueprint, url_for, redirect, render_template, request, flash
+from flask import Blueprint, url_for, redirect, render_template, request, flash, send_file
 from flask_login import login_user, current_user, login_required, logout_user
 from thesis_archiving import bcrypt, db
 from thesis_archiving.user.validation import LoginSchema, validate_input
 from thesis_archiving.models import User, Log
+from thesis_archiving.utils import export_to_excel
 from sqlalchemy import or_
-# from pprint import pprint
 
 user = Blueprint('user', __name__, url_prefix="/user")
 
@@ -82,3 +82,31 @@ def read():
         ).order_by(User.full_name).paginate(error_out=False)
 
     return render_template("user/read.html", users=users)
+
+@user.route("/export")
+@login_required
+def export():
+    
+    data = [ 
+        [
+            user.username,
+            user.full_name,
+            user.email,
+            user.is_adviser,
+            user.is_admin,
+            user.is_superuser
+        ] for user in User.query.order_by(User.full_name).all()
+    ] 
+    
+    columns = [
+        "username",
+        "full_name",
+        "email",
+        "is_adviser",
+        "is_admin",
+        "is_superuser"
+    ]
+
+    output, download_name = export_to_excel('thesis-archiving-user-', data, columns)
+
+    return send_file(output, as_attachment=True, download_name=download_name)

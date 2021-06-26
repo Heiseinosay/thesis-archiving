@@ -5,10 +5,8 @@ from sqlalchemy import or_
 
 category = Blueprint("category", __name__, url_prefix="/category")
 
-@category.before_request
-@login_required
-
 @category.route("/read")
+@login_required
 def read():
     page = request.args.get('page', 1, type=int)
     search = '%' + request.args.get('search', '') + '%'

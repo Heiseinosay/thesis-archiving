@@ -1,14 +1,14 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, send_file
 from flask_login import login_required
 from thesis_archiving.models import Log, User
+from thesis_archiving.utils import export_to_excel
 from sqlalchemy import or_
+from datetime import datetime
 
 log = Blueprint("log", __name__, url_prefix="/log")
 
-@log.before_request
-@login_required
-
 @log.route("/read")
+@login_required
 def read():
     page = request.args.get('page', 1, type=int)
     search = '%' + request.args.get('search', '') + '%'
@@ -21,3 +21,27 @@ def read():
         logs = Log.query.order_by(Log.date.desc()).paginate()
 
     return render_template("log/read.html", logs=logs)
+
+@log.route("/export")
+@login_required
+def export():
+
+    data = [
+        [
+            log.date.isoformat(),
+            log.user.username,
+            log.user.full_name,
+            log.description
+        ] for log in Log.query.order_by(Log.date.desc()).all()
+    ]
+
+    columns = [
+        "date",
+        "username",
+        "full_name",
+        "description"
+    ]
+
+    output, download_name = export_to_excel('thesis-archiving-log-', data, columns)
+
+    return send_file(output, as_attachment=True, download_name=download_name)

@@ -117,6 +117,7 @@ class Thesis(db.Model):
 				finilter yung is_old=False kasi baka may ma add na number sa hindi naman old
 		'''
 
-		thesis = Thesis.query.filter_by(is_old=False).filter(Thesis.number.isnot(None)).order_by(Thesis.date_registered.desc()).order_by(Thesis.id.desc()).order_by(Thesis.number.desc()).first()
-		
+		# thesis = Thesis.query.filter_by(is_old=False).filter(Thesis.number.isnot(None)).order_by(Thesis.date_registered.desc()).order_by(Thesis.id.desc()).order_by(Thesis.number.desc()).first()
+		thesis = Thesis.query.filter_by(is_old=False).filter(Thesis.number.isnot(None)).order_by(Thesis.number.desc()).first()
+
 		return thesis.number + 1 if (thesis and thesis.number) else 1 
