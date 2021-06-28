@@ -18,7 +18,7 @@ def export_to_excel(file_prefix, data, columns):
     df = pd.DataFrame(data, columns=columns)
 
     # write data to binary object
-    df.to_excel(writer)
+    df.to_excel(writer, index=False)
     writer.save()
 
     # seek pointer to beginning of the object to return the whole content
