@@ -1,4 +1,6 @@
 {% from "components/_pagination.html" import pagination %}
+{% from "components/_data_actions.html" import data_actions %}
+{% from "components/_thesis_card.html" import thesis_card %}
 
 {% extends "base.html" %}
 
@@ -9,86 +11,12 @@
 		<div class="row justify-content-center">
 			<div class="col-12 col-xl-10 py-3">
 				<div class="d-grid gap-3">
-					<a class="btn btn-sm btn-secondary me-1 bi bi-download" href="{{ url_for('thesis.export') }}" role="button"> Export</a>
-					{% for thesis in theses.items %}
-						<div class="card shadow-sm border-0 overflow-auto">
-							<div class="card-body">
-
-								<h5 class="card-title">
-									<div class="d-flex justify-content-between">
-										<!-- title -->
-										<div>
-											{{thesis.title}}
-										</div>
-
-										<!-- action buttons -->
-										{% if current_user.is_superuser or current_user.is_admin %}
-											<div class="d-flex flex-nowrap">
-												<a class="btn btn-sm btn-primary bi bi-pencil align-self-start mx-1" href="#" role="button"></a>
-												<a class="btn btn-sm btn-danger bi bi-trash align-self-start" href="#" role="button"></a>
-											</div>
-										{% endif %}
-
-									</div>
-								</h5>
-								
-								<!-- call number -->
-								{% if current_user.is_superuser or current_user.is_admin %}
-									{% if  thesis.sy_start and thesis.semester and thesis.number %}
-										<h6 class="card-subtitle mb-2">
-											{{thesis.sy_start}}-{{thesis.semester}}-{{thesis.category.code}}{{thesis.program.code}}-{{thesis.number}}
-										</h6>
-
-									{% endif %}
-
-								{% endif %}
-
-								<!-- program and category -->
-								<h6 class="card-subtitle mb-2">
-									{{thesis.program.name}}
-									<small class="text-muted">{{thesis.category.name}}</small>
-								</h6>
-
-								<h6 class="card-subtitle mb-2">
-									<!-- area -->
-									<span class="badge bg-dark">{{thesis.area if thesis.area else ''}}</span>
-									
-									<!-- keywords -->
-									{% if thesis.keywords %}
-										{% for keyword in thesis.keywords.split(',') %}
-											<span class="badge rounded-pill bg-light text-dark">{{keyword}}</span>
-										{% endfor %}
-									{% endif %}
-								</h6>
-								
-
-								{% if current_user.is_superuser or current_user.is_admin %}
-									<h6 class="card-subtitle mb-2">
-										<!-- adviser -->
-										<span class="badge bg-ueccss">{{thesis.adviser.full_name}}</span>
-										
-										<!-- proponents -->
-										{% for proponent in thesis.proponents %}
-											<span class="badge rounded-pill bg-secondary text-light">{{proponent.full_name}}</span>
-										{% endfor %}
-									</h6>
-								{% endif %}
-
-								<!-- overview -->
-								<p class="card-text small">
-									{% if thesis.overview %}
-										{% if thesis.overview|length > 500 %}
-											{{thesis.overview[0:500]}}...
-										{% else %}
-											{{thesis.overview}}
-										{% endif %}
-									{% endif %}
-								</p>
-								
-							</div>
-						</div>
-					{% endfor %}
 					
+					{{ data_actions(export_url='thesis.export') }}
+					{% for thesis in theses.items %}
+						{{ thesis_card(thesis, current_user) }}	
+					{% endfor %}					
+
 				</div>
 			</div>
 		</div>

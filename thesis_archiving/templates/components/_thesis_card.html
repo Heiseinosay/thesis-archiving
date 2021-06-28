@@ -1,0 +1,80 @@
+{% macro thesis_card(thesis, current_user) %}
+
+    <div class="card shadow-sm border-0 overflow-auto">
+        <div class="card-body">
+
+            <h5 class="card-title">
+                <div class="d-flex justify-content-between">
+                    <!-- title -->
+                    <div>
+                        {{thesis.title}}
+                    </div>
+
+                    <!-- action buttons -->
+                    {% if current_user.is_superuser or current_user.is_admin %}
+                        <div class="d-flex flex-nowrap">
+                            <a class="btn btn-sm btn-primary bi bi-pencil align-self-start mx-1" href="#" role="button"></a>
+                            <a class="btn btn-sm btn-danger bi bi-trash align-self-start" href="#" role="button"></a>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </h5>
+            
+            <!-- call number -->
+            {% if current_user.is_superuser or current_user.is_admin %}
+                {% if  thesis.sy_start and thesis.semester and thesis.number %}
+                    <h6 class="card-subtitle mb-2">
+                        {{thesis.sy_start}}-{{thesis.semester}}-{{thesis.category.code}}{{thesis.program.code}}-{{thesis.number}}
+                    </h6>
+
+                {% endif %}
+
+            {% endif %}
+
+            <!-- program and category -->
+            <h6 class="card-subtitle mb-2">
+                {{thesis.program.name}}
+                <small class="text-muted">{{thesis.category.name}}</small>
+            </h6>
+
+            <h6 class="card-subtitle mb-2">
+                <!-- area -->
+                <span class="badge bg-dark">{{thesis.area if thesis.area else ''}}</span>
+                
+                <!-- keywords -->
+                {% if thesis.keywords %}
+                    {% for keyword in thesis.keywords.split(',') %}
+                        <span class="badge rounded-pill bg-light text-dark">{{keyword}}</span>
+                    {% endfor %}
+                {% endif %}
+            </h6>
+            
+
+            {% if current_user.is_superuser or current_user.is_admin %}
+                <h6 class="card-subtitle mb-2">
+                    <!-- adviser -->
+                    <span class="badge bg-ueccss">{{thesis.adviser.full_name}}</span>
+                    
+                    <!-- proponents -->
+                    {% for proponent in thesis.proponents %}
+                        <span class="badge rounded-pill bg-secondary text-light">{{proponent.full_name}}</span>
+                    {% endfor %}
+                </h6>
+            {% endif %}
+
+            <!-- overview -->
+            <p class="card-text small">
+                {% if thesis.overview %}
+                    {% if thesis.overview|length > 500 %}
+                        {{thesis.overview[0:500]}}...
+                    {% else %}
+                        {{thesis.overview}}
+                    {% endif %}
+                {% endif %}
+            </p>
+            
+        </div>
+    </div>
+
+{% endmacro %}

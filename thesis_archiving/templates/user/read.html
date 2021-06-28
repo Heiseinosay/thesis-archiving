@@ -1,4 +1,5 @@
 {% from "components/_pagination.html" import pagination %}
+{% from "components/_data_actions.html" import data_actions %}
 
 {% macro role(attr) %}
 	{% if attr %}
@@ -15,7 +16,7 @@
 	<div class="container">
 		<div class="row justify-content-center">
 			<div class="col py-3">
-				<div class="card px-3">
+				<div class="card px-3 shadow-sm border-0">
 					<div class="card-body">
 						
 						<!-- title and create -->
@@ -25,9 +26,7 @@
 									User
 								</span>
 								<div class="d-flex flex-wrap align-items-start">
-									<a class="btn btn-sm btn-outline-secondary me-1 bi bi-upload" href="#" role="button"> Import</a>
-									<a class="btn btn-sm btn-secondary me-1 bi bi-download" href="{{ url_for('user.export') }}" role="button"> Export</a>
-									<a class="btn btn-sm btn-dark bi bi-plus-circle" href="#" role="button"> New User</a>
+									{{ data_actions(export_url='user.export') }}
 								</div>
 							</div>
 						</h3>
