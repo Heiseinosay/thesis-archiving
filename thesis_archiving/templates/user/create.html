@@ -1,0 +1,87 @@
+{% from "components/_fields.html" import field, field_checkbox %}
+
+{% extends "base.html" %}
+
+{% block body %}
+
+	<div class="container py-3">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-7">
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h3 class="card-title">
+							Create User
+						</h3>
+                        
+                        <form action="" method="POST">
+                            {% include "components/csrf_token.html" %}
+
+                            <!-- username -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Username</label>
+                                {{ field("text", "username", result, request.form['username']) }}
+                            </div>
+
+                            <!-- full name -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Full Name</label>
+                                {{ field("text", "full_name", result, request.form['full_name']) }}
+                            </div>
+
+                            <!-- email -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Email</label>
+                                {{ field("email", "email", result, request.form['email']) }}
+                            </div>
+
+                            <!-- roles -->
+                            <div class="mb-4 row">
+                                <label class="form-label h6">Roles</label>
+                                
+                                <!-- adviser -->
+                                <div class="col-12 col-sm-4">
+                                    {{ field_checkbox("is_adviser", result, "Adviser", request.form['is_adviser']) }}
+                                </div>
+
+                                {% if current_user.is_superuser %}
+                                    <!-- admin -->
+                                    <div class="col-12 col-sm-4">
+                                        {{ field_checkbox("is_admin", result, "Admin", request.form['is_admin']) }}
+                                    </div>
+                                    <!-- su -->
+                                    <div class="col-12 col-sm-4">
+                                        {{ field_checkbox("is_superuser", result, "Superuser", request.form['is_superuser']) }}
+                                    </div>    
+    
+                                {% endif %}
+
+                            </div>
+                            
+                            <!-- pw -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Password</label>
+                                {{ field("password", "password", result, request.form['password']) }}
+                            </div>
+
+                            <!-- confirm pw -->
+                            <div class="mb-5">
+                                <label class="form-label h6">Confirm Password</label>
+                                {{ field("password", "confirm_password", result, request.form['confirm_password']) }}
+                            </div>
+
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-ueccss" type="submit">Create</button>    
+                            </div>
+                        </form>
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </div>		
+	</div>
+	
+	
+	
+{% endblock %}

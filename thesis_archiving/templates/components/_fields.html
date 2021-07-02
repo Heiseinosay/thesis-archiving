@@ -1,30 +1,111 @@
 <!-- general field -->
-{% macro field(type, name, result, value="") %}
+{% macro field(type, name, result, value) %}
+
+    {% set input_class = "form-control" %}
+    {% set feedback_class = "" %}
 
     {% if result["valid"][name] %}
-        <input type="{{type}}" name="{{name}}" value="{{value}}" class="form-control is-valid">
-        <!-- feedback div for ajax -->
-        <div class="">
-            
-        </div>
-        
-    {% elif result["invalid"][name] %}
-        <input type="{{type}}" name="{{name}}" value="{{value}}" class="form-control is-invalid">
-        <div class="invalid-feedback">
-            {% for msg in result["invalid"][name] %}
-                <p class="mb-0"><small>{{msg}}</small></p>
-            {% endfor %}
-        </div>
-
-    {% else %}
-        <input type="{{type}}" name="{{name}}" value="{{value}}" class="form-control">
-        
-        <!-- feedback div for ajax -->
-        <div class="">
-            
-        </div>
-        
+        {% set input_class = input_class + " is-valid" %}
     {% endif %}
+    {% if result["invalid"][name] %}
+        {% set input_class = input_class + " is-invalid" %}
+        {% set feedback_class = "invalid-feedback" %}
+
+    {% endif %}
+
+    <input type="{{type}}" name="{{name}}" value="{{value|trim}}" class="{{ input_class }}">
+    
+    <!-- feedback div for ajax -->
+    {{ feedback(feedback_class, result["invalid"][name]) }}
 
 {% endmacro %}
 
+
+<!-- select field -->
+{% macro field_select(name, result, choices, value) %}
+
+    {% set select_class = "form-select form-control" %}
+    {% set feedback_class = "" %}
+
+    {% if result["valid"][name] %}
+        {% set select_class = select_class + " is-valid" %}
+    {% endif %}
+    {% if result["invalid"][name] %}
+        {% set select_class = select_class + " is-invalid" %}
+        {% set feedback_class = "invalid-feedback" %}
+
+    {% endif %}
+    
+    <select class="{{ select_class }}" name="{{ name }}">
+        <option selected disabled value="">...</option>
+        {% for k, v in choices.items() %}
+            {% if value and k == value | int %}
+                <option selected value="{{ k }}">{{ v }}</option>
+            {% else %}
+                <option value="{{ k }}">{{ v }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+
+    <!-- feedback div for ajax -->
+    {{ feedback(feedback_class, result["invalid"][name]) }}
+
+{% endmacro %}
+
+
+<!-- textarea -->
+{% macro field_textarea(name, result, value) %}
+
+    {% set textarea_class = "form-control" %}
+    {% set feedback_class = "" %}
+
+    {% if result["valid"][name] %}
+        {% set textarea_class = textarea_class + " is-valid" %}
+    {% endif %}
+    {% if result["invalid"][name] %}
+        {% set textarea_class = textarea_class + " is-invalid" %}
+        {% set feedback_class = "invalid-feedback" %}
+
+    {% endif %}
+
+    <textarea name="{{name}}" placeholder="Brief thesis overview..." class="{{ textarea_class }}" rows="10">{{value}}</textarea>
+    <!-- feedback div for ajax -->
+    {{ feedback(feedback_class, result["invalid"][name]) }}
+
+{% endmacro %}
+
+<!-- checkbox -->
+{% macro field_checkbox(name, result, label, value) %}
+
+    {% set check_class = "form-check-input" %}
+    {% set feedback_class = "" %}
+
+    {% if result["valid"][name] %}
+        {% set check_class = check_class + " is-valid" %}
+    {% endif %}
+
+    {% if result["invalid"][name] %}
+        {% set check_class = check_class + " is-invalid" %}
+        {% set feedback_class = "invalid-feedback" %}
+    {% endif %}
+
+    <input class="{{ check_class }}" type="checkbox" value="1" {{ 'checked' if value else '' }} name="{{ name }}">
+    <label class="form-check-label">
+        {{ label }}
+    </label>
+{% endmacro %}
+
+<!-- feedback -->
+{% macro feedback(feedback_class, result) %}
+    <!-- id = feedback-{{name}} -->
+    <div class="{{ feedback_class }}">
+        
+        {% if result %}
+            {% for msg in result %}
+                <p class="mb-0"><small>{{msg}}</small></p>
+            {% endfor %}
+        {% endif %}
+
+    </div>
+
+{% endmacro %}

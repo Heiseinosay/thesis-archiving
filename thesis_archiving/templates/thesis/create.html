@@ -1,0 +1,136 @@
+{% from "components/_fields.html" import field, field_select, field_textarea %}
+
+{% extends "base.html" %}
+
+{% block body %}
+
+	<div class="container py-3">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-7">
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h3 class="card-title">
+							Create Thesis
+						</h3>
+                        
+                        <form action="" method="POST">
+                            {% include "components/csrf_token.html" %}
+
+                            <!-- title -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Title</label>
+                                {{ field("text", "title", result, request.form['title']) }}
+                            </div>
+
+                            <!-- adviser -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Adviser</label>
+                                {{ field_select("adviser_id", result, choices['adviser_id'], request.form['adviser_id']) }}
+                            </div>
+
+                            <!-- proponents -->
+                            <div class="mb-3">
+                                <label class="form-label h6 mb-0">Proponents Student Number</label>
+                                <p class="mb-2"><small>Comma-separated without spaces.</small></p>
+                                {{ field("text", "proponents", result, request.form['proponents']) }}
+                            </div>
+                            
+                            <div class="my-5">
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <!-- program -->
+                                <div class="col-12 col-sm-6">
+                                    <label class="form-label h6">Program</label>
+                                    {{ field_select("program_id", result, choices['program_id'], request.form['program_id']) }}
+                                </div>
+                                
+                                <!-- category -->
+                                <div class="col-12 col-sm-6">
+                                    <label class="form-label h6">Category</label>
+                                    {{ field_select("category_id", result, choices['category_id'], request.form['category_id']) }}        
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <!-- sy -->
+                                <div class="col-12 col-sm-4">
+                                    <label class="form-label h6">School Year</label>
+                                    {{ field_select("sy_start", result, choices['sy_start'], request.form['sy_start']) }}
+                                </div>
+                                
+                                <!-- sem -->
+                                <div class="col-12 col-sm-4">
+                                    <label class="form-label h6">Semester</label>
+                                    {{ field_select("semester", result, choices['semester'], request.form['semester']) }}
+                                </div>
+                                
+                                <!-- is_old -->
+                                <div class="col-12 col-sm-4">
+                                    <label class="form-label h6">Batch</label>
+                                    {{ field_select("is_old", result, choices['is_old'], request.form['is_old']) }}
+                                </div>
+                            </div>
+
+                            <div class="my-5">
+                            </div>
+
+                            <!-- area -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Area</label>
+                                {{ field("text", "area", result, request.form['area']) }}
+                            </div>
+
+                            <!-- keywords -->
+                            <div class="mb-3">
+                                <label class="form-label h6 mb-0">Keywords</label>
+                                <p class="mb-2"><small>Comma-separated.</small></p>
+                                {{ field("text", "keywords", result, request.form['keywords']) }}
+                            </div>
+
+                            <!-- overview -->
+                            <div class="mb-5">
+                                <label class="form-label h6">Overview</label>
+                                {{ field_textarea("overview", result, request.form['overview']) }}
+                            </div>
+
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-ueccss" type="submit">Create</button>    
+                            </div>
+                        </form>
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </div>		
+	</div>
+	
+	
+	
+{% endblock %}
+
+{# 
+==basic info
+title - input/
+
+adviser_id - dropdown/
+proponents - input
+
+program_id - dropdown/
+category_id - dropdown/
+
+sy_start - input/
+semester - dropdown/
+is_old - check/
+
+==Descriptions
+area - input
+keywords - input
+overview - textarea
+
+
+number - backend
+date_registered - backend
+#}

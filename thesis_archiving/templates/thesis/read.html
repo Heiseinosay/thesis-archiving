@@ -12,7 +12,12 @@
 			<div class="col-12 col-xl-10 py-3">
 				<div class="d-grid gap-3">
 					
-					{{ data_actions(export_url='thesis.export') }}
+					{% if current_user.is_superuser or current_user.is_admin %}
+						<div class="d-flex flex-wrap justify-content-end">
+							{{ data_actions(export_url='thesis.export', create_url='thesis.create', create_label='Thesis') }}
+						</div>
+					{% endif %}
+
 					{% for thesis in theses.items %}
 						{{ thesis_card(thesis, current_user) }}	
 					{% endfor %}					

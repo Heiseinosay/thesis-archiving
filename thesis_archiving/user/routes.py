@@ -1,10 +1,12 @@
 from flask import Blueprint, url_for, redirect, render_template, request, flash, send_file
 from flask_login import login_user, current_user, login_required, logout_user
 from thesis_archiving import bcrypt, db
-from thesis_archiving.user.validation import LoginSchema, validate_input
+from thesis_archiving.user.validation import LoginSchema, CreateUserSchema
 from thesis_archiving.models import User, Log
 from thesis_archiving.utils import export_to_excel
+from thesis_archiving.validation import validate_input
 from sqlalchemy import or_
+from pprint import pprint
 
 user = Blueprint('user', __name__, url_prefix="/user")
 
@@ -110,3 +112,49 @@ def export():
     output, download_name = export_to_excel('thesis-archiving-user-', data, columns)
 
     return send_file(output, as_attachment=True, download_name=download_name)
+
+@user.route("/create", methods=["POST","GET"])
+@login_required
+def create():
+    result = {
+        'valid' : {},
+        'invalid' : {}
+    }
+
+    if request.method == "POST":
+        
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+        
+        
+        # marshmallow validation
+        result = validate_input(data, CreateUserSchema)
+        pprint(result)
+
+        if not result['invalid']:
+            # prevent premature flushing
+            with db.session.no_autoflush:
+                # values for validated and filtered input
+                data = result['valid']
+                
+                # init model obj + fill in values
+                _user = User()
+
+                _user.username = data['username']
+                _user.full_name = data['full_name']
+                _user.email = data['email']
+                _user.password = bcrypt.generate_password_hash(data['password'])
+                _user.is_adviser = data['is_adviser']
+                _user.is_admin = data['is_admin']
+                _user.is_superuser = data['is_superuser']
+
+                try:
+                    db.session.add(_user)
+                    db.session.commit()
+                    flash("Successfully created new user.", "success")
+                    return redirect(url_for('user.read'))
+
+                except:
+                    flash("An error occured", "danger")
+
+    return render_template("user/create.html", result=result)

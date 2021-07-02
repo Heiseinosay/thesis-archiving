@@ -34,7 +34,7 @@
 				<p class="text-center mb-4">CCSS Thesis Archiving</p>
 				
 				<form class="row" method="POST" action="">
-					<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+					{% include "components/csrf_token.html" %}
 					
 					<!-- username -->
 					<div class="mb-3">

@@ -1,4 +1,4 @@
-{% macro data_actions(import_url='',export_url='',new_url='',new_label='') %}
+{% macro data_actions(import_url='',export_url='',create_url='',create_label='') %}
 
     {% if import_url %}
         <a class="btn btn-sm btn-outline-secondary me-1 bi bi-upload" href="{{ url_for(import_url) }}" role="button"> Import</a>
@@ -8,8 +8,8 @@
         <a class="btn btn-sm btn-secondary me-1 bi bi-download" href="{{ url_for(export_url) }}" role="button"> Export</a>
     {% endif %}
 
-    {% if new_url %}
-        <a class="btn btn-sm btn-dark bi bi-plus-circle" href="{{ url_for(new_url) }}" role="button"> New {{ new_label }}</a>
+    {% if create_url %}
+        <a class="btn btn-sm btn-dark bi bi-plus-circle" href="{{ url_for(create_url) }}" role="button"> Create {{ create_label }}</a>
     {% endif %}
     
 {% endmacro %}
