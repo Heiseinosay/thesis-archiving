@@ -3,7 +3,7 @@ from flask_login import login_user, current_user, login_required, logout_user
 from thesis_archiving import bcrypt, db
 from thesis_archiving.user.validation import LoginSchema, CreateUserSchema
 from thesis_archiving.models import User, Log
-from thesis_archiving.utils import export_to_excel
+from thesis_archiving.utils import export_to_excel, has_roles
 from thesis_archiving.validation import validate_input
 from sqlalchemy import or_
 from pprint import pprint
@@ -71,6 +71,7 @@ def logout():
 
 @user.route("/read")
 @login_required
+@has_roles("is_admin")
 def read():
     # login 
     page = request.args.get('page', 1, type=int)
@@ -87,6 +88,7 @@ def read():
 
 @user.route("/export")
 @login_required
+@has_roles("is_admin")
 def export():
     
     data = [ 
@@ -115,6 +117,7 @@ def export():
 
 @user.route("/create", methods=["POST","GET"])
 @login_required
+@has_roles("is_superuser")
 def create():
     result = {
         'valid' : {},

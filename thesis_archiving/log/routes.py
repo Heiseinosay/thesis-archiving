@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, send_file
 from flask_login import login_required
 from thesis_archiving.models import Log, User
-from thesis_archiving.utils import export_to_excel
+from thesis_archiving.utils import export_to_excel, has_roles
 from sqlalchemy import or_
 from datetime import datetime
 
@@ -9,6 +9,7 @@ log = Blueprint("log", __name__, url_prefix="/log")
 
 @log.route("/read")
 @login_required
+@has_roles("is_admin")
 def read():
     page = request.args.get('page', 1, type=int)
     search = '%' + request.args.get('search', '') + '%'
@@ -24,6 +25,7 @@ def read():
 
 @log.route("/export")
 @login_required
+@has_roles("is_admin")
 def export():
 
     data = [

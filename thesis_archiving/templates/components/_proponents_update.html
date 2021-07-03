@@ -1,0 +1,62 @@
+{% macro proponents_update(thesis_id, proponents) %}
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+
+            <h3 class="card-title">
+                Proponents
+            </h3>
+
+            <div class="table-responsive">
+
+                <table class="table table-borderless table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Student #</th>
+                            <th scope="col">Full Name</th>
+                            <th scope="col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for proponent in proponents %}
+                            <tr>
+                                <form action="{{ url_for('thesis.proponent_remove',thesis_id=thesis_id, user_id=proponent.id) }}" method="POST">
+                                    {% include "components/csrf_token.html" %}
+                                    <td>
+                                        {{ proponent.username }}
+                                    </td>
+                                    <td>
+                                        {{ proponent.full_name }}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-danger bi bi-person-dash" type="submit"> Remove</button>
+                                    </td>
+                                </form>                
+                            </tr>
+                        {% endfor %}
+                        
+                        <tr>
+                            <td colspan="3">
+                                <form action="{{ url_for('thesis.proponent_add', thesis_id=thesis_id) }}" method="POST">
+                                    {% include "components/csrf_token.html" %}
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control" placeholder="Student number" name="username">
+                                        <button class="btn btn-ueccss" type="submit"><i class="bi bi bi-person-plus"></i> Add</button>
+                                      </div>
+                                </form>
+                            </td>            
+                        </tr>
+                    </tbody>
+    
+                </table>
+
+            </div>
+
+            
+
+        </div>
+
+    </div>
+
+{% endmacro %}

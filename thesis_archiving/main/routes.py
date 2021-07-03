@@ -1,11 +1,13 @@
 from flask import Blueprint, url_for, redirect, render_template
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 main = Blueprint('main', __name__)
 
 @main.route("/")
-@login_required
 def home():
-    # redir to login if anon
     # redir to thesis read if logged in
-    return redirect(url_for("thesis.read"))
+    if current_user.is_authenticated:
+        return redirect(url_for("thesis.read"))
+    
+    # redir to login if anon
+    return redirect(url_for("user.login"))

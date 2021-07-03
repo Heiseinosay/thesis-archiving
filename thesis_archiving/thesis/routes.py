@@ -2,12 +2,11 @@ from flask import Blueprint, render_template, request, redirect, url_for, send_f
 from flask_login import login_required
 from thesis_archiving import db
 from thesis_archiving.models import Thesis, User, Program, Category
-from thesis_archiving.utils import export_to_excel
+from thesis_archiving.utils import export_to_excel, has_roles
 from thesis_archiving.validation import validate_input
-from thesis_archiving.thesis.validation import CreateThesisSchema
+from thesis_archiving.thesis.validation import CreateThesisSchema, UpdateThesisSchema
+from thesis_archiving.thesis.utils import select_choices
 from sqlalchemy import or_
-from datetime import datetime
-import pytz
 from pprint import pprint
 
 thesis = Blueprint("thesis", __name__, url_prefix="/thesis")
@@ -43,6 +42,7 @@ def read():
 
 @thesis.route("/export")
 @login_required
+@has_roles("is_admin")
 def export():
 
     # rows
@@ -92,19 +92,11 @@ def export():
 
 @thesis.route("/create", methods=["POST", "GET"])
 @login_required
+@has_roles("is_admin")
 def create():
     result = {
         'valid' : {},
         'invalid' : {}
-    }
-
-    choices = {
-        'adviser_id' : {adviser.id : adviser.full_name for adviser in User.query.filter_by(is_adviser=True).order_by(User.full_name).all()},
-        'program_id' : {program.id : program.name for program in Program.query.order_by(Program.name).all()},
-        'category_id' : {category.id : category.name for category in Category.query.order_by(Category.name).all()},
-        'sy_start' : { year : year for year in range(2000, datetime.now(tz=pytz.timezone('Asia/Manila')).year + 1)},
-        'semester' : {1:1, 2:2},
-        'is_old' : {1:'Old', 0:'New'}
     }
 
     if request.method == "POST":
@@ -151,4 +143,108 @@ def create():
                 except:
                     flash("An error occured", "danger")
 
-    return render_template("thesis/create.html", result=result, choices=choices)
+    return render_template("thesis/create.html", result=result, select_choices=select_choices())
+
+@thesis.route("/update/<int:thesis_id>", methods=["POST", "GET"])
+@login_required
+@has_roles("is_admin")
+def update(thesis_id):
+    _thesis = Thesis.query.get_or_404(thesis_id)
+
+    result = {
+        'valid' : {},
+        'invalid' : {}
+    }
+
+    if request.method == "POST":
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+        
+        # marshmallow validation
+        result = validate_input(data, UpdateThesisSchema)
+        
+        if not result['invalid']:
+            # prevent premature flushing
+            with db.session.no_autoflush:
+                # values for validated and filtered input
+                data = result['valid']
+
+                _thesis.title = data['title']
+                _thesis.sy_start = data['sy_start']
+                _thesis.semester = data['semester']
+                _thesis.is_old = data['is_old']
+                _thesis.area = data['area']
+                _thesis.keywords = data['keywords']
+                _thesis.overview = data['overview']
+
+                _thesis.adviser = User.query.get(data['adviser_id'])
+                _thesis.program = Program.query.get(data['program_id'])
+                _thesis.category = Category.query.get(data['category_id'])
+                
+                # when setting to new batch, add number
+                if not _thesis.is_old and not _thesis.number:
+                    _thesis.number = Thesis.thesis_number()
+
+                try:
+                    db.session.commit()
+                    flash("Successfully updated thesis.", "success")
+                    return redirect(url_for('thesis.read'))
+
+                except:
+                    flash("An error occured", "danger")
+
+    return render_template("thesis/update.html", thesis=_thesis, result=result, select_choices=select_choices())
+
+@thesis.route("/delete/<int:thesis_id>", methods=["POST"])
+@login_required
+@has_roles("is_admin")
+def delete(thesis_id):
+    _thesis = Thesis.query.get_or_404(thesis_id)
+    try:
+        db.session.delete(_thesis)
+        db.session.commit()
+        flash("Successfully deleted a thesis.","success")
+    except:
+        flash("An error occured.","danger")
+
+    return redirect(url_for('thesis.read'))
+
+@thesis.route("/proponent/add/<int:thesis_id>", methods=["POST"])
+@login_required
+@has_roles("is_admin")
+def proponent_add(thesis_id):
+
+    _thesis = Thesis.query.get_or_404(thesis_id)
+    _user = User.query.filter_by(username=request.form['username']).first()
+
+    if _user:
+        if _user in _thesis.proponents:
+            flash("User is already a proponent.", "warning")
+        else:
+            try:
+                _thesis.proponents.append(_user)
+                db.session.commit()
+                flash("Proponent successfully added.", "success")    
+            except:
+                flash("An error occured.", "danger")    
+    else:
+        flash("User does not exist.", "danger")
+
+
+    return redirect(url_for("thesis.update", thesis_id=_thesis.id))
+
+@thesis.route("/proponent/remove/<int:thesis_id>/<int:user_id>", methods=["POST"])
+@login_required
+@has_roles("is_admin")
+def proponent_remove(thesis_id, user_id):
+    
+    _thesis = Thesis.query.get_or_404(thesis_id)
+    _user = User.query.get_or_404(user_id)
+    try:
+        _thesis.proponents.remove(_user)
+        db.session.commit()
+        flash("Successfully removed a proponent", "success")
+    except:
+        flash("An error occured.", "danger")
+
+    return redirect(url_for("thesis.update", thesis_id=_thesis.id))

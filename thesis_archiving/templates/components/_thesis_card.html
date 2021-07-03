@@ -1,3 +1,5 @@
+{% from "components/_delete_modal.html" import delete_modal %}
+
 {% macro thesis_card(thesis, current_user) %}
 
     <div class="card shadow-sm border-0 overflow-auto">
@@ -13,8 +15,10 @@
                     <!-- action buttons -->
                     {% if current_user.is_superuser or current_user.is_admin %}
                         <div class="d-flex flex-nowrap">
-                            <a class="btn btn-sm btn-primary bi bi-pencil align-self-start mx-1" href="#" role="button"></a>
-                            <a class="btn btn-sm btn-danger bi bi-trash align-self-start" href="#" role="button"></a>
+                            <a class="btn btn-sm btn-primary bi bi-pencil align-self-start mx-1" href="{{ url_for('thesis.update', thesis_id=thesis.id) }}" role="button"></a>
+
+                            {{ delete_modal(url_for('thesis.delete', thesis_id=thesis.id)) }}
+                            
                         </div>
                     {% endif %}
 
@@ -23,7 +27,7 @@
             
             <!-- call number -->
             {% if current_user.is_superuser or current_user.is_admin %}
-                {% if  thesis.sy_start and thesis.semester and thesis.number %}
+                {% if not thesis.is_old and thesis.sy_start and thesis.semester and thesis.number %}
                     <h6 class="card-subtitle mb-2">
                         {{thesis.sy_start}}-{{thesis.semester}}-{{thesis.category.code}}{{thesis.program.code}}-{{thesis.number}}
                     </h6>

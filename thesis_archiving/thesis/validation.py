@@ -6,6 +6,7 @@ import pytz
 
 class CreateThesisSchema(Schema):
 	csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
+	
 	title = fields.Str(required=True, validate=validate.And(
 		validate_empty, validate.Length(1,250)
 		))
@@ -78,3 +79,42 @@ class CreateThesisSchema(Schema):
 	def create_data(self, data, **kwargs):
 		data['proponents'] = data['proponents'].split(',')
 		return data
+
+class UpdateThesisSchema(Schema):
+	csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
+	
+	title = fields.Str(required=True, validate=validate.And(
+		validate_empty, validate.Length(1,250)
+		))
+	
+	is_old = fields.Bool(required=True)
+	
+	overview = fields.Str(required=True, validate=validate.And(
+		validate_empty, validate.Length(1,10000)
+		))
+	
+	area = fields.Str(required=True, validate=validate.And(
+		validate_empty, validate.Length(1,120)
+		))
+	
+	keywords = fields.Str(required=True, validate=validate.And(
+		validate_empty, validate.Length(1,250)
+		))
+	
+	sy_start = fields.Int(required=True, validate=validate.Range(min=1, max=datetime.now(tz=pytz.timezone('Asia/Manila')).year))
+	
+	semester = fields.Int(required=True, validate=validate.Range(min=1, max=2))
+
+	adviser_id = fields.Int(required=True)
+	category_id = fields.Int(required=True)
+	program_id = fields.Int(required=True)
+
+	@pre_load
+	def strip_fields(self, in_data, **kwargs):
+		# dont strip password kasi baka may mag set ng spaces yung first and last lmao
+		in_data["title"] = in_data["title"].strip()
+		in_data["overview"] = in_data["overview"].strip()
+		in_data["area"] = in_data["area"].strip()
+		in_data["keywords"] = in_data["keywords"].strip()
+		
+		return in_data
