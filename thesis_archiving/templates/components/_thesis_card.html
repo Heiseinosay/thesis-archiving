@@ -17,8 +17,8 @@
                         <div class="d-flex flex-nowrap">
                             <a class="btn btn-sm btn-primary bi bi-pencil align-self-start mx-1" href="{{ url_for('thesis.update', thesis_id=thesis.id) }}" role="button"></a>
 
-                            {{ delete_modal(url_for('thesis.delete', thesis_id=thesis.id)) }}
-                            
+                            {{ delete_modal(url_for('thesis.delete', thesis_id=thesis.id),thesis.id,thesis.title) }}
+
                         </div>
                     {% endif %}
 

@@ -1,6 +1,6 @@
 from marshmallow import ValidationError
 
-def validate_input(data, schema):
+def validate_input(data, schema, **kwargs):
     '''
         can only take single dictionary of data
     '''
@@ -9,9 +9,9 @@ def validate_input(data, schema):
         'valid' : {},
         'invalid' : {}
     }
-
+    
     try:
-        result['valid'] = schema().load(data)
+        result['valid'] = schema(**kwargs).load(data)
 
     except ValidationError as err:
         result['valid'] = err.valid_data

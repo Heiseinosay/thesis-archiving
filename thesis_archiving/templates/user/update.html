@@ -1,0 +1,88 @@
+{% from "components/_fields.html" import field, field_checkbox %}
+{% from "components/_proponents_update.html" import proponents_update %}
+
+{% extends "base.html" %}
+
+{% block body %}
+
+	<div class="container py-3">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-7 mb-3">
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h3 class="card-title">
+							Update User
+						</h3>
+
+                        <form action="" method="POST">
+                            {% 
+                                set user = {
+                                    'username': request.form['username'] if request.form['username'] else user.username,
+                                    'full_name': request.form['full_name'] if request.form['full_name'] else user.full_name,
+                                    'email': request.form['email'] if request.form['email'] else user.email,
+                                    'is_adviser': request.form['is_adviser'] if request.form['is_adviser'] else user.is_adviser,
+                                    'is_admin': request.form['is_admin'] if request.form['is_admin'] else user.is_admin,
+                                    'is_superuser': request.form['is_superuser'] if request.form['is_superuser'] else user.is_superuser
+                                }
+                            %}
+                            
+                            {% include "components/csrf_token.html" %}
+                            
+                             <!-- username -->
+                             <div class="mb-3">
+                                <label class="form-label h6">Username</label>
+                                {{ field("text", "username", result, user['username']) }}
+                            </div>
+
+                            <!-- full name -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Full Name</label>
+                                {{ field("text", "full_name", result, user['full_name']) }}
+                            </div>
+
+                            <!-- email -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Email</label>
+                                {{ field("email", "email", result, user['email']) }}
+                            </div>
+
+                            <!-- roles -->
+                            <div class="mb-4 row">
+                                <label class="form-label h6">Roles</label>
+                                
+                                <!-- adviser -->
+                                <div class="col-12 col-sm-4">
+                                    {{ field_checkbox("is_adviser", result, "Adviser", user['is_adviser']) }}
+                                </div>
+
+                                {% if current_user.is_superuser %}
+                                    <!-- admin -->
+                                    <div class="col-12 col-sm-4">
+                                        {{ field_checkbox("is_admin", result, "Admin", user['is_admin']) }}
+                                    </div>
+                                    <!-- su -->
+
+                                    <div class="col-12 col-sm-4">
+                                        {{ field_checkbox("is_superuser", result, "Superuser", user['is_superuser']) }}
+                                    </div>    
+    
+                                {% endif %}
+
+                            </div>
+
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-ueccss" type="submit">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>		
+	</div>
+	
+	
+	
+{% endblock %}

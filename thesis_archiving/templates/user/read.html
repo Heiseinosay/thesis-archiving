@@ -1,5 +1,6 @@
 {% from "components/_pagination.html" import pagination %}
 {% from "components/_data_actions.html" import data_actions %}
+{% from "components/_delete_modal.html" import delete_modal %}
 
 {% macro role(attr) %}
 	{% if attr %}
@@ -64,9 +65,10 @@
 											<td>{{ role(user.is_admin) }}</td>
 											<td>{{ role(user.is_superuser) }}</td>
 											<td>{{ user.date_registered }}</td>
-											<td>
-												<a class="btn btn-sm btn-primary bi bi-pencil align-self-start mr-1" href="#" role="button"></a>
-												<a class="btn btn-sm btn-danger bi bi-trash align-self-start" href="#" role="button"></a>
+											<td class="d-flex">
+												<a class="btn btn-sm btn-primary bi bi-pencil align-self-start me-1" href="{{ url_for('user.update', user_id=user.id) }}" role="button"></a>
+												{{ delete_modal(url_for('user.delete', user_id=user.id), user.id, user.username+' - '+user.full_name) }}
+												
 											</td>
 										</tr>
 									{% endfor %}

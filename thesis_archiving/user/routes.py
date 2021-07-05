@@ -1,7 +1,7 @@
 from flask import Blueprint, url_for, redirect, render_template, request, flash, send_file
 from flask_login import login_user, current_user, login_required, logout_user
 from thesis_archiving import bcrypt, db
-from thesis_archiving.user.validation import LoginSchema, CreateUserSchema
+from thesis_archiving.user.validation import LoginSchema, CreateUserSchema, UpdateUserSchema
 from thesis_archiving.models import User, Log
 from thesis_archiving.utils import export_to_excel, has_roles
 from thesis_archiving.validation import validate_input
@@ -161,3 +161,63 @@ def create():
                     flash("An error occured", "danger")
 
     return render_template("user/create.html", result=result)
+
+@user.route("/update/<int:user_id>", methods=["POST", "GET"])
+@login_required
+@has_roles("is_admin")
+def update(user_id):
+
+    _user = User.query.get_or_404(user_id)
+
+    result = {
+        'valid' : {},
+        'invalid' : {}
+    }
+
+    if request.method == "POST":
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+        
+        
+        # marshmallow validation
+        result = validate_input(data, UpdateUserSchema, user_obj=_user)
+
+        if not result['invalid']:
+            # prevent premature flushing
+            with db.session.no_autoflush:
+                # values for validated and filtered input
+                data = result['valid']
+
+                _user.username = data['username']
+                _user.full_name = data['full_name']
+                _user.email = data['email']
+                _user.is_adviser = data['is_adviser']
+                _user.is_admin = data['is_admin']
+                _user.is_superuser = data['is_superuser']
+
+                try:
+                    db.session.commit()
+                    flash("Successfully updated user.", "success")
+                    return redirect(request.referrer)
+
+                except:
+                    flash("An error occured", "danger")
+
+    return render_template("user/update.html", result=result, user=_user)
+
+@user.route("/delete/<int:user_id>", methods=["POST"])
+@login_required
+@has_roles("is_superuser")
+def delete(user_id):
+    _user = User.query.get_or_404(user_id)
+    print(_user)
+    try:
+        db.session.delete(_user)
+        db.session.commit()
+        flash("Successfully deleted a user.","success")
+        
+        return redirect(request.referrer)
+    except:
+        flash("An error occured.","danger")
+
+    return redirect(url_for('user.read'))

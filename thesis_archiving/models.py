@@ -63,7 +63,9 @@ class User(db.Model, UserMixin):
 	is_superuser = db.Column(BOOLEAN(), default=False)
 	date_registered = db.Column(db.DateTime, nullable=False, default=lambda:datetime.now(tz=pytz.timezone('Asia/Manila')))
 
-	logs = db.relationship('Log', backref='user', lazy='dynamic')
+	# cascade delete
+	logs = db.relationship('Log', backref='user', lazy='dynamic', cascade="all, delete") 
+	
 	advisees = db.relationship('Thesis', backref='adviser', lazy='dynamic')
 
 	def __repr__(self):

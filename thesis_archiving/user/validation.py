@@ -68,3 +68,47 @@ class CreateUserSchema(Schema):
         
         if err:
             raise ValidationError(err)
+
+class UpdateUserSchema(Schema):
+    csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
+    username = fields.Str(required=True, validate=validate.And(
+    validate_empty, validate.Length(max=20)
+    ))
+
+    full_name = fields.Str(required=True, validate=validate.And(
+    validate_empty, validate.Length(max=64)
+    ))
+
+    email = fields.Email(validate=validate.And(
+    validate_empty, validate.Length(max=64)
+    ))
+
+    is_adviser = fields.Bool(missing=False)
+    is_admin = fields.Bool(missing=False)
+    is_superuser = fields.Bool(missing=False)
+    
+    def __init__(self, user_obj, **kwargs):
+        self.user = user_obj #set instance variable for current subj
+        
+        super().__init__(**kwargs) #sends arbitarary arguments to base class
+
+    @pre_load
+    def strip_fields(self, in_data, **kwargs):
+        # dont strip password kasi baka may mag set ng spaces yung first and last lmao
+        in_data["username"] = in_data["username"].strip()
+        in_data["full_name"] = in_data["full_name"].strip()
+        in_data["email"] = in_data["email"].strip()
+
+        return in_data
+    
+    @validates("username")
+    def validate_username(self, data):
+        _user = User.query.filter_by(username=data).first()
+        if _user and _user != self.user:
+            raise ValidationError("Username is taken.")
+
+    @validates("email")
+    def validate_email(self, data):
+        _user = User.query.filter_by(email=data).first()
+        if _user and _user != self.user:
+            raise ValidationError("Email is taken.")

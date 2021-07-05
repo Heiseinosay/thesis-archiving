@@ -188,7 +188,7 @@ def update(thesis_id):
                 try:
                     db.session.commit()
                     flash("Successfully updated thesis.", "success")
-                    return redirect(url_for('thesis.read'))
+                    return redirect(request.referrer)
 
                 except:
                     flash("An error occured", "danger")
@@ -200,10 +200,12 @@ def update(thesis_id):
 @has_roles("is_admin")
 def delete(thesis_id):
     _thesis = Thesis.query.get_or_404(thesis_id)
+    print(_thesis)
     try:
         db.session.delete(_thesis)
         db.session.commit()
         flash("Successfully deleted a thesis.","success")
+        return redirect(request.referrer)
     except:
         flash("An error occured.","danger")
 
