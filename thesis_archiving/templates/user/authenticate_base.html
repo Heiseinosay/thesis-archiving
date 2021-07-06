@@ -1,0 +1,42 @@
+{% from "components/_fields.html" import field %}
+
+{% extends "base.html" %}
+
+{% block css %}
+
+	{#body {
+		background-image: url("{{ url_for('static', filename='bg.png') }}");
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		background-size: cover;
+		background-position: center;
+	}#}
+
+{% endblock %}
+
+{% block body %}
+
+	<div class="container-fluid py-5">
+		
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				{% for category, message in messages %}
+					<div class="alert alert-{{category}} mx-auto" role="alert" style="min-width: 350px; max-width: 350px;">
+						<i class="bi bi-exclamation-triangle-fill"></i><small> {{message}}</small>
+					</div>
+				{% endfor %}
+			{% endif %}
+		{% endwith %}
+
+		<div class="card shadow mx-auto border-0" style="min-width: 350px; max-width: 350px;">
+			<div class="card-body p-4 py-5">
+				
+                {% block form %}
+
+                {% endblock %}
+				
+			</div>
+		</div>
+	</div>
+
+{% endblock %}

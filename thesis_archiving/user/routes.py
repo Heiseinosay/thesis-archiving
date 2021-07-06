@@ -1,12 +1,18 @@
 from flask import Blueprint, url_for, redirect, render_template, request, flash, send_file
+from sqlalchemy.sql.expression import false
 from flask_login import login_user, current_user, login_required, logout_user
-from thesis_archiving import bcrypt, db
-from thesis_archiving.user.validation import LoginSchema, CreateUserSchema, UpdateUserSchema
-from thesis_archiving.models import User, Log
-from thesis_archiving.utils import export_to_excel, has_roles
-from thesis_archiving.validation import validate_input
+
 from sqlalchemy import or_
-from pprint import pprint
+
+from thesis_archiving import bcrypt, db
+from thesis_archiving.utils import export_to_excel, has_roles
+from thesis_archiving.models import User, Log
+from thesis_archiving.validation import validate_input
+
+from thesis_archiving.user.validation import LoginSchema, CreateUserSchema, UpdateUserSchema, PasswordResetSchema, PasswordResetRequestSchema
+from thesis_archiving.user.utils import send_reset_request
+
+# from pprint import pprint
 
 user = Blueprint('user', __name__, url_prefix="/user")
 
@@ -68,6 +74,71 @@ def logout():
     logout_user()
     
     return redirect(url_for("user.login"))
+
+@user.route("/password/reset/<token>", methods=["POST", "GET"])
+def password_reset(token):
+    
+    if current_user.is_authenticated:
+        return redirect(url_for("main.home"))
+
+    _user = User.verify_reset_token(token)
+
+    if _user is None:
+        flash('Token is invalid or expired.','danger')
+        return redirect(url_for('user.login'))
+
+    result = {
+        'valid' : {},
+        'invalid' : {}
+    }
+
+    if request.method == "POST":
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+        
+        # marshmallow validation
+        result = validate_input(data, PasswordResetSchema)
+
+        if not result['invalid']:
+            _user.password = bcrypt.generate_password_hash(data['password'])
+            
+            try:
+                db.session.commit()
+                flash("Password successfully changed.","success")
+                return redirect(url_for('user.login'))
+            except:
+                flash("An error occured.","danger")
+
+    return render_template("user/password/reset.html", result=result)
+
+@user.route("/password/reset_request", methods=["POST", "GET"])
+def password_reset_request():
+
+    if current_user.is_authenticated:
+        return redirect(url_for("main.home"))
+
+    result = {
+        'valid' : {},
+        'invalid' : {}
+    }
+
+    if request.method == "POST":
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+        
+        # marshmallow validation
+        result = validate_input(data, PasswordResetRequestSchema)
+
+        if not result['invalid']:
+            _user = User.query.filter_by(email=data['email']).first()
+            
+            send_reset_request(_user)
+            
+            flash("Reset request sent (expires in 3 days). Please check your inbox or spam folder. This may take more than a minute.","success")
+            
+            return redirect(url_for("user.login"))
+
+    return render_template("user/password/reset_request.html", result=result)
 
 @user.route("/read")
 @login_required
@@ -132,7 +203,6 @@ def create():
         
         # marshmallow validation
         result = validate_input(data, CreateUserSchema)
-        pprint(result)
 
         if not result['invalid']:
             # prevent premature flushing
@@ -210,7 +280,7 @@ def update(user_id):
 @has_roles("is_superuser")
 def delete(user_id):
     _user = User.query.get_or_404(user_id)
-    print(_user)
+    
     try:
         db.session.delete(_user)
         db.session.commit()

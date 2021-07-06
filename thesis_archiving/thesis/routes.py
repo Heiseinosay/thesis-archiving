@@ -1,13 +1,17 @@
 from flask import Blueprint, render_template, request, redirect, url_for, send_file, flash
 from flask_login import login_required
+
+from sqlalchemy import or_
+
 from thesis_archiving import db
 from thesis_archiving.models import Thesis, User, Program, Category
 from thesis_archiving.utils import export_to_excel, has_roles
 from thesis_archiving.validation import validate_input
+
 from thesis_archiving.thesis.validation import CreateThesisSchema, UpdateThesisSchema
 from thesis_archiving.thesis.utils import select_choices
-from sqlalchemy import or_
-from pprint import pprint
+
+# from pprint import pprint
 
 thesis = Blueprint("thesis", __name__, url_prefix="/thesis")
 
@@ -200,7 +204,7 @@ def update(thesis_id):
 @has_roles("is_admin")
 def delete(thesis_id):
     _thesis = Thesis.query.get_or_404(thesis_id)
-    print(_thesis)
+    
     try:
         db.session.delete(_thesis)
         db.session.commit()

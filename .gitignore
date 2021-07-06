@@ -3,3 +3,4 @@ scss
 .vscode
 package-lock.json
 script.py
+.env

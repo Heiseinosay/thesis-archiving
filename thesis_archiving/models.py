@@ -1,8 +1,12 @@
-from thesis_archiving import db, login_manager
-from sqlalchemy.dialects.mysql import INTEGER, BOOLEAN, BIGINT
+from flask import current_app
 from flask_login import UserMixin
+from sqlalchemy.dialects.mysql import INTEGER, BOOLEAN, BIGINT
+
+from thesis_archiving import db, login_manager
+
 from datetime import datetime
 import pytz
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -70,6 +74,22 @@ class User(db.Model, UserMixin):
 
 	def __repr__(self):
 		return f"[{self.id}] {self.username} - {self.full_name}"
+
+	def get_reset_token(self, expires_sec=259200):
+		# 3 days expiration
+		s = Serializer(current_app.config['SECRET_KEY'], expires_sec)
+		return s.dumps({'user_id':self.id}).decode('utf-8')
+
+	@staticmethod
+	def verify_reset_token(token):
+		s = Serializer(current_app.config['SECRET_KEY'])
+
+		try:
+			_user_id = s.loads(token)['user_id']
+		except:
+			return None
+
+		return User.query.get(_user_id)
 
 class Log(db.Model):
 	id = db.Column(BIGINT(unsigned=True), primary_key=True)

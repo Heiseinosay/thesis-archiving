@@ -15,6 +15,46 @@ class LoginSchema(Schema):
 
         return in_data
 
+class PasswordResetSchema(Schema):
+    csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
+
+    password = fields.Str(required=True, validate=validate.And(
+    validate_empty, validate.Length(max=60)
+    ))
+
+    confirm_password = fields.Str(required=True, validate=validate.And(
+    validate_empty, validate.Length(max=60)
+    ))
+
+    @validates_schema
+    def validate_confirm_password(self, data, **kwargs):
+        err = {}
+        if data["password"] != data["confirm_password"]:
+            err["confirm_password"] = ["Password do not match."]
+        
+        if err:
+            raise ValidationError(err)
+    
+class PasswordResetRequestSchema(Schema):
+    csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
+
+    email = fields.Email(validate=validate.And(
+    validate_empty, validate.Length(max=64)
+    ))
+
+    @pre_load
+    def strip_fields(self, in_data, **kwargs):
+        # dont strip password kasi baka may mag set ng spaces yung first and last lmao
+        in_data["email"] = in_data["email"].strip()
+
+        return in_data
+
+    @validates("email")
+    def validate_email(self, data):
+        if not User.query.filter_by(email=data).first():
+            raise ValidationError("Email does not exist.")
+
+
 class CreateUserSchema(Schema):
     csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
     username = fields.Str(required=True, validate=validate.And(

@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request
 from flask_login import login_required
+
+from sqlalchemy import or_
+
 from thesis_archiving.models import Category
 from thesis_archiving.utils import has_roles
-from sqlalchemy import or_
 
 category = Blueprint("category", __name__, url_prefix="/category")
 

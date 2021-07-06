@@ -1,5 +1,5 @@
 from flask import Blueprint, url_for, redirect, render_template
-from flask_login import login_required, current_user
+from flask_login import current_user
 
 main = Blueprint('main', __name__)
 

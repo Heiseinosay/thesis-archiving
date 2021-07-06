@@ -1,0 +1,22 @@
+{% extends "user/authenticate_base.html" %}
+
+{% block form %}
+
+	<p class="text-center mb-5 h5">Password Reset Request</p>
+
+	<form class="row" method="POST" action="">
+		{% include "components/csrf_token.html" %}
+		
+		<!-- email -->
+		<div class="mb-3">
+			<label class="form-label">Email</label>
+			{{ field("email", "email", result, request.form["email"]) }}
+		</div>
+
+		<!-- submit -->
+		<div class="d-grid gap-2">
+			<button type="submit" class="btn btn-sm btn-ueccss">Send request</button>
+		</div>
+	</form>
+
+{% endblock %}

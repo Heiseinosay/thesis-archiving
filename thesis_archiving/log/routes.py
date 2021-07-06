@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, request, send_file
 from flask_login import login_required
+
+from sqlalchemy import or_
+
 from thesis_archiving.models import Log, User
 from thesis_archiving.utils import export_to_excel, has_roles
-from sqlalchemy import or_
-from datetime import datetime
 
 log = Blueprint("log", __name__, url_prefix="/log")
 
