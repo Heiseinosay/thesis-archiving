@@ -100,7 +100,7 @@ def password_reset(token):
         result = validate_input(data, PasswordResetSchema)
 
         if not result['invalid']:
-            _user.password = bcrypt.generate_password_hash(data['password'])
+            _user.password = bcrypt.generate_password_hash(data['password']).decode("utf-8")
             
             try:
                 db.session.commit()
@@ -134,7 +134,7 @@ def password_reset_request():
             
             send_reset_request(_user)
             
-            flash("Reset request sent (expires in 3 days). Please check your inbox or spam folder. This may take more than a minute.","success")
+            flash("Reset request sent (expires in 3 days). Please check your inbox or spam folder. This may take some time.","success")
             
             return redirect(url_for("user.login"))
 
@@ -216,7 +216,7 @@ def create():
                 _user.username = data['username']
                 _user.full_name = data['full_name']
                 _user.email = data['email']
-                _user.password = bcrypt.generate_password_hash(data['password'])
+                _user.password = bcrypt.generate_password_hash(data['password']).decode("utf-8")
                 _user.is_adviser = data['is_adviser']
                 _user.is_admin = data['is_admin']
                 _user.is_superuser = data['is_superuser']

@@ -47,6 +47,6 @@ def create_app(config_class=Config):
     app.register_blueprint(category)
     
     # import models for flask migrate
-    from thesis_archiving.models import User
+    import thesis_archiving.models
 
     return app

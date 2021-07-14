@@ -62,6 +62,7 @@ class User(db.Model, UserMixin):
 	full_name = db.Column(db.String(64), nullable=False)
 	email = db.Column(db.String(64), unique=True)
 	password = db.Column(db.String(60), nullable=False)
+	is_student = db.Column(BOOLEAN(), default=False)
 	is_adviser = db.Column(BOOLEAN(), default=False)
 	is_admin = db.Column(BOOLEAN(), default=False)
 	is_superuser = db.Column(BOOLEAN(), default=False)
