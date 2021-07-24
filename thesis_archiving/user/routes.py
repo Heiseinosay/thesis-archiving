@@ -217,6 +217,7 @@ def create():
                 _user.full_name = data['full_name']
                 _user.email = data['email']
                 _user.password = bcrypt.generate_password_hash(data['password']).decode("utf-8")
+                _user.is_student = data['is_student']
                 _user.is_adviser = data['is_adviser']
                 _user.is_admin = data['is_admin']
                 _user.is_superuser = data['is_superuser']

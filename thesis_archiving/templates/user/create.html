@@ -39,18 +39,23 @@
                             <div class="mb-4 row">
                                 <label class="form-label h6">Roles</label>
                                 
+                                <!-- student -->
+                                <div class="col-12 col-sm-3">
+                                    {{ field_checkbox("is_student", result, "Student", request.form['is_student']) }}
+                                </div>
+
                                 <!-- adviser -->
-                                <div class="col-12 col-sm-4">
+                                <div class="col-12 col-sm-3">
                                     {{ field_checkbox("is_adviser", result, "Adviser", request.form['is_adviser']) }}
                                 </div>
 
                                 {% if current_user.is_superuser %}
                                     <!-- admin -->
-                                    <div class="col-12 col-sm-4">
+                                    <div class="col-12 col-sm-3">
                                         {{ field_checkbox("is_admin", result, "Admin", request.form['is_admin']) }}
                                     </div>
                                     <!-- su -->
-                                    <div class="col-12 col-sm-4">
+                                    <div class="col-12 col-sm-3">
                                         {{ field_checkbox("is_superuser", result, "Superuser", request.form['is_superuser']) }}
                                     </div>    
     

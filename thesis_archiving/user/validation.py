@@ -77,6 +77,7 @@ class CreateUserSchema(Schema):
     validate_empty, validate.Length(max=60)
     ))
 
+    is_student = fields.Bool(missing=False)
     is_adviser = fields.Bool(missing=False)
     is_admin = fields.Bool(missing=False)
     is_superuser = fields.Bool(missing=False)

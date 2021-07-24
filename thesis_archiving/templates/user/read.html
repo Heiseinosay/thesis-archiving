@@ -47,6 +47,7 @@
 										<th scope="col">Username</th>
 										<th scope="col">Full Name</th>
 										<th scope="col">Email</th>
+										<th scope="col">is_student</th>
 										<th scope="col">is_adviser</th>
 										<th scope="col">is_admin</th>
 										<th scope="col">is_superuser</th>
@@ -61,6 +62,7 @@
 											<td>{{ user.username }}</td>
 											<td>{{ user.full_name }}</td>
 											<td>{{ user.email }}</td>
+											<td>{{ role(user.is_student) }}</td>
 											<td>{{ role(user.is_adviser) }}</td>
 											<td>{{ role(user.is_admin) }}</td>
 											<td>{{ role(user.is_superuser) }}</td>
