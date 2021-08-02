@@ -108,6 +108,7 @@ class UpdateThesisSchema(Schema):
 	adviser_id = fields.Int(required=True)
 	category_id = fields.Int(required=True)
 	program_id = fields.Int(required=True)
+	group_id = fields.Int()
 
 	@pre_load
 	def strip_fields(self, in_data, **kwargs):

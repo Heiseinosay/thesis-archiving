@@ -56,6 +56,12 @@ proponents = db.Table('proponents',
 	db.Column('thesis_id', INTEGER(unsigned=True), db.ForeignKey('thesis.id'))
 )
 
+# groups to user many to many helper table
+panelists = db.Table('panelists', 
+	db.Column('group_id', INTEGER(unsigned=True), db.ForeignKey('group.id')),
+	db.Column('user_id', INTEGER(unsigned=True), db.ForeignKey('user.id'))
+)
+
 class User(db.Model, UserMixin):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
 	username = db.Column(db.String(20), unique=True, nullable=False)
@@ -64,6 +70,7 @@ class User(db.Model, UserMixin):
 	password = db.Column(db.String(60), nullable=False)
 	is_student = db.Column(BOOLEAN(), default=False, nullable=False)
 	is_adviser = db.Column(BOOLEAN(), default=False, nullable=False)
+	is_guest_panelist = db.Column(BOOLEAN(), default=False, nullable=False)
 	is_admin = db.Column(BOOLEAN(), default=False, nullable=False)
 	is_superuser = db.Column(BOOLEAN(), default=False, nullable=False)
 	date_registered = db.Column(db.DateTime, nullable=False, default=lambda:datetime.now(tz=pytz.timezone('Asia/Manila')))
@@ -72,6 +79,8 @@ class User(db.Model, UserMixin):
 	logs = db.relationship('Log', backref='user', lazy='dynamic', cascade="all, delete") 
 	
 	advisees = db.relationship('Thesis', backref='adviser', lazy='dynamic')
+
+	group_chairman = db.relationship('Group', backref='chairman', lazy='dynamic')
 
 	def __repr__(self):
 		return f"[{self.id}] {self.username} - {self.full_name}"
@@ -118,6 +127,10 @@ class Thesis(db.Model):
 
 	adviser_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
 	category_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('category.id'), nullable=False)
+	
+	group_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('group.id'))
+	presentor_number = db.Column(db.Integer)
+	
 	program_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('program.id'), nullable=False)
 	proponents = db.relationship('User', secondary=proponents, lazy='dynamic', backref=db.backref('theses', lazy='dynamic'))
 
@@ -127,6 +140,9 @@ class Thesis(db.Model):
 
 		return f"[{self.id}] {old_or_number} {title}"
 	
+	def call_number(self):
+		return f"{self.sy_start}-{self.semester}-{self.category.code}{self.program.code}-{self.number}"
+
 	@staticmethod
 	def thesis_number():
 		'''
@@ -144,3 +160,19 @@ class Thesis(db.Model):
 		thesis = Thesis.query.filter_by(is_old=False).filter(Thesis.number.isnot(None)).order_by(Thesis.number.desc()).first()
 
 		return thesis.number + 1 if (thesis and thesis.number) else 1 
+
+class Group(db.Model):
+	id = db.Column(INTEGER(unsigned=True), primary_key=True)
+	number = db.Column(db.Integer, unique=True, nullable=False)
+	chairmain_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'))
+	
+	# adviser users
+	panelists = db.relationship('User', secondary=panelists, lazy='dynamic', backref=db.backref('groups', lazy='dynamic'))
+	# theses
+	presentors = db.relationship('Thesis', backref='group', lazy='dynamic') 
+	
+	# presentor ids cannot be the same 
+	# can only be chairman if a panelist
+	# presentors = thesis.presentors.sortby presentor number
+	# for i in range(group presentors length sort by presentor number):
+	# 	presentors[i].number = i + 1

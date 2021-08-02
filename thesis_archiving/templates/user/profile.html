@@ -1,0 +1,42 @@
+{% from "components/_thesis_card.html" import thesis_card %}
+{% from "components/_group_card.html" import group_card %}
+
+{% extends "base.html" %}
+
+{% block body %}
+
+<div class="container">
+			
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10 py-3">
+            <div class="d-grid gap-3">
+
+                <h6>Your theses ({{theses.count()}})</h6>
+
+                {% for thesis in theses %}
+                    {{ thesis_card(thesis, current_user) }}	
+                {% endfor %}
+                
+                {% if advisees %}
+                    <h6>Your advisees ({{advisees.count()}})</h6>
+                    
+                    {% for advisee in advisees %}
+                        {{ thesis_card(advisee, current_user) }}	
+                    {% endfor %}
+                {% endif %}
+
+                {% if groups %}
+                    <h6>Your panel groups ({{groups.count()}})</h6>
+                    
+                    {% for group in groups %}
+                        {{ group_card(group) }}	
+                    {% endfor %}
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+
+</div>
+	
+{% endblock %}

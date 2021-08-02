@@ -30,7 +30,8 @@
                                     'is_old': (request.form['is_old'] | int) if request.form['is_old'] else (thesis.is_old | int),
                                     'area': request.form['area'] if request.form['area'] else thesis.area,
                                     'keywords': request.form['keywords'] if request.form['keywords'] else thesis.keywords,
-                                    'overview': request.form['overview'] if request.form['overview'] else thesis.overview
+                                    'overview': request.form['overview'] if request.form['overview'] else thesis.overview,
+                                    'group_id': request.form['group_id'] if request.form['group_id'] else thesis.group_id
                                 } 
                             
                             %}
@@ -68,21 +69,27 @@
 
                             <div class="row mb-3">
                                 <!-- sy -->
-                                <div class="col-12 col-sm-4">
+                                <div class="col-12 col-sm-3">
                                     <label class="form-label h6">School Year</label>
                                     {{ field_select("sy_start", result, select_choices['sy_start'], thesis['sy_start']) }}
                                 </div>
                                 
                                 <!-- sem -->
-                                <div class="col-12 col-sm-4">
+                                <div class="col-12 col-sm-3">
                                     <label class="form-label h6">Semester</label>
                                     {{ field_select("semester", result, select_choices['semester'], thesis['semester']) }}
                                 </div>
                                 
                                 <!-- is_old -->
-                                <div class="col-12 col-sm-4">
+                                <div class="col-12 col-sm-3">
                                     <label class="form-label h6">Batch</label>
                                     {{ field_select("is_old", result, select_choices['is_old'], thesis['is_old']) }}
+                                </div>
+
+                                <!-- group_id -->
+                                <div class="col-12 col-sm-3">
+                                    <label class="form-label h6">Panel Group</label>
+                                    {{ field_select("group_id", result, select_choices['group_id'], thesis['group_id']) }}
                                 </div>
                             </div>
 

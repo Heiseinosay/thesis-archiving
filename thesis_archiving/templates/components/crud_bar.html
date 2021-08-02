@@ -15,10 +15,14 @@
                     {{ crud_link("Thesis", url_for('thesis.read')) }}
                     
                     {% if current_user.is_superuser or current_user.is_admin %}
-                    {{ crud_link("User", url_for('user.read')) }}
+                        {{ crud_link("Group", url_for('group.read')) }}
+                        {{ crud_link("User", url_for('user.read')) }}
                         {{ crud_link("Program", url_for('program.read')) }}
                         {{ crud_link("Category", url_for('category.read')) }}
                         {{ crud_link("Log", url_for('log.read')) }}
+
+                    {% elif current_user.is_adviser or current_user.is_guest_panelist %}
+                        {{ crud_link("Group", url_for('group.read')) }}
 
                     {% endif %}
 

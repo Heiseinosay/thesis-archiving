@@ -45,11 +45,12 @@ def has_roles(*roles):
                 abort(401)
 
             if "is_adviser" in roles and current_user.is_adviser:
-                print("adv")
                 permitted = True
             
+            if "is_guest_panelist" in roles and current_user.is_guest_panelist:
+                permitted = True
+
             if "is_admin" in roles and current_user.is_admin:
-                print("adm")
                 permitted = True
             
             # hindi na needed "is_superuser" arg

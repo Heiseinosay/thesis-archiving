@@ -1,0 +1,125 @@
+{% from "components/_fields.html" import field %}
+
+{% extends "base.html" %}
+
+{% block body %}
+
+
+{% 
+
+    set group = {
+        'id': group.id,
+        'number': request.form['number'] if request.form['number'] else group.number,
+        'panelists': group.panelists,
+        'presentors': group.presentors
+    }
+
+%}
+
+
+	<div class="container py-3">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-7">
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h3 class="card-title">
+							Update Group
+						</h3>
+                        
+                        <form action="" method="POST">
+                            {% include "components/csrf_token.html" %}
+
+                            <!-- number -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Number</label>
+                                {{ field("text", "number", result, group['number']) }}
+                            </div>
+
+                            <!-- panelist_username -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Add a panelist</label>
+                                {{ field("text", "panelist_username", result) }}
+                            </div>
+
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-ueccss" type="submit">Update</button>    
+                            </div>
+
+                            
+                        </form>
+                        
+                        <h5>Panelists</h5>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Full Name</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                                {% for panelist in group['panelists'] %}
+                                    <tr>
+                                        <form action="{{ url_for('group.panelist_remove', group_id=group['id'], user_id=panelist.id) }}" method="POST">
+                                            {% include "components/csrf_token.html" %}
+                                            <td>
+                                                {{ panelist.username }}
+                                            </td>
+                                            <td>
+                                                {{ panelist.full_name }}
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-danger bi bi-person-dash" type="submit"> Remove</button>
+                                            </td>
+                                        </form>                
+                                    </tr>
+                                {% endfor %}
+                                
+                            </tbody>
+            
+                        </table>
+
+                        <h5 class="mt-5">Presentors</h5>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Call Number</th>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                                {% for presentor in group['presentors'] %}
+                                    <tr>
+                                        <form action="{{ url_for('group.presentor_remove', group_id=group['id'], thesis_id=presentor.id) }}" method="POST">
+                                            {% include "components/csrf_token.html" %}
+                                            <td>
+                                                {{ presentor.call_number() }}
+                                            </td>
+                                            <td>
+                                                {{ presentor.title }}
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-sm btn-danger bi bi-person-dash" type="submit"> Remove</button>
+                                            </td>
+                                        </form>                
+                                    </tr>
+                                {% endfor %}
+                                
+                            </tbody>
+            
+                        </table>
+                           
+                    </div>
+                </div>
+                
+            </div>
+        </div>		
+	</div>
+	
+	
+	
+{% endblock %}

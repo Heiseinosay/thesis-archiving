@@ -292,3 +292,12 @@ def delete(user_id):
         flash("An error occured.","danger")
 
     return redirect(url_for('user.read'))
+
+@user.route("/profile")
+@login_required
+def profile():
+    
+    theses = current_user.theses
+    advisees = current_user.advisees if current_user.is_adviser else None
+    groups = current_user.groups if current_user.is_adviser or current_user.is_guest_panelist else None
+    return render_template("user/profile.html", theses=theses, advisees=advisees, groups=groups)
