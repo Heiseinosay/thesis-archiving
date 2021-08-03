@@ -1,5 +1,6 @@
 from types import MethodDescriptorType
 from flask import Blueprint, render_template, request, flash, redirect, url_for
+from werkzeug.exceptions import abort
 from flask_login import login_required, current_user
 
 from thesis_archiving import db
@@ -160,7 +161,36 @@ def presentor_remove(group_id, thesis_id):
         flash("An error occured.","danger")
 
     return redirect(request.referrer)
-# group panelist/add
-# group panelist/remove
 
-# group
+@group.route("/assign/chairman/<int:group_id>", methods=['POST'])
+@login_required
+@has_roles("is_adviser", "is_guest_panelist")
+def chairman_assign(group_id):
+
+    group_ = Group.query.get_or_404(group_id)
+
+    try:
+        group_.chairman = current_user
+        db.session.commit()
+        flash("Successfully assigned as chairman.","success")
+        return redirect(url_for('group.grading', group_id=group_id))
+    except:
+        flash("An error occured.","danger")
+
+    return redirect(request.referrer)
+
+@group.route("/grading/<int:group_id>", methods=['POST','GET'])
+@login_required
+@has_roles("is_adviser", "is_guest_panelist")
+def grading(group_id):
+
+    group_ = Group.query.get_or_404(group_id)
+    
+    if current_user not in group_.panelists:
+        abort(403)
+
+    if not group_.chairman:
+        flash("Please assign a chairman before proceeding.", "danger")
+        return redirect('user.profile')
+
+    return render_template('group/grading.html')

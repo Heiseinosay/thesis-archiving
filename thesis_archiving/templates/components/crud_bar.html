@@ -21,9 +21,6 @@
                         {{ crud_link("Category", url_for('category.read')) }}
                         {{ crud_link("Log", url_for('log.read')) }}
 
-                    {% elif current_user.is_adviser or current_user.is_guest_panelist %}
-                        {{ crud_link("Group", url_for('group.read')) }}
-
                     {% endif %}
 
                     

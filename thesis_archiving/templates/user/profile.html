@@ -29,7 +29,7 @@
                     <h6>Your panel groups ({{groups.count()}})</h6>
                     
                     {% for group in groups %}
-                        {{ group_card(group) }}	
+                        {{ group_card(group, current_user)}}	
                     {% endfor %}
                 {% endif %}
 

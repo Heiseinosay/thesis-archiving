@@ -1,7 +1,7 @@
 {% macro delete_modal(delete_url, id, name) %}
 
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-sm btn-danger bi bi-trash align-self-start" data-bs-toggle="modal" data-bs-target="#confirmDelete{{id}}">
+<button type="button" class="btn btn-sm btn-danger bi bi-trash align-self-start" data-bs-toggle="modal" data-bs-target="#chairmanModal-{{id}}">
 
 </button>
   
@@ -9,7 +9,7 @@
   
 
   
-  <div class="modal fade" id="confirmDelete{{id}}" tabindex="-1">
+  <div class="modal fade" id="chairmanModal-{{id}}" tabindex="-1">
     <div class="modal-dialog modal-sm">
       <div class="modal-content">
         <div class="modal-header">

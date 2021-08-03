@@ -1,4 +1,5 @@
 {% from "components/_delete_modal.html" import delete_modal %}
+{% from "components/_chairman_modal.html" import chairman_modal %}
 
 {% macro group_card(group, current_user) %}
 
@@ -15,14 +16,18 @@
                     </div>
 
                     <!-- action buttons -->
-                    {% if current_user.is_superuser or current_user.is_admin %}
-                        <div class="d-flex flex-nowrap">
+                    <div class="d-flex flex-nowrap">
+                        {% if current_user in group.panelists %}
+                            {{ chairman_modal(group) }}
+                        {% endif %}
+                        
+                        {% if current_user.is_superuser or current_user.is_admin %}
                             <a class="btn btn-sm btn-primary bi bi-pencil align-self-start mx-1" href="{{ url_for('group.update', group_id=group.id) }}" role="button"></a>
 
                             {{ delete_modal(url_for('group.delete', group_id=group.id),group.id, group.number) }}
 
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                    </div>
 
                 </div>
             </h5>

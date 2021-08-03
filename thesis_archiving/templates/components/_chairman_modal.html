@@ -1,0 +1,33 @@
+{% macro chairman_modal(group) %}
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-sm text-light btn-uefaculty bi bi-arrow-right" data-bs-toggle="modal" data-bs-target="#exampleModal{{group.id}}">
+  </button>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="exampleModal{{group.id}}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Become chairman</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Current chairman: {{ group.chairman.full_name }}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+          <form action="{{ url_for('group.chairman_assign', group_id=group.id) }}" method="POST">
+                {% include "components/csrf_token.html" %}
+              <button type="submit" class="btn btn-uefaculty">Become Chairman</button>
+          </form>
+          {% if group.chairman %}
+          <a class="btn btn-primary" href="{{ url_for('group.grading', group_id=group.id) }}" role="button">Proceed</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endmacro %}
