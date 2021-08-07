@@ -82,6 +82,8 @@ class User(db.Model, UserMixin):
 
 	group_chairman = db.relationship('Group', backref='chairman', lazy='dynamic')
 
+	quantitative_panelist_grades = db.relationship('QuantitativePanelistGrade', backref='panelist', lazy='dynamic', cascade="all, delete")
+
 	def __repr__(self):
 		return f"[{self.id}] {self.username} - {self.full_name}"
 
@@ -134,6 +136,9 @@ class Thesis(db.Model):
 	program_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('program.id'), nullable=False)
 	proponents = db.relationship('User', secondary=proponents, lazy='dynamic', backref=db.backref('theses', lazy='dynamic'))
 
+	quantitative_rating_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_rating.id'))
+	quantitative_panelist_grades = db.relationship('QuantitativePanelistGrade', backref='thesis', lazy='dynamic', cascade="all, delete") 
+
 	def __repr__(self):
 		title = self.title[0: (50 if len(self.title) > 50 else len(self.title))] + ('...' if len(self.title) > 50 else '')
 		old_or_number = "old" if self.is_old else f"{self.sy_start}-{self.semester}-{self.category.code}{self.program.code}-{self.number}"
@@ -176,3 +181,45 @@ class Group(db.Model):
 	# presentors = thesis.presentors.sortby presentor number
 	# for i in range(group presentors length sort by presentor number):
 	# 	presentors[i].number = i + 1
+
+# =================================================
+# A thesis can have 1 QuantitativeRating template it can follow (depending sa college) 
+# wherein its criteria can be dynamically set through QuantitativeCriteria
+
+# A panelist will have a collection of its grades for a certain thesis stored in QuantitativePanelGrade
+# the QuantitatveGrades stored in it will have the corresponding grade and the QunatitativeCriteria it grades
+# it can also be marked by is_final to know if the panelist is done grading the quantitative aspect for that specfic thesis
+# =================================================
+
+class QuantitativeRating(db.Model):
+	id = db.Column(INTEGER(unsigned=True), primary_key=True)
+	name = db.Column(db.String(120))
+
+	# theses using this rating template
+	theses = db.relationship('Thesis', backref='quantitative_rating', lazy='dynamic')
+
+	criteria = db.relationship('QuantitativeCriteria', backref='rating', lazy='dynamic', cascade="all, delete")
+
+class QuantitativeCriteria(db.Model):
+	id = db.Column(INTEGER(unsigned=True), primary_key=True)
+	name =  db.Column(db.String(64))
+	quantitative_rating_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_rating.id'), nullable=False)
+
+	grades = db.relationship('QuantitativeCriteriaGrade', backref='criteria', lazy='dynamic', cascade="all, delete")
+
+# collection of grades a panel has
+class QuantitativePanelistGrade(db.Model):
+	id = db.Column(INTEGER(unsigned=True), primary_key=True)
+	is_final = db.Column(BOOLEAN(), default=False, nullable=False)
+	panelist_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
+	thesis_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('thesis.id'), nullable=False)
+
+	grades = db.relationship('QuantitativeCriteriaGrade', backref='panelist_grade', lazy='dynamic', cascade="all, delete")
+
+class QuantitativeCriteriaGrade(db.Model):
+	id = db.Column(INTEGER(unsigned=True), primary_key=True)
+	grade = db.Column(db.Integer)
+	quantitative_criteria_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_criteria.id'), nullable=False)
+	quantitative_panelist_grade_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_panelist_grade.id'), nullable=False)
+
+
