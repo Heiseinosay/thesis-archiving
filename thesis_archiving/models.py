@@ -84,6 +84,12 @@ class User(db.Model, UserMixin):
 
 	quantitative_panelist_grades = db.relationship('QuantitativePanelistGrade', backref='panelist', lazy='dynamic', cascade="all, delete")
 
+	student_individual_ratings = db.relationship('IndividualRating', backref='student', lazy='dynamic', cascade="all, delete")
+
+	panelist_individual_rating = db.relationship('IndividualRating', backref='panelist', lazy='dynamic', cascade="all, delete")
+
+	revision_list = db.relationship('IndividualRating', backref='panelist', lazy='dynamic', cascade="all, delete")
+
 	def __repr__(self):
 		return f"[{self.id}] {self.username} - {self.full_name}"
 
@@ -125,6 +131,8 @@ class Thesis(db.Model):
 	semester = db.Column(db.Integer)
 	number = db.Column(db.Integer, unique=True)
 	date_deployed = db.Column(db.DateTime)
+	date_defense = db.Column(db.DateTime)
+	qualitative_rating = db.Column(db.String(64))
 	date_registered = db.Column(db.DateTime, nullable=False, default=lambda:datetime.now(tz=pytz.timezone('Asia/Manila')))
 
 	adviser_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
@@ -137,7 +145,10 @@ class Thesis(db.Model):
 	proponents = db.relationship('User', secondary=proponents, lazy='dynamic', backref=db.backref('theses', lazy='dynamic'))
 
 	quantitative_rating_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_rating.id'))
-	quantitative_panelist_grades = db.relationship('QuantitativePanelistGrade', backref='thesis', lazy='dynamic', cascade="all, delete") 
+
+	quantitative_panelist_grades = db.relationship('QuantitativePanelistGrade', backref='thesis', lazy='dynamic', cascade="all, delete")
+
+	revision_lists = db.relationship('RevisionList', backref='thesis', lazy='dynamic', cascade="all, delete")
 
 	def __repr__(self):
 		title = self.title[0: (50 if len(self.title) > 50 else len(self.title))] + ('...' if len(self.title) > 50 else '')
@@ -189,6 +200,8 @@ class Group(db.Model):
 # A panelist will have a collection of its grades for a certain thesis stored in QuantitativePanelGrade
 # the QuantitatveGrades stored in it will have the corresponding grade and the QunatitativeCriteria it grades
 # it can also be marked by is_final to know if the panelist is done grading the quantitative aspect for that specfic thesis
+
+# quanti rating is also panel specific for each thesis
 # =================================================
 
 class QuantitativeRating(db.Model):
@@ -222,4 +235,30 @@ class QuantitativeCriteriaGrade(db.Model):
 	quantitative_criteria_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_criteria.id'), nullable=False)
 	quantitative_panelist_grade_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_panelist_grade.id'), nullable=False)
 
+# =================================================
+# individual rating is panel specific for each student
+# =================================================
+class IndividualRating(db.Model):
+	id = db.Column(INTEGER(unsigned=True), primary_key=True)
+	intelligent_response = db.Column(db.Integer)
+	respectful_response = db.Column(db.Integer)
+	communication_skills = db.Column(db.Integer)
+	confidence = db.Column(db.Integer)
+	attire = db.Column(db.Integer)
+	is_final = db.Column(BOOLEAN(), default=False, nullable=False)
 
+	student_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
+	thesis_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('thesis.id'), nullable=False)
+	panelist_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
+
+
+# =================================================
+# revision list is panel specific for each student
+# =================================================
+class RevisionList(db.Model):
+	id = db.Column(INTEGER(unsigned=True), primary_key=True)
+	comment = db.Column(db.String(10000))
+	is_final = db.Column(BOOLEAN(), default=False, nullable=False)
+
+	thesis_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('thesis.id'), nullable=False)
+	panelist_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
