@@ -63,6 +63,10 @@ panelists = db.Table('panelists',
 )
 
 class User(db.Model, UserMixin):
+
+	# ambiguous foreign keys fix
+	# https://www.reddit.com/r/flask/comments/2o4ejl/af_flask_sqlalchemy_two_foreign_keys_referencing/
+
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
 	username = db.Column(db.String(20), unique=True, nullable=False)
 	full_name = db.Column(db.String(64), nullable=False)
@@ -84,11 +88,11 @@ class User(db.Model, UserMixin):
 
 	quantitative_panelist_grades = db.relationship('QuantitativePanelistGrade', backref='panelist', lazy='dynamic', cascade="all, delete")
 
-	student_individual_ratings = db.relationship('IndividualRating', backref='student', lazy='dynamic', cascade="all, delete")
+	student_individual_ratings = db.relationship('IndividualRating', backref='student', lazy='dynamic', foreign_keys='IndividualRating.student_id', cascade="all, delete")
 
-	panelist_individual_rating = db.relationship('IndividualRating', backref='panelist', lazy='dynamic', cascade="all, delete")
+	panelist_individual_rating = db.relationship('IndividualRating', backref='panelist', lazy='dynamic', foreign_keys='IndividualRating.panelist_id', cascade="all, delete")
 
-	revision_list = db.relationship('IndividualRating', backref='panelist', lazy='dynamic', cascade="all, delete")
+	revision_list = db.relationship('RevisionList', backref='panelist', lazy='dynamic', cascade="all, delete")
 
 	def __repr__(self):
 		return f"[{self.id}] {self.username} - {self.full_name}"
