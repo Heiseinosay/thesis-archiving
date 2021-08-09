@@ -42,6 +42,8 @@ def create():
         if not result['invalid']:
             # prevent premature flushing
             with db.session.no_autoflush:
+                data = result['valid']
+
                 group_ = Group()
 
                 group_.number = data['number']

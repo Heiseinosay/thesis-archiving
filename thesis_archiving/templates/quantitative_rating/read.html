@@ -1,0 +1,64 @@
+{% from "components/_pagination.html" import pagination %}
+{% from "components/_data_actions.html" import data_actions %}
+{% extends "base.html" %}
+
+{% block body %}
+
+	<div class="container">
+		<div class="row justify-content-center">
+			<div class="col-12 col-md-8 col-xl-6 py-3">
+				<div class="card px-3 shadow-sm border-0">
+					<div class="card-body">
+						
+						<!-- title and create -->
+						<h3 class="card-title">
+							<div class="d-flex flex-wrap justify-content-between">
+								<span>
+									Quantitative Rating
+								</span>
+								<div class="d-flex flex-wrap align-items-start">
+									{{ data_actions(create_url='quantitative_rating.create', create_label='Quantitative Rating') }}
+								</div>
+							</div>
+						</h3>
+
+						<!-- total -->
+						<h6 class="card-subtitle mb-2">
+							Total: {{quantitative_ratings.total}}
+						</h6>
+
+						<!-- table -->
+						<div class="table-responsive">
+
+							<table class="table table-borderless table-striped table-hover">
+								<thead>
+									<tr>
+										<th scope="col">#</th>
+										<th scope="col">Name</th>
+										<th scope="col">Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for quantitative_rating in quantitative_ratings.items %}
+										<tr>
+											<th scope="row">{{ quantitative_ratings.page * quantitative_ratings.per_page - quantitative_ratings.per_page + loop.index }}</th>
+											<td>{{ quantitative_rating.name }}</td>
+											<td>
+												<a class="btn btn-sm btn-primary bi bi-pencil align-self-start mr-1" href="#" role="button"></a>
+												<a class="btn btn-sm btn-danger bi bi-trash align-self-start" href="#" role="button"></a>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	{{ pagination(quantitative_ratings, "quantitative_rating.read") }}
+	
+{% endblock %}

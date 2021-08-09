@@ -210,7 +210,7 @@ class Group(db.Model):
 
 class QuantitativeRating(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
-	name = db.Column(db.String(120))
+	name = db.Column(db.String(120), unique=True)
 
 	# theses using this rating template
 	theses = db.relationship('Thesis', backref='quantitative_rating', lazy='dynamic')

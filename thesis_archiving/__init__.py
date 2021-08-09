@@ -39,6 +39,7 @@ def create_app(config_class=Config):
     from thesis_archiving.program.routes import program
     from thesis_archiving.category.routes import category
     from thesis_archiving.group.routes import group
+    from thesis_archiving.quantitative_rating.routes import quantitative_rating
 
     app.register_blueprint(main)
     app.register_blueprint(thesis)
@@ -47,6 +48,8 @@ def create_app(config_class=Config):
     app.register_blueprint(program)
     app.register_blueprint(category)
     app.register_blueprint(group)
+    app.register_blueprint(quantitative_rating)
+    
     
     # import models for flask migrate
     import thesis_archiving.models
