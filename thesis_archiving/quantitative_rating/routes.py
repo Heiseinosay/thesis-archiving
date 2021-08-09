@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
-# from werkzeug.exceptions import abort
-from flask_login import login_required, current_user
+
+from flask_login import login_required
 
 from thesis_archiving import db, quantitative_rating
 
@@ -65,3 +65,61 @@ def create():
 
 
     return render_template('quantitative_rating/create.html', result=result)
+
+@quantitative_rating.route("/update/<int:quantitative_rating_id>", methods=['POST','GET'])
+@login_required
+@has_roles("is_admin")
+def update(quantitative_rating_id):
+
+    quantitative_rating_ = QuantitativeRating.query.get_or_404(quantitative_rating_id)
+
+    result = {
+        'valid' : {},
+        'invalid' : {}
+    }
+
+    # if request.method == 'POST':
+    #     # contains form data converted to mutable dict
+    #     data = request.form.to_dict()
+        
+    #     # marshmallow validation
+    #     result = validate_input(data, CreateQuantitativeRatingSchema)
+
+    #     if not result['invalid']:
+    #         # prevent premature flushing
+    #         with db.session.no_autoflush:
+    #             # values for validated and filtered input
+    #             data = result['valid']
+
+    #             quantitative_rating_ = QuantitativeRating()
+
+    #             quantitative_rating_.name = data['name']
+
+    #             try:
+    #                 db.session.add(quantitative_rating_)
+    #                 db.session.commit()
+    #                 flash("Successfully created a new quantitative rating.", "success")
+    #                 return redirect(url_for('quantitative_rating.read'))
+
+    #             except:
+    #                 flash("An error occured", "danger")
+
+
+    return render_template('quantitative_rating/update.html', result=result, quantitative_rating=quantitative_rating_)
+
+@quantitative_rating.route("/delete/<int:quantitative_rating_id>", methods=['POST'])
+@login_required
+@has_roles("is_admin")
+def delete(quantitative_rating_id):
+
+    quantitative_rating_ = QuantitativeRating.query.get_or_404(quantitative_rating_id)
+
+    try:
+        db.session.delete(quantitative_rating_)
+        db.session.commit()
+        flash("Successfully deleted a quantitative rating.", "success")
+
+    except:
+        flash("An error occured", "danger")
+    
+    return redirect(url_for('quantitative_rating.read'))
