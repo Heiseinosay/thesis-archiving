@@ -1,0 +1,67 @@
+{% macro thesis_card_grading(thesis, group_id) %}
+
+    <div class="card overflow-auto">
+        <div class="card-body">
+
+            <h5 class="card-title">
+                <div class="d-flex justify-content-between">
+                    <!-- title -->
+                    <div>
+                        {{thesis.title}}
+                    </div>
+
+                    <!-- proceed to grade -->
+                
+                    <div class="d-flex flex-nowrap">
+                        <a class="btn btn-sm btn-ueccss bi bi-arrow-bar-right align-self-start mx-1" href="{{ url_for('group.grading', group_id=group_id, thesis_id=thesis.id) }}" role="button"></a>
+                    </div>
+
+                </div>
+            </h5>
+        
+
+            <!-- program and category -->
+            <h6 class="card-subtitle mb-2">
+                {{thesis.program.name}}
+                <small class="text-muted">{{thesis.category.name}}</small>
+            </h6>
+
+            <h6 class="card-subtitle mb-2">
+                <!-- area -->
+                <span class="badge bg-dark">{{thesis.area if thesis.area else ''}}</span>
+                
+                <!-- keywords -->
+                {% if thesis.keywords %}
+                    {% for keyword in thesis.keywords.split(',') %}
+                        <span class="badge rounded-pill bg-light text-dark">{{keyword}}</span>
+                    {% endfor %}
+                {% endif %}
+            </h6>
+            
+
+            <h6 class="card-subtitle mb-2">
+                <!-- adviser -->
+                <span class="badge bg-ueccss">{{thesis.adviser.full_name}}</span>
+                
+                <!-- proponents -->
+                {% for proponent in thesis.proponents %}
+                    <span class="badge rounded-pill bg-secondary text-light">{{proponent.full_name}}</span>
+                {% endfor %}
+            </h6>
+
+            <!-- overview -->
+            <p class="card-text small">
+                {% if thesis.overview %}
+                    {% if thesis.overview|length > 500 %}
+                        {{thesis.overview[0:500]}}...
+                    {% else %}
+                        {{thesis.overview}}
+                    {% endif %}
+                {% endif %}
+            </p>
+            
+        </div>
+    </div>
+
+{% endmacro %}
+

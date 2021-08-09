@@ -1,0 +1,32 @@
+{% from 'components/_thesis_card_grading.html' import thesis_card_grading %}
+
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container py-3">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-7 mb-3">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        Group {{ group.number }} Presentors
+                    </h3>
+
+                    <h5 class="text-muted mb-4">
+                        <small>Chairman: {{ group.chairman.full_name }}</small>
+                    </h5>
+
+                    <!-- presentor is a Thesis object -->
+                    {% for presentor in group.presentors %}
+                        {{ thesis_card_grading(presentor, group.id) }}
+                    {% endfor %}
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>		
+</div>
+
+{% endblock %}
