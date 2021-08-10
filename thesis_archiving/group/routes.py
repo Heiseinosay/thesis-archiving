@@ -12,11 +12,6 @@ from thesis_archiving.group.validation import CreateGroupSchema, UpdateGroupSche
 
 group = Blueprint("group", __name__, url_prefix="/group")
 
-# create
-# read 
-# update
-# delete
-
 @group.route("/create", methods=["POST","GET"])
 @login_required
 @has_roles("is_admin")

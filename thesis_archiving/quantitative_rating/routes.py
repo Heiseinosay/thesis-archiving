@@ -2,13 +2,13 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 
 from flask_login import login_required
 
-from thesis_archiving import db, quantitative_rating
+from thesis_archiving import db
 
 from thesis_archiving.utils import has_roles
-from thesis_archiving.models import QuantitativeRating
+from thesis_archiving.models import QuantitativeRating, QuantitativeCriteria
 from thesis_archiving.validation import validate_input
 
-from thesis_archiving.quantitative_rating.validation import CreateQuantitativeRatingSchema
+from thesis_archiving.quantitative_rating.validation import CreateQuantitativeRatingSchema, UpdateQuantitativeRatingSchema
 
 quantitative_rating = Blueprint("quantitative_rating", __name__, url_prefix="/quantitative_rating")
 
@@ -78,31 +78,41 @@ def update(quantitative_rating_id):
         'invalid' : {}
     }
 
-    # if request.method == 'POST':
-    #     # contains form data converted to mutable dict
-    #     data = request.form.to_dict()
+    if request.method == 'POST':
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
         
-    #     # marshmallow validation
-    #     result = validate_input(data, CreateQuantitativeRatingSchema)
+        # remove empty item
+        if not data['criteria_name']:
+            data.pop('criteria_name')
 
-    #     if not result['invalid']:
-    #         # prevent premature flushing
-    #         with db.session.no_autoflush:
-    #             # values for validated and filtered input
-    #             data = result['valid']
+        # marshmallow validation
+        result = validate_input(data, UpdateQuantitativeRatingSchema, quantitative_rating_obj=quantitative_rating_)
 
-    #             quantitative_rating_ = QuantitativeRating()
+        if not result['invalid']:
 
-    #             quantitative_rating_.name = data['name']
+            # prevent premature flushing
+            with db.session.no_autoflush:
 
-    #             try:
-    #                 db.session.add(quantitative_rating_)
-    #                 db.session.commit()
-    #                 flash("Successfully created a new quantitative rating.", "success")
-    #                 return redirect(url_for('quantitative_rating.read'))
+                # values for validated and filtered input
+                data = result['valid']
 
-    #             except:
-    #                 flash("An error occured", "danger")
+                quantitative_rating_.name = data['name']
+
+                if data.get('criteria_name'):
+
+                    # create a new criteria to append to the quanti rating
+                    quantitative_criteria_ = QuantitativeCriteria()
+                    quantitative_criteria_.name = data['criteria_name']
+
+                    quantitative_rating_.criteria.append(quantitative_criteria_)
+
+                try:
+                    db.session.commit()
+                    flash("Successfully updated quantitative rating.", "success")
+
+                except:
+                    flash("An error occured", "danger")
 
 
     return render_template('quantitative_rating/update.html', result=result, quantitative_rating=quantitative_rating_)

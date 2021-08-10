@@ -1,4 +1,4 @@
-{% macro delete_modal(delete_url, id, name) %}
+{% macro delete_modal(delete_url, id, name, msg) %}
 
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-sm btn-danger bi bi-trash align-self-start" data-bs-toggle="modal" data-bs-target="#chairmanModal-{{id}}">
@@ -17,7 +17,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <small>Are you sure you want to delete this record? <strong>({{name}})</strong></small>
+          <small>Are you sure you want to delete this record? {{msg}} <strong>({{name}})</strong></small>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
