@@ -110,6 +110,7 @@ def update(quantitative_rating_id):
                 try:
                     db.session.commit()
                     flash("Successfully updated quantitative rating.", "success")
+                    return redirect(request.referrer)
 
                 except:
                     flash("An error occured", "danger")
