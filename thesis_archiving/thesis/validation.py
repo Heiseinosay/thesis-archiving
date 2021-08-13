@@ -1,5 +1,5 @@
 from thesis_archiving.validation import validate_empty
-from thesis_archiving.models import User, Program, Category
+from thesis_archiving.models import User, Program, Category, Group, QuantitativeRating
 from marshmallow import Schema, fields, validate, pre_load, post_load, validates, ValidationError
 from datetime import datetime
 import pytz
@@ -109,6 +109,7 @@ class UpdateThesisSchema(Schema):
 	category_id = fields.Int(required=True)
 	program_id = fields.Int(required=True)
 	group_id = fields.Int()
+	quantitative_rating_id = fields.Int()
 
 	@pre_load
 	def strip_fields(self, in_data, **kwargs):
@@ -119,3 +120,13 @@ class UpdateThesisSchema(Schema):
 		in_data["keywords"] = in_data["keywords"].strip()
 		
 		return in_data
+
+	@validates("group_id")
+	def validate_group_id(self, data):
+		if not Group.query.get(data):
+			raise ValidationError("Panel group is invalid.")
+
+	@validates("quantitative_rating_id")
+	def validate_quantitative_rating_id(self, data):
+		if not QuantitativeRating.query.get(data):
+			raise ValidationError("Quantitative rating is invalid.")

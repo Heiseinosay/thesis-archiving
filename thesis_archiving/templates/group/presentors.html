@@ -16,7 +16,7 @@
                     <h5 class="text-muted mb-4">
                         <small>Chairman: {{ group.chairman.full_name }}</small>
                     </h5>
-
+                    
                     <!-- presentor is a Thesis object -->
                     {% for presentor in group.presentors %}
                         {{ thesis_card_grading(presentor, group.id) }}

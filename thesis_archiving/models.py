@@ -1,4 +1,5 @@
 from flask import current_app
+from flask.helpers import flash
 from flask_login import UserMixin
 from sqlalchemy.dialects.mysql import INTEGER, BOOLEAN, BIGINT
 
@@ -113,6 +114,41 @@ class User(db.Model, UserMixin):
 
 		return User.query.get(_user_id)
 
+	def check_quantitative_panelist_grade(self, thesis):
+		
+		# fetch the panel's quantatitative grades for the thesis
+		panelist_grade = self.quantitative_panelist_grades.filter_by(thesis_id=thesis.id).first()
+
+		# create if there is none
+		if not panelist_grade:
+			
+			# create panelist grade for the thesis
+			panelist_grade = QuantitativePanelistGrade()
+			panelist_grade.panelist_id = self.id
+			panelist_grade.thesis_id = thesis.id
+			
+			# fetch each criteria of the rating for the thesis
+			criteria = thesis.quantitative_rating.criteria
+
+			# create grade for each criteria
+			for criterion in criteria:
+				# grade object
+				grade = QuantitativeCriteriaGrade()
+				
+				# set quantitative_criteria_id for the grade object
+				criterion.grades.append(grade)
+
+				# set quantitative_panelist_grade_id for the grade object
+				panelist_grade.grades.append(grade)
+			
+			# insert newly created panelist_grade for the thesis
+			try:
+				db.session.add(panelist_grade)
+				db.session.commit()
+				flash('Created quantitative rating grades.','success')
+			except:
+				flash('An error occured while creating quantitative rating grades.','danger')
+
 class Log(db.Model):
 	id = db.Column(BIGINT(unsigned=True), primary_key=True)
 	description = db.Column(db.String(60), nullable=False)
@@ -220,7 +256,7 @@ class QuantitativeRating(db.Model):
 class QuantitativeCriteria(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
 	name =  db.Column(db.String(64))
-	quantitative_rating_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_rating.id'), nullable=False)
+	quantitative_rating_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_rating.id', ondelete='cascade'), nullable=False)
 
 	grades = db.relationship('QuantitativeCriteriaGrade', backref='criteria', lazy='dynamic', cascade="all, delete")
 
@@ -228,16 +264,16 @@ class QuantitativeCriteria(db.Model):
 class QuantitativePanelistGrade(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
 	is_final = db.Column(BOOLEAN(), default=False, nullable=False)
-	panelist_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
-	thesis_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('thesis.id'), nullable=False)
+	panelist_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id', ondelete='cascade'), nullable=False)
+	thesis_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('thesis.id', ondelete='cascade'), nullable=False)
 
 	grades = db.relationship('QuantitativeCriteriaGrade', backref='panelist_grade', lazy='dynamic', cascade="all, delete")
 
 class QuantitativeCriteriaGrade(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
 	grade = db.Column(db.Integer)
-	quantitative_criteria_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_criteria.id'), nullable=False)
-	quantitative_panelist_grade_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_panelist_grade.id'), nullable=False)
+	quantitative_criteria_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_criteria.id', ondelete='cascade'), nullable=False)
+	quantitative_panelist_grade_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_panelist_grade.id', ondelete='cascade'), nullable=False)
 
 # =================================================
 # individual rating is panel specific for each student

@@ -4,7 +4,7 @@ from flask_login import login_required
 from sqlalchemy import or_
 
 from thesis_archiving import db
-from thesis_archiving.models import Thesis, User, Program, Category, Group
+from thesis_archiving.models import QuantitativeCriteria, QuantitativePanelistGrade, QuantitativeRating, Thesis, User, Program, Category, Group
 from thesis_archiving.utils import export_to_excel, has_roles
 from thesis_archiving.validation import validate_input
 
@@ -192,9 +192,33 @@ def update(thesis_id):
                 # when assigned a group
                 if data.get('group_id'):
                     group_ = Group.query.get(data['group_id'])
-                    print(group_)
                     _thesis.group = group_
+
                 
+                if data.get('quantitative_rating_id'):
+
+                    id = data['quantitative_rating_id']
+                    
+                    # when assigned new quanti rating,
+                    # delete its current quanti grades and assign to new rating
+                    if id != _thesis.quantitative_rating_id:
+                        
+                        # https://stackoverflow.com/questions/39773560/sqlalchemy-how-do-you-delete-multiple-rows-without-querying    
+
+                        # bulk deletes bypasses in-python cascades but not fk(ondelete='cascade')
+                        # https://stackoverflow.com/questions/46904273/sqlalchemy-delete-all-items-and-not-just-the-first#comment80807412_46904371
+
+                        query = QuantitativePanelistGrade.__table__.delete()\
+                            .where(QuantitativePanelistGrade.thesis_id == _thesis.id)
+
+                        _thesis.quantitative_rating_id = id
+
+                        try:
+                            db.session.execute(query)
+                            flash("Successfully deleted current quantitative rating grades.", "success")
+                        except:
+                            flash("An error occured while deleting current quantitative grades.", "danger")
+
                 try:
                     db.session.commit()
                     flash("Successfully updated thesis.", "success")

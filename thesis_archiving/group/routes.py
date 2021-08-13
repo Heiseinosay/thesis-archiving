@@ -9,6 +9,7 @@ from thesis_archiving.models import Group, IndividualRating, User, Thesis
 from thesis_archiving.validation import validate_input
 
 from thesis_archiving.group.validation import CreateGroupSchema, UpdateGroupSchema
+from thesis_archiving.group.utils import check_panelists
 
 group = Blueprint("group", __name__, url_prefix="/group")
 
@@ -169,7 +170,7 @@ def chairman_assign(group_id):
         group_.chairman = current_user
         db.session.commit()
         flash("Successfully assigned as chairman.","success")
-        return redirect(url_for('group.grading', group_id=group_id))
+        return redirect(url_for('group.presentors', group_id=group_id))
     except:
         flash("An error occured.","danger")
 
@@ -182,12 +183,7 @@ def presentors(group_id):
 
     group_ = Group.query.get_or_404(group_id)
     
-    if current_user not in group_.panelists:
-        abort(403)
-
-    if not group_.chairman:
-        flash("Please assign a chairman before proceeding.", "danger")
-        return redirect('user.profile')
+    check_panelists(current_user, group_)
 
     return render_template('group/presentors.html', group=group_)
 
@@ -199,16 +195,25 @@ def grading(group_id, thesis_id):
     group_ = Group.query.get_or_404(group_id)
     thesis_ = Thesis.query.get_or_404(thesis_id)
     
-    if current_user not in group_.panelists:
-        abort(403)
-
-    if not group_.chairman:
-        flash("Please assign a chairman before proceeding.", "danger")
-        return redirect('user.profile')
+    check_panelists(current_user, group_)
 
     if thesis_ not in group_.presentors:
         abort(406)
 
-    individual_ratings = { proponent.id : IndividualRating.query.filter_by(thesis_id=thesis_id, student_id=proponent.id, panelist_id=current_user.id).first() for proponent in thesis_.proponents }
+    current_user.check_quantitative_panelist_grade(thesis_)
 
-    return render_template('group/grading.html', thesis=thesis_, individual_ratings=individual_ratings)
+    quantitative_panelist_grade_ = current_user.quantitative_panelist_grades.filter_by(thesis_id=thesis_.id).first()
+
+    individual_ratings = { 
+        proponent.id : IndividualRating.query.filter_by(
+            thesis_id=thesis_id, 
+            student_id=proponent.id, 
+            panelist_id=current_user.id).first() for proponent in thesis_.proponents 
+            }
+
+    return render_template(
+        'group/grading.html', 
+        thesis=thesis_,
+        individual_ratings=individual_ratings,
+        quantitative_panelist_grade=quantitative_panelist_grade_
+        )

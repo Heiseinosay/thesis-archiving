@@ -25,6 +25,7 @@
                                     'proponents': thesis.proponents,
                                     'program_id': request.form['program_id'] if request.form['program_id'] else thesis.program_id,
                                     'category_id': request.form['category_id'] if request.form['category_id'] else thesis.category_id,
+                                    'quantitative_rating_id': request.form['quantitative_rating_id'] if request.form['quantitative_rating_id'] else thesis.quantitative_rating_id,
                                     'sy_start': request.form['sy_start'] if request.form['sy_start'] else thesis.sy_start,
                                     'semester': request.form['semester'] if request.form['semester'] else thesis.semester,
                                     'is_old': (request.form['is_old'] | int) if request.form['is_old'] else (thesis.is_old | int),
@@ -55,15 +56,21 @@
                             
                             <div class="row mb-3">
                                 <!-- program -->
-                                <div class="col-12 col-sm-6">
+                                <div class="col-12 col-sm-4">
                                     <label class="form-label h6">Program</label>
                                     {{ field_select("program_id", result, select_choices['program_id'], thesis['program_id']) }}
                                 </div>
                                 
                                 <!-- category -->
-                                <div class="col-12 col-sm-6">
+                                <div class="col-12 col-sm-4">
                                     <label class="form-label h6">Category</label>
                                     {{ field_select("category_id", result, select_choices['category_id'], thesis['category_id']) }}        
+                                </div>
+
+                                <div class="col-12 col-sm-4">
+                                    <label class="form-label h6">Quantitative Rating</label>
+                                    {{ field_select("quantitative_rating_id", result, select_choices['quantitative_rating_id'], thesis['quantitative_rating_id']) }}
+                                    <small>Existing grades associated with the thesis for the <strong>current rating</strong> are <strong>deleted</strong> after changing.</small>
                                 </div>
                             </div>
 

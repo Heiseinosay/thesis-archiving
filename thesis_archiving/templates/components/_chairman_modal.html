@@ -9,7 +9,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Become chairman</h5>
+          <h5 class="modal-title" id="exampleModalLabel">Chairman assignment for Group {{group.number}}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -23,7 +23,7 @@
               <button type="submit" class="btn btn-uefaculty">Become Chairman</button>
           </form>
           {% if group.chairman %}
-          <a class="btn btn-primary" href="{{ url_for('group.grading', group_id=group.id) }}" role="button">Proceed</a>
+          <a class="btn btn-primary" href="{{ url_for('group.presentors', group_id=group.id) }}" role="button">Proceed</a>
           {% endif %}
         </div>
       </div>
