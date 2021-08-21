@@ -1,0 +1,60 @@
+{% set grades = {
+
+    {# 5 - > 1 grades #}
+
+    'CHARACTER DEVELOPMENT' : {
+        'ALL characters are fully developed. They reflect appropriate attributes evident with their physical and  behavioural characteristics.',
+        'MOST characters are fully developed. They reflect appropriate attributes evident with their physical and  behavioural characteristics.',
+        'MANY characters are fully developed. They reflect appropriate attributes evident with their physical and  behavioural characteristics.',
+        'FEW characters are fully developed. They reflect appropriate attributes evident with their physical and  behavioural characteristics.',
+        'The characters are not fully developed.  They do not reflect appropriate attributes evident with their physical and  behavioural characteristics.'
+    },
+
+    'ENVIRONMENT DEVELOPMENT' : {
+        'ALL environments are fully developed. Dimensions, perspectives, colors, texture, and inherent details are translated effectively.',
+        'MOST environments are fully developed. Dimensions, perspectives, colors, texture, and inherent details are translated effectively.',
+        'MANY environments are fully developed. Dimensions, perspectives, colors, texture, and inherent details are translated effectively.',
+        'FEW environments are fully developed. Dimensions, perspectives, colors, texture, and inherent details are translated effectively.',
+        'The environments are not fully developed. Dimensions, perspectives, colors, texture, and inherent details are not translated effectively.'
+    },
+
+    'ANIMATION' : {
+        'Correct application of animation principles are evident in ALL scenes to solicit the appropriate reaction/response from the audience.',
+        'Correct application of animation principles are evident in MOST scenes to solicit the appropriate reaction/response from the audience.',
+        'Correct application of animation principles are evident in MANY scenes to solicit the appropriate reaction/response from the audience.',
+        'Correct application of animation principles are evident in FEW scenes to solicit the appropriate reaction/response from the audience.',
+        'Correct application of animation principles are not evident in the scenes. Animation techniques do not impact the audience for appropriate reaction/response.'
+    },
+
+    'SOUND ELEMENTS' : {
+        'ALL sound elements are appropriate in the scenes.',
+        'MOST sound elements are appropriate in the scenes.',
+        'MANY sound elements are appropriate in the scenes.',
+        'FEW sound elements are appropriate in the scenes.',
+        'Sound elements are not appropriate in the scenes.'
+    },
+
+    'SCREENPLAY' : {
+        'ALL screenplay elements are present. The presentation to unravel the story and the language used are effective.',
+        'MOST screenplay elements are present. The presentation to unravel the story and the language used are effective.',
+        'MANY screenplay elements are present. The presentation to unravel the story and the language used are effective.',
+        'FEW screenplay elements are present. The presentation to unravel the story and the language used are effective.',
+        'The screenplay elements are not present. The presentation to unravel the story and the language used are not effective.'
+    },
+
+    'MANUSCRIPT' : {
+        'Exemplery!
+        The paper surpassed expectations.',
+        'A comprehensive paper is evident.',
+        'A comprehensive paper is moderately evident.',
+        'A comprehensive paper is slightly evident.',
+        'A comprehensive paper is not evident.'
+    }
+
+    grades = current_user.quantatitve_panelist_grades.grades
+    
+    for grade in grades:
+        grade = data[grade.criteria.name]
+    for criteria in quanti.criteria:
+        grade = data[criteria.name]
+} %}

@@ -18,7 +18,6 @@
                             <h4>Qualitative Rating</h4>
                             
                             {% for grade in quantitative_panelist_grade.grades %}
-                            
                                 <p>{{ grade.criteria.name }} </p>
                             {% endfor %}
                         </div>
@@ -27,7 +26,7 @@
                             <div class="d-grid gap-1">
                                 <h4>Individual Rating</h4>
                                 {% for proponent in thesis.proponents %}
-                                    {{proponent_card(proponent, individual_ratings[proponent.id])}}
+                                    {{proponent_card(proponent, thesis.id, individual_ratings[proponent.id])}}
                                 {% endfor %}
                             </div>
                         </div>

@@ -149,6 +149,31 @@ class User(db.Model, UserMixin):
 			except:
 				flash('An error occured while creating quantitative rating grades.','danger')
 
+	def check_student_individual_rating(self, student, thesis_id):
+		
+		# check for existing rating for the thesis and corresponding student
+		rating = student.student_individual_ratings.filter_by(
+			thesis_id = thesis_id,
+			panelist_id = self.id
+		).first()
+		
+		# create a rating if there is none
+		if not rating:
+			rating = IndividualRating()
+			rating.student_id = student.id
+			rating.thesis_id = thesis_id
+			rating.panelist_id = self.id
+
+			try:
+				db.session.add(rating)
+				db.session.commit()
+				flash("Created new individual rating.",'success')
+			except:
+				flash("An error occured.",'danger')
+				
+		return rating
+
+
 class Log(db.Model):
 	id = db.Column(BIGINT(unsigned=True), primary_key=True)
 	description = db.Column(db.String(60), nullable=False)
@@ -291,6 +316,9 @@ class IndividualRating(db.Model):
 	thesis_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('thesis.id'), nullable=False)
 	panelist_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
 
+	def check_thesis_id(self, thesis_id):
+		return True if thesis_id == self.thesis.id else False
+			
 
 # =================================================
 # revision list is panel specific for each student

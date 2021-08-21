@@ -45,6 +45,7 @@ def has_roles(*roles):
                 abort(401)
 
             if "is_adviser" in roles and current_user.is_adviser:
+                print("if else")
                 permitted = True
             
             if "is_guest_panelist" in roles and current_user.is_guest_panelist:

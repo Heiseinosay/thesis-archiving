@@ -1,4 +1,4 @@
-{% macro proponent_card(proponent, individual_rating) %}
+{% macro proponent_card(proponent, thesis_id, individual_rating) %}
 
     <div class="card overflow-auto">
         <div class="card-body">
@@ -17,7 +17,7 @@
 
                     <!-- proceed to indiv rating-->
                     <div class="d-flex flex-nowrap">
-                        <a class="btn btn-sm btn-ueccss bi bi-arrow-bar-right align-self-start mx-1" href="#" role="button" target="_blank"></a>
+                        <a class="btn btn-sm btn-ueccss bi bi-arrow-bar-right align-self-start mx-1" href="{{ url_for('individual_rating.grading', thesis_id=thesis_id, proponent_id=proponent.id) }}" role="button" target="_blank"></a>
                     </div>
 
                 </div>
