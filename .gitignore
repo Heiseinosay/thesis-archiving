@@ -4,4 +4,4 @@ scss
 package-lock.json
 script.py
 .env
-*pycache*
+**/*pycache*
