@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, send_file, flash
-from flask_login import login_required
+from flask_login import login_required, current_user
 
 from sqlalchemy import or_
 
@@ -22,11 +22,29 @@ def read():
     page = request.args.get('page', 1, type=int)
     search = '%' + request.args.get('search', '') + '%'
     
-    theses = Thesis.query.filter(
+    # base query
+    theses = Thesis.query
+
+    if current_user.is_student:
+        category_ = [
+                        categ.id for categ in Category.query.filter(
+                            or_(
+                                Category.name.like("Approved Title - On Going"),
+                                Category.name.like("Completed Title")
+                                )
+                            ).all()
+                    ]
+        
+        theses = theses.filter(
+                    Thesis.category_id.in_(category_)
+                )
+
+    theses = theses.filter(
                 or_(
                     Thesis.title.like(search),
                     Thesis.area.like(search),
-                    Thesis.keywords.like(search)
+                    Thesis.keywords.like(search),
+                    Thesis.overview.like(search)
                 )
             )
 

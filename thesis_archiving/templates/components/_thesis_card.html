@@ -26,15 +26,14 @@
             </h5>
             
             <!-- call number -->
-            {% if current_user.is_superuser or current_user.is_admin %}
-                {% if not thesis.is_old and thesis.sy_start and thesis.semester and thesis.number %}
-                    <h6 class="card-subtitle mb-2">
-                        {{thesis.sy_start}}-{{thesis.semester}}-{{thesis.category.code}}{{thesis.program.code}}-{{thesis.number}}
-                    </h6>
-
-                {% endif %}
+            {% if not thesis.is_old and thesis.sy_start and thesis.semester and thesis.number %}
+                <h6 class="card-subtitle mb-2">
+                    {{thesis.sy_start}}-{{thesis.semester}}-{{thesis.category.code}}{{thesis.program.code}}-{{thesis.number}}
+                </h6>
 
             {% endif %}
+
+            
 
             <!-- program and category -->
             <h6 class="card-subtitle mb-2">
@@ -55,17 +54,17 @@
             </h6>
             
 
-            {% if current_user.is_superuser or current_user.is_admin %}
-                <h6 class="card-subtitle mb-2">
-                    <!-- adviser -->
-                    <span class="badge bg-ueccss">{{thesis.adviser.full_name}}</span>
-                    
-                    <!-- proponents -->
-                    {% for proponent in thesis.proponents %}
-                        <span class="badge rounded-pill bg-secondary text-light">{{proponent.full_name}}</span>
-                    {% endfor %}
-                </h6>
-            {% endif %}
+            
+            <h6 class="card-subtitle mb-2">
+                <!-- adviser -->
+                <span class="badge bg-ueccss">{{thesis.adviser.full_name}}</span>
+                
+                <!-- proponents -->
+                {% for proponent in thesis.proponents %}
+                    <span class="badge rounded-pill bg-secondary text-light">{{proponent.full_name}}</span>
+                {% endfor %}
+            </h6>
+            
 
             <!-- overview -->
             <p class="card-text small">
