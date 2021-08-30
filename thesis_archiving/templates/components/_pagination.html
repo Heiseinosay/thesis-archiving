@@ -7,6 +7,7 @@
             <ul class="pagination justify-content-center">
                 
                 {# update dict for previous page#}
+                {# uses underscore variable to throwaway #}
                 {% set _ = params.update({'page': 1 if paginate_obj.page == 1 else paginate_obj.page - 1}) %}
 
                 {# use ** to spread kwargs #}
