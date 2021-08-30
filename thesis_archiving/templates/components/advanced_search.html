@@ -1,0 +1,65 @@
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-sm btn-ueccss me-1 bi bi-search" data-bs-toggle="modal" data-bs-target="#advacedSearch">
+  Advanced Search
+</button>
+
+<!-- Modal -->
+<form method="GET" action="">
+  <div class="modal fade" id="advacedSearch" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Advanced Search</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+
+          <!-- unfiltered search -->
+          <div class="mb-3">
+            <label class="form-label">Title/adviser/area/keywords/overview</label>
+            <input type="text" class="form-control" name="search">
+          </div>  
+          
+          <!-- program -->
+          <div class="mb-3">
+            <label class="form-label">Program</label>
+            <select class="form-select form-control" name="program_id">
+              <option selected disabled value="">...</option>
+              {% for program in programs %}
+                  <option value="{{ program.id }}">{{ program.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- category -->
+          <div class="mb-3">
+            <label class="form-label">Category</label>
+            <select class="form-select form-control" name="category_id">
+              <option selected disabled value="">...</option>
+              {% for category in categories %}
+                  <option value="{{ category.id }}">{{ category.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- year -->
+          <div class="mb-3">
+            <label class="form-label">Year started</label>
+            <select class="form-select form-control" name="sy_start">
+              <option selected disabled value="">...</option>
+              {% for year in years %}
+                  <option value="{{ year }}">{{ year }}</option>
+              {% endfor %}
+            </select>
+          </div>
+            
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="reset" class="btn btn-dark">Reset</button>
+                <button class="btn btn-ueccss" type="submit"><i class="bi bi-search"></i> Search</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>

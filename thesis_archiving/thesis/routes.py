@@ -12,6 +12,8 @@ from thesis_archiving.thesis.validation import CreateThesisSchema, UpdateThesisS
 from thesis_archiving.thesis.utils import select_choices
 
 from pprint import pprint
+from datetime import datetime
+import pytz
 
 thesis = Blueprint("thesis", __name__, url_prefix="/thesis")
 
@@ -21,6 +23,9 @@ def read():
     # login req
     page = request.args.get('page', 1, type=int)
     search = '%' + request.args.get('search', '') + '%'
+    program_id = request.args.get('program_id', type=int)
+    category_id = request.args.get('category_id', type=int)
+    sy_start = request.args.get('sy_start', type=int)
     
     # base query
     theses = Thesis.query
@@ -47,6 +52,18 @@ def read():
                     Thesis.overview.like(search)
                 )
             )
+    
+    # refine by program
+    if program_id:
+        theses = theses.filter_by(program_id=program_id)
+    
+    # refine by category
+    if category_id:
+        theses = theses.filter_by(category_id=category_id)
+
+    # refine by school year started
+    if sy_start:
+        theses = theses.filter_by(sy_start=sy_start)
 
     # refine query by adviser and proponents if search query is not just the 2 wildcards
     if len(search) > 2:
@@ -58,9 +75,15 @@ def read():
         # users = [u.id for u in User.query.filter_by(is_adviser=False).filter(or_(User.username.like(search), User.full_name.like(search))).all()]
         # theses = theses.union_all(Thesis.query.filter(Thesis.proponents.))
 
+
     theses = theses.order_by(Thesis.date_registered.desc()).order_by(Thesis.id.desc()).order_by(Thesis.number.desc()).paginate(page=page, per_page=25, error_out=False)
 
-    return render_template("thesis/read.html", theses=theses)
+    # select choices
+    programs = Program.query.order_by(Program.name).all()
+    categories = Category.query.order_by(Category.name).all()
+    years = [ year for year in range(2000, datetime.now(tz=pytz.timezone('Asia/Manila')).year + 1) ]
+
+    return render_template("thesis/read.html", theses=theses, programs=programs, categories=categories, years=years)
 
 @thesis.route("/export")
 @login_required
