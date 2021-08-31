@@ -20,7 +20,8 @@ thesis = Blueprint("thesis", __name__, url_prefix="/thesis")
 @thesis.route("/read")
 @login_required
 def read():
-    # login req
+    
+    # url params
     page = request.args.get('page', 1, type=int)
     search = '%' + request.args.get('search', '') + '%'
     program_id = request.args.get('program_id', type=int)
@@ -30,20 +31,7 @@ def read():
     # base query
     theses = Thesis.query
 
-    if current_user.is_student:
-        category_ = [
-                        categ.id for categ in Category.query.filter(
-                            or_(
-                                Category.name.like("Approved Title - On Going"),
-                                Category.name.like("Completed Title")
-                                )
-                            ).all()
-                    ]
-        
-        theses = theses.filter(
-                    Thesis.category_id.in_(category_)
-                )
-
+    # general search
     theses = theses.filter(
                 or_(
                     Thesis.title.like(search),
@@ -75,7 +63,22 @@ def read():
         # users = [u.id for u in User.query.filter_by(is_adviser=False).filter(or_(User.username.like(search), User.full_name.like(search))).all()]
         # theses = theses.union_all(Thesis.query.filter(Thesis.proponents.))
 
+    # limit results for students
+    if current_user.is_student:
+        category_ = [
+                        categ.id for categ in Category.query.filter(
+                            or_(
+                                Category.name.like("Approved Title - On Going"),
+                                Category.name.like("Completed Title")
+                                )
+                            ).all()
+                    ]
+        
+        theses = theses.filter(
+                    Thesis.category_id.in_(category_)
+                )
 
+    # paginate resulting query
     theses = theses.order_by(Thesis.date_registered.desc()).order_by(Thesis.id.desc()).order_by(Thesis.number.desc()).paginate(page=page, per_page=25, error_out=False)
 
     # select choices
