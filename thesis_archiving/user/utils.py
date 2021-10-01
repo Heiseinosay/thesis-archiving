@@ -4,6 +4,10 @@ from flask_mail import Message
 from thesis_archiving import mail
 
 def send_reset_request(user):
+    
+    # if smtp auth error
+    # https://stackoverflow.com/questions/26852128/smtpauthenticationerror-when-sending-mail-using-gmail-and-python
+    
     token = user.get_reset_token()
 
     msg = Message("Password Reset Request", sender=current_app.config['MAIL_USERNAME'], recipients=[user.email])

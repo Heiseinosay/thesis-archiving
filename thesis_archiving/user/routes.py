@@ -100,6 +100,9 @@ def password_reset(token):
         result = validate_input(data, PasswordResetSchema)
 
         if not result['invalid']:
+            
+            data = result['valid']
+    
             _user.password = bcrypt.generate_password_hash(data['password']).decode("utf-8")
             
             try:

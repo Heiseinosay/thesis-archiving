@@ -128,6 +128,7 @@ class User(db.Model, UserMixin):
 			panelist_grade.thesis_id = thesis.id
 			
 			# fetch each criteria of the rating for the thesis
+			# might raise an error if the thesis HAS NO quantitative grading criteria selected
 			criteria = thesis.quantitative_rating.criteria
 
 			# create grade for each criteria
