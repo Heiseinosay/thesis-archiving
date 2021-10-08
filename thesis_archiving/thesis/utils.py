@@ -23,11 +23,22 @@ def select_choices():
     return choices_
 
 def proposal_form_name(thesis, file):
+    
     _ , f_ext = os.path.splitext(file.filename)
+    
     return thesis.adviser.full_name + "-" + thesis.call_number() + f_ext
 
 def save_proposal_form(thesis, file):
     
+    # remove any existing
+    remove_proposal_form(thesis)
+
+    # create file name
+    file_name = proposal_form_name(thesis, file)
+    
+    # stage to db the file name for commit
+    thesis.proposal_form = file_name
+
     # root + year 
     path = os.path.join(
         current_app.root_path, 
@@ -37,7 +48,7 @@ def save_proposal_form(thesis, file):
         str(thesis.sy_start)
         )
     
-    # create directory for the year
+    # creates directory for the year 
     if not os.path.exists(path):
         os.makedirs(path)
     
@@ -49,15 +60,17 @@ def save_proposal_form(thesis, file):
 
 def remove_proposal_form(thesis):
 
-    path = os.path.join(
-        current_app.root_path, 
-        "static", 
-        "thesis_attachments", 
-        "proposal_form", 
-        str(thesis.sy_start),
-        thesis.proposal_form
-        )
+    proposal_form = thesis.proposal_form
+    
+    if proposal_form:
+        path = os.path.join(
+            current_app.root_path, 
+            "static", 
+            "thesis_attachments", 
+            "proposal_form", 
+            str(thesis.sy_start),
+            proposal_form
+            )
 
-    if os.path.exists(path):
-        
-        os.remove(path)
+        if os.path.exists(path):
+            os.remove(path)

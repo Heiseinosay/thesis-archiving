@@ -269,15 +269,15 @@ def update(thesis_id):
                     file = data.get('proposal_form')
                     file_name = proposal_form_name(_thesis, file)
                     
-                    try:
-                        remove_proposal_form(_thesis)
+                    # try:
+                    remove_proposal_form(_thesis)
 
-                        _thesis.proposal_form = file_name
+                    _thesis.proposal_form = file_name
 
-                        save_proposal_form(_thesis, file)
+                    save_proposal_form(_thesis, file)
 
-                    except:
-                        flash("An error occured while saving file.", "danger")
+                    # except:
+                    #     flash("An error occured while saving file.", "danger")
 
 
 
