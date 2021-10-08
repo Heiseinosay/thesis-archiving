@@ -7,9 +7,13 @@ from thesis_archiving import db
 from thesis_archiving.utils import has_roles
 from thesis_archiving.models import User, Thesis, IndividualRating
 
+from thesis_archiving.individual_rating.validation import IndividualRatingSchema
+
+from pprint import pprint
+
 individual_rating = Blueprint("individual_rating", __name__, url_prefix="/individual_rating")
 
-@individual_rating.route("/grading/<int:thesis_id>/<int:proponent_id>")
+@individual_rating.route("/grading/<int:thesis_id>/<int:proponent_id>", methods=["POST","GET"])
 @login_required
 @has_roles("is_adviser", "is_guest_panelist")
 def grading(thesis_id, proponent_id):
@@ -34,7 +38,23 @@ def grading(thesis_id, proponent_id):
         thesis_id=thesis.id
         )
 
-    return str(individual_rating_.id)
+    result = {
+        'valid' : {},
+        'invalid' : {}
+    }
+
+    if request.method == "POST":
+        
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+
+        pprint(data)
+    # submit for SAVE
+    # submit for GRADING (is_final) boolean nalang to lol checkable
+    # CONFIRMATION MODALS
+    # print din kung ano yung value na nakukuha
+
+    return render_template("individual_rating/grading.html", individual_rating=individual_rating_, result=result)
 
 # @individual_rating.route("/grading/<int:thesis_id>/<int:individual_rating_id>", methods=["POST"])
 # @login_required

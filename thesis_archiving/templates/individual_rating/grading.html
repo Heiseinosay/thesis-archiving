@@ -1,1 +1,131 @@
-test
+{% from "components/_fields.html" import field_checkbox, field_individual_rating %}
+
+{% extends "base.html" %}
+
+{% block body %}
+<div class="container py-3">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 mb-3">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h3 class="card-title mb-4">
+                        Individual Rating
+                        <span class="text-muted h5">{{individual_rating.student.username}} - {{individual_rating.student.full_name}}</span>
+                    </h3>
+
+                    <div class="row overflow-auto">
+                        <div class="col-12" style="min-width: 768px;">
+                            
+                            <form action="" method="POST">
+                                {%
+                                
+                                    set individual_rating = {
+                                        'intelligent_response' : request.form["intelligent_response"] if request.form["intelligent_response"] else individual_rating.intelligent_response,
+    
+                                        'respectful_response' : request.form["respectful_response"] if request.form["respectful_response"] else individual_rating.respectful_response,
+                                        
+                                        'communication_skills' : request.form["communication_skills"] if request.form["communication_skills"] else individual_rating.communication_skills,
+                                        
+                                        'confidence' : request.form["confidence"] if request.form["confidence"] else individual_rating.confidence,
+                                        
+                                        'attire' : request.form["attire"] if request.form["attire"] else individual_rating.attire,
+                                        
+                                        'is_final' : request.form["is_final"] if request.form["is_final"] else individual_rating.is_final
+                                    }
+
+                                %}
+
+
+                                {% include "components/csrf_token.html" %}
+                                
+                                <ol>
+                                    <li>
+                                        <div class="mb-3">
+                                            {{ field_individual_rating(
+                                                "Intelligent Response",
+                                                "intelligent_response",
+                                                result,
+                                                individual_rating["intelligent_response"]
+                                            ) }}
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="mb-3">
+                                            {{ field_individual_rating(
+                                                "Respectful Response",
+                                                "respectful_response",
+                                                result,
+                                                individual_rating["respectful_response"]
+                                            ) }}
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="mb-3">
+                                            {{ field_individual_rating(
+                                                "Communication Skills",
+                                                "communication_skills",
+                                                result,
+                                                individual_rating["communication_skills"]
+                                            ) }}
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="mb-3">
+                                            {{ field_individual_rating(
+                                                "Confidence",
+                                                "confidence",
+                                                result,
+                                                individual_rating["confidence"]
+                                            ) }}
+                                        </div>
+                                    </li>
+
+                                    <li>
+                                        <div class="mb-3">
+                                            {{ field_individual_rating(
+                                                "Attire",
+                                                "attire",
+                                                result,
+                                                individual_rating["attire"]
+                                            ) }}
+                                        </div>
+                                    </li>
+
+                                </ol>
+
+                                <div class="mt-5 mb-3 mx-3 d-flex justify-content-between">
+                                    
+                                    <div>
+
+                                        {{ field_checkbox(
+                                            "is_final",
+                                            result,
+                                            "Mark as final to be included for grading.",
+                                            individual_rating["is_final"]
+                                            ) 
+                                        }}
+                                    </div>
+
+                                    <button type="submit" class="btn btn-ueccss">Save</button>
+
+                                </div>
+                                
+
+                            </form>
+
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>		
+</div>
+
+{% endblock %}

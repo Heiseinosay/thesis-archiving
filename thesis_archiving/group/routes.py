@@ -210,6 +210,13 @@ def grading(group_id, thesis_id):
             student_id=proponent.id, 
             panelist_id=current_user.id).first() for proponent in thesis_.proponents 
             }
+    
+    # revision textarea
+    # submit for save
+    # submit for final (do proper checking + checkbox lang)
+    # each criteria will have unique validations
+    # unahin muna revision list + saving dahil mas madali
+    # CONFIRMATION MODALS
 
     return render_template(
         'group/grading.html', 

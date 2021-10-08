@@ -1,6 +1,8 @@
+from flask import current_app
 from thesis_archiving.models import User, Program, Category, Group, QuantitativeRating
 from datetime import datetime
 import pytz
+import os
 
 def select_choices():
 
@@ -19,3 +21,43 @@ def select_choices():
     }
 
     return choices_
+
+def proposal_form_name(thesis, file):
+    _ , f_ext = os.path.splitext(file.filename)
+    return thesis.adviser.full_name + "-" + thesis.call_number() + f_ext
+
+def save_proposal_form(thesis, file):
+    
+    # root + year 
+    path = os.path.join(
+        current_app.root_path, 
+        "static", 
+        "thesis_attachments", 
+        "proposal_form", 
+        str(thesis.sy_start)
+        )
+    
+    # create directory for the year
+    if not os.path.exists(path):
+        os.makedirs(path)
+    
+    # filename
+    path = os.path.join(path, thesis.proposal_form)
+
+    # check kung maooverwrite pag sinave on same file path
+    file.save(path)
+
+def remove_proposal_form(thesis):
+
+    path = os.path.join(
+        current_app.root_path, 
+        "static", 
+        "thesis_attachments", 
+        "proposal_form", 
+        str(thesis.sy_start),
+        thesis.proposal_form
+        )
+
+    if os.path.exists(path):
+        
+        os.remove(path)

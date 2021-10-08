@@ -1,4 +1,4 @@
-{% from "components/_fields.html" import field, field_select, field_textarea %}
+{% from "components/_fields.html" import field, field_select, field_textarea, field_file %}
 {% from "components/_proponents_update.html" import proponents_update %}
 
 {% extends "base.html" %}
@@ -15,7 +15,7 @@
 							Update Thesis
 						</h3>
 
-                        <form action="" method="POST">
+                        <form action="" method="POST" enctype='multipart/form-data'>
                             
                             {% 
                                 set thesis = {
@@ -117,14 +117,21 @@
                             </div>
 
                             <!-- overview -->
-                            <div class="mb-5">
+                            <div class="mb-3">
                                 <label class="form-label h6">Overview</label>
                                 {{ field_textarea("overview", result, thesis['overview']) }}
+                            </div>
+                            
+                            <!-- file input -->
+                            <div class="mb-5">
+                                <label class="form-label h6">Proposal Form</label>
+                                {{ field_file("proposal_form", result) }}
                             </div>
 
                             <div class="d-grid gap-2 mb-3">
                                 <button class="btn btn-ueccss" type="submit">Update</button>
                             </div>
+
                         </form>
                     </div>
                 </div>

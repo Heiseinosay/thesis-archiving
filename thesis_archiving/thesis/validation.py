@@ -3,6 +3,7 @@ from thesis_archiving.models import User, Program, Category, Group, Quantitative
 from marshmallow import Schema, fields, validate, pre_load, post_load, validates, ValidationError
 from datetime import datetime
 import pytz
+import os
 
 class CreateThesisSchema(Schema):
 	csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
@@ -111,6 +112,8 @@ class UpdateThesisSchema(Schema):
 	group_id = fields.Int()
 	quantitative_rating_id = fields.Int()
 
+	proposal_form = fields.Raw()
+
 	@pre_load
 	def strip_fields(self, in_data, **kwargs):
 		# dont strip password kasi baka may mag set ng spaces yung first and last lmao
@@ -130,3 +133,38 @@ class UpdateThesisSchema(Schema):
 	def validate_quantitative_rating_id(self, data):
 		if not QuantitativeRating.query.get(data):
 			raise ValidationError("Quantitative rating is invalid.")
+
+	@validates("proposal_form")
+	def validate_proposal_form(self, data): 
+		
+		err = []
+
+		# getting file ext
+		f_name, f_ext = os.path.splitext(data.filename)
+        
+		# end validation if empty file name
+		if not f_name:
+			return
+
+		# validate pdf file type
+		if f_ext != ".pdf":
+			err.append("PDF files only.")
+
+		# validate file size
+		
+		# set cursor right at the end
+		data.seek(0, os.SEEK_END) 
+		
+		# bytes -> mb
+		size = data.tell() / 1024 / 1024
+
+		if size > 5:
+			err.append("Upload file sizes up to 5mb only.")
+		
+		# set cursor back to beginning
+		data.seek(0) 
+        
+		if err:
+			raise ValidationError(err)
+
+	

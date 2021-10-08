@@ -9,7 +9,7 @@ from thesis_archiving.utils import export_to_excel, has_roles
 from thesis_archiving.validation import validate_input
 
 from thesis_archiving.thesis.validation import CreateThesisSchema, UpdateThesisSchema
-from thesis_archiving.thesis.utils import select_choices
+from thesis_archiving.thesis.utils import select_choices, proposal_form_name, save_proposal_form, remove_proposal_form
 
 from pprint import pprint
 from datetime import datetime
@@ -207,7 +207,8 @@ def update(thesis_id):
     if request.method == "POST":
         # contains form data converted to mutable dict
         data = request.form.to_dict()
-        
+        data.update(request.files)
+
         # marshmallow validation
         result = validate_input(data, UpdateThesisSchema)
         
@@ -216,7 +217,7 @@ def update(thesis_id):
             with db.session.no_autoflush:
                 # values for validated and filtered input
                 data = result['valid']
-                
+            
                 _thesis.title = data['title']
                 _thesis.sy_start = data['sy_start']
                 _thesis.semester = data['semester']
@@ -262,6 +263,23 @@ def update(thesis_id):
                             flash("Successfully deleted current quantitative rating grades.", "success")
                         except:
                             flash("An error occured while deleting current quantitative grades.", "danger")
+
+                if data.get('proposal_form'):
+                    
+                    file = data.get('proposal_form')
+                    file_name = proposal_form_name(_thesis, file)
+                    
+                    try:
+                        remove_proposal_form(_thesis)
+
+                        _thesis.proposal_form = file_name
+
+                        save_proposal_form(_thesis, file)
+
+                    except:
+                        flash("An error occured while saving file.", "danger")
+
+
 
                 try:
                     db.session.commit()

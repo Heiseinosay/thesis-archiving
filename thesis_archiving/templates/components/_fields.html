@@ -20,6 +20,27 @@
 
 {% endmacro %}
 
+<!-- file field -->
+{% macro field_file(name, result) %}
+
+    {% set input_class = "form-control" %}
+    {% set feedback_class = "" %}
+
+    {% if result["valid"][name] %}
+        {% set input_class = input_class + " is-valid" %}
+    {% endif %}
+    {% if result["invalid"][name] %}
+        {% set input_class = input_class + " is-invalid" %}
+        {% set feedback_class = "invalid-feedback" %}
+
+    {% endif %}
+
+    <input type="file" name="{{name}}" class="{{ input_class }}">
+    
+    <!-- feedback div for ajax -->
+    {{ feedback(feedback_class, result["invalid"][name]) }}
+
+{% endmacro %}
 
 <!-- select field -->
 {% macro field_select(name, result, choices, value) %}
@@ -93,6 +114,54 @@
     <label class="form-check-label">
         {{ label }}
     </label>
+{% endmacro %}
+
+
+<!-- indiv rating -->
+{% macro field_individual_rating(criteria, name, result, value) %}
+
+    {% set labels = {
+        'Poor': 1,
+        'Below Average': 2,
+        'Average': 3,
+        'Above Average': 4,
+        'Good': 5,
+        'Very Good' : 6
+    } %}
+
+    {% set radio_class = "form-check-input" %}
+    {% set feedback_class = "" %}
+
+    {% if result["valid"][name] %}
+        {% set radio_class = radio_class + " is-valid" %}
+    {% endif %}
+    {% if result["invalid"][name] %}
+        {% set radio_class = radio_class + " is-invalid" %}
+        {% set feedback_class = "invalid-feedback" %}
+
+    {% endif %}
+
+            
+    <label class="form-label h6">{{criteria}}</label>
+    
+    <br>
+
+    <div class="d-flex justify-content-around">
+
+        {% for k,v in labels.items() %}
+        
+        <div>
+            <input class="{{radio_class}}" type="radio" name="{{name}}" value="{{v}}" {{ "checked" if v == value|int else ""}}>
+        
+            <label class="form-check-label">
+                {{k}}
+            </label>
+            
+        </div>
+        {% endfor %}
+
+    </div>
+            
 {% endmacro %}
 
 <!-- feedback -->
