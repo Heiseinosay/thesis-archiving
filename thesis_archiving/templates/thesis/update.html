@@ -32,7 +32,8 @@
                                     'area': request.form['area'] if request.form['area'] else thesis.area,
                                     'keywords': request.form['keywords'] if request.form['keywords'] else thesis.keywords,
                                     'overview': request.form['overview'] if request.form['overview'] else thesis.overview,
-                                    'group_id': request.form['group_id'] if request.form['group_id'] else thesis.group_id
+                                    'group_id': request.form['group_id'] if request.form['group_id'] else thesis.group_id,
+                                    'proposal_form' : thesis.proposal_form
                                 } 
                             
                             %}
@@ -126,6 +127,8 @@
                             <div class="mb-5">
                                 <label class="form-label h6">Proposal Form</label>
                                 {{ field_file("proposal_form", result) }}
+
+                                {{ thesis.proposal_form }}
                             </div>
 
                             <div class="d-grid gap-2 mb-3">
