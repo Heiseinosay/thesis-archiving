@@ -4,6 +4,11 @@ from datetime import datetime
 import pytz
 import os
 
+from PyPDF2 import PdfFileWriter, PdfFileReader
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+
 def select_choices():
 
     # pag bumagal yung site dahil dito,
@@ -52,11 +57,11 @@ def save_proposal_form(thesis, file):
     if not os.path.exists(path):
         os.makedirs(path)
     
-    # filename
+    # directory + filename
     path = os.path.join(path, thesis.proposal_form)
 
-    # check kung maooverwrite pag sinave on same file path
-    file.save(path)
+    # stamp w/ call number then save
+    stamp_save(file, path, thesis.call_number())
 
 def remove_proposal_form(thesis):
 
@@ -74,3 +79,35 @@ def remove_proposal_form(thesis):
 
         if os.path.exists(path):
             os.remove(path)
+
+def stamp_save(file, path, call_number):
+    
+    packet = io.BytesIO()
+
+    # Create a new PDF with Reportlab
+    can = canvas.Canvas(packet, pagesize=letter)
+
+    can.setFillColorRGB(6/256,136/256,36/256)
+    can.setFont('Helvetica-Bold', 18)
+    can.drawString(410, 10, call_number)
+    # can.drawString(410, 60, "2020-1-TPCS-58")
+    can.showPage()
+    can.save()
+
+    # Move to the beginning of the StringIO buffer
+    packet.seek(0)
+    new_pdf = PdfFileReader(packet)
+
+    # Read your existing PDF
+    existing_pdf = PdfFileReader(file)
+    output = PdfFileWriter()
+
+    # Add the "watermark" (which is the new pdf) on the existing page
+    page = existing_pdf.getPage(0)
+    page.mergePage(new_pdf.getPage(0))
+    output.addPage(page)
+
+    # Finally, write "output" to a real file
+    outputStream = open(path, "wb")
+    output.write(outputStream)
+    outputStream.close()

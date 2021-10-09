@@ -314,9 +314,9 @@ class IndividualRating(db.Model):
 	attire = db.Column(db.Integer)
 	is_final = db.Column(BOOLEAN(), default=False, nullable=False)
 
-	student_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
-	thesis_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('thesis.id'), nullable=False)
-	panelist_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
+	student_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id', ondelete='cascade'), nullable=False)
+	thesis_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('thesis.id', ondelete='cascade'), nullable=False)
+	panelist_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id', ondelete='cascade'), nullable=False)
 
 	def check_thesis_id(self, thesis_id):
 		return True if thesis_id == self.thesis.id else False
