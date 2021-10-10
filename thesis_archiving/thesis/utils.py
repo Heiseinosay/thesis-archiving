@@ -107,6 +107,11 @@ def stamp_save(file, path, call_number):
     page.mergePage(new_pdf.getPage(0))
     output.addPage(page)
 
+    # merge the rest
+    for p in range(existing_pdf.getNumPages()):
+        if p != 0:
+            output.addPage(existing_pdf.getPage(p))
+
     # Finally, write "output" to a real file
     outputStream = open(path, "wb")
     output.write(outputStream)
