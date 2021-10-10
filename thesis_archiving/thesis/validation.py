@@ -158,8 +158,8 @@ class UpdateThesisSchema(Schema):
 		# bytes -> mb
 		size = data.tell() / 1024 / 1024
 
-		if size > 5:
-			err.append("Upload file sizes up to 5mb only.")
+		if size > 10:
+			err.append("Upload file sizes up to 10mb only.")
 		
 		# set cursor back to beginning
 		data.seek(0) 
