@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, send_file, flash
+from flask import Blueprint, render_template, request, redirect, url_for, send_from_directory, flash, abort, current_app
+from flask.helpers import send_file
 from flask_login import login_required, current_user
 
 from sqlalchemy import or_
@@ -13,7 +14,7 @@ from thesis_archiving.thesis.utils import select_choices, proposal_form_name, sa
 
 from pprint import pprint
 from datetime import datetime
-import pytz
+import pytz, os
 
 thesis = Blueprint("thesis", __name__, url_prefix="/thesis")
 
@@ -341,3 +342,25 @@ def proponent_remove(thesis_id, user_id):
         flash("An error occured.", "danger")
 
     return redirect(url_for("thesis.update", thesis_id=_thesis.id))
+
+@thesis.route("/download/proposal_form/<int:thesis_id>")
+@login_required
+@has_roles("is_admin")
+def download_proposal_form(thesis_id):
+
+    thesis = Thesis.query.get_or_404(thesis_id)
+
+    path = os.path.join( 
+        current_app.root_path,
+        "static", 
+        "thesis_attachments", 
+        "proposal_form", 
+        str(thesis.sy_start),
+        thesis.proposal_form
+        )
+
+    if os.path.exists(path):
+        # as_attachment = False to view first
+        return send_file(path, attachment_filename=thesis.proposal_form, as_attachment=False, mimetype='application/pdf')
+    else:
+        abort(404)

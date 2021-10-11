@@ -127,8 +127,7 @@
                             <div class="mb-5">
                                 <label class="form-label h6">Proposal Form</label>
                                 {{ field_file("proposal_form", result) }}
-
-                                {{ thesis.proposal_form }}
+                                <a href="{{ url_for("thesis.download_proposal_form", thesis_id=thesis.id) }}" target="_blank">{{ thesis.proposal_form }}</a>
                             </div>
 
                             <div class="d-grid gap-2 mb-3">
