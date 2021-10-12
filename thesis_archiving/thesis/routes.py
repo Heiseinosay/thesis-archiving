@@ -294,6 +294,7 @@ def delete(thesis_id):
     _thesis = Thesis.query.get_or_404(thesis_id)
     
     try:
+        remove_proposal_form(_thesis)
         db.session.delete(_thesis)
         db.session.commit()
         flash("Successfully deleted a thesis.","success")
