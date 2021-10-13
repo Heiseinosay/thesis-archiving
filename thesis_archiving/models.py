@@ -150,12 +150,14 @@ class User(db.Model, UserMixin):
 			except:
 				flash('An error occured while creating quantitative rating grades.','danger')
 
-	def check_student_individual_rating(self, student, thesis_id):
-		
+	def check_student_individual_rating(self, student, thesis_id, panelist_id):
+		'''
+			return individual rating
+		'''
 		# check for existing rating for the thesis and corresponding student
 		rating = student.student_individual_ratings.filter_by(
 			thesis_id = thesis_id,
-			panelist_id = self.id
+			panelist_id = panelist_id
 		).first()
 		
 		# create a rating if there is none
@@ -163,7 +165,7 @@ class User(db.Model, UserMixin):
 			rating = IndividualRating()
 			rating.student_id = student.id
 			rating.thesis_id = thesis_id
-			rating.panelist_id = self.id
+			rating.panelist_id = panelist_id
 
 			try:
 				db.session.add(rating)

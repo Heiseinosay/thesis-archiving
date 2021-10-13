@@ -208,7 +208,8 @@ def grading(group_id, thesis_id):
         proponent.id : IndividualRating.query.filter_by(
             thesis_id=thesis_id, 
             student_id=proponent.id, 
-            panelist_id=current_user.id).first() for proponent in thesis_.proponents 
+            panelist_id=current_user.id
+            ).first() for proponent in thesis_.proponents 
             }
     
     # revision textarea

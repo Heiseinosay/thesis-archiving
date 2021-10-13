@@ -11,6 +11,8 @@ from thesis_archiving.individual_rating.validation import IndividualRatingSchema
 
 from pprint import pprint
 
+from thesis_archiving.validation import validate_input
+
 individual_rating = Blueprint("individual_rating", __name__, url_prefix="/individual_rating")
 
 @individual_rating.route("/grading/<int:thesis_id>/<int:proponent_id>", methods=["POST","GET"])
@@ -33,9 +35,12 @@ def grading(thesis_id, proponent_id):
 
     # Check if there is already an individual rating for the student 
     # if there is none, create a record for it
+    # returns individual rating
     individual_rating_ = proponent.check_student_individual_rating(
         student = proponent,
-        thesis_id=thesis.id
+        thesis_id=thesis.id,
+        panelist_id=current_user.id
+
         )
 
     result = {
@@ -47,8 +52,34 @@ def grading(thesis_id, proponent_id):
         
         # contains form data converted to mutable dict
         data = request.form.to_dict()
+        result = validate_input(data, IndividualRatingSchema)
 
-        pprint(data)
+        if not result["invalid"]:
+            
+            data = result["valid"]
+
+            if data.get("intelligent_response"):
+                individual_rating_.intelligent_response = data["intelligent_response"]
+            
+            if data.get("respectful_response"):
+                individual_rating_.respectful_response = data["respectful_response"]
+
+            if data.get("communication_skills"):
+                individual_rating_.communication_skills = data["communication_skills"]
+
+            if data.get("confidence"):
+                individual_rating_.confidence = data["confidence"]
+
+            if data.get("attire"):
+                individual_rating_.attire = data["attire"]
+
+            individual_rating_.is_final = data["is_final"] if data.get("is_final") else False
+
+            try:
+                db.session.commit()
+                flash("Successfully graded.","success")
+            except:
+                flash("An error occured while trying to grade.","danger")
     # submit for SAVE
     # submit for GRADING (is_final) boolean nalang to lol checkable
     # CONFIRMATION MODALS
