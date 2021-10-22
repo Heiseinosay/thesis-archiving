@@ -276,10 +276,12 @@ class Group(db.Model):
 class QuantitativeRating(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
 	name = db.Column(db.String(120), unique=True)
+	max_grade = db.Column(db.Integer, default=5)
 
 	# theses using this rating template
 	theses = db.relationship('Thesis', backref='quantitative_rating', lazy='dynamic')
 
+	# adding new criteria will not reflect on ongoing gradings
 	criteria = db.relationship('QuantitativeCriteria', backref='rating', lazy='dynamic', cascade="all, delete")
 
 class QuantitativeCriteria(db.Model):

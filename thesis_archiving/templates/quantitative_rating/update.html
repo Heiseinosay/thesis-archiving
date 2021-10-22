@@ -11,6 +11,7 @@
     set quantitative_rating = {
         'id': quantitative_rating.id,
         'name': request.form['name'] if request.form['name'] else quantitative_rating.name,
+        'max_grade': request.form['max_grade'] if request.form['max_grade'] else quantitative_rating.max_grade,
         'criteria': quantitative_rating.criteria
     }
 
@@ -34,6 +35,11 @@
                             <div class="mb-3">
                                 <label class="form-label h6">Name</label>
                                 {{ field("text", "name", result, quantitative_rating['name']) }}
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label h6">Max grade for all criteria</label>
+                                {{ field("number", "max_grade", result, quantitative_rating['max_grade'], 1, 10) }}
                             </div>
 
                             <!-- criteria -->

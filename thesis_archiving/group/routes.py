@@ -211,6 +211,11 @@ def grading(group_id, thesis_id):
             panelist_id=current_user.id
             ).first() for proponent in thesis_.proponents 
             }
+
+    result = {
+        "valid" : {},
+        "invalid" : {}
+    }
     
     # revision textarea
     # submit for save
@@ -223,5 +228,6 @@ def grading(group_id, thesis_id):
         'group/grading.html', 
         thesis=thesis_,
         individual_ratings=individual_ratings,
-        quantitative_panelist_grade=quantitative_panelist_grade_
+        quantitative_panelist_grade=quantitative_panelist_grade_,
+        result=result
         )

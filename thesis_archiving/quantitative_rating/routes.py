@@ -98,13 +98,14 @@ def update(quantitative_rating_id):
                 data = result['valid']
 
                 quantitative_rating_.name = data['name']
+                quantitative_rating_.max_grade = data['max_grade']
 
                 if data.get('criteria_name'):
 
                     # create a new criteria to append to the quanti rating
                     quantitative_criteria_ = QuantitativeCriteria()
                     quantitative_criteria_.name = data['criteria_name']
-
+                    
                     quantitative_rating_.criteria.append(quantitative_criteria_)
 
                 try:

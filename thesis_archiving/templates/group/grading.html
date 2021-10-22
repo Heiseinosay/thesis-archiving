@@ -1,4 +1,5 @@
 {% from 'components/_proponent_card.html' import proponent_card %}
+{% from "components/_fields.html" import field_quantitative_rating, field_checkbox, field_individual_rating %}
 
 {% extends "base.html" %}
 
@@ -15,13 +16,54 @@
 
                     <div class="row">
                         <div class="col-12 col-sm-6">
-                            <h4>Qualitative Rating</h4>
+                            <h4>Quantitative Rating</h4>
                             
-                            {% for grade in quantitative_panelist_grade.grades %}
-                                <p>{{ grade.criteria.name }} </p>
-                            {% endfor %}
-                        </div>
+                            <form action="" method="POST">
+                                {% include "components/csrf_token.html" %}
 
+                                {% set grades = {} %}
+                                
+                                {# update dictionary values #}
+                                
+                                {% for grade in quantitative_panelist_grade.grades %}
+                                    {% set grades = grades.update(
+                                            {
+                                                grade.criteria.name:
+                                                    request.form[grade.criteria.name] if request.form[grade.criteria.name] else grade.grade
+                                            }
+                                        ) 
+                                    %}
+
+                                {% endfor %}
+
+                                <ol>    
+                                    {#
+                                        create a field na mag rerestrict ng maximum grade
+                                        #}
+                                    {% for name, value in grades.items() %}
+                                    
+                                        <li>
+                                            <div class="mb-3">
+                                                {{ field_quantitative_rating(name, result, value, thesis.quantitative_rating.max_grade) }}
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                    
+                                    {#
+                                    copy the template ng indiv rating
+                                    overflow w/ fixed with
+                                    is final
+                                    real shit
+                                    
+                                    #}
+
+                                    
+                                </ol>
+                            </form>
+                            <p>link to manuscript grading</p>
+                            <p>link to capstone grading</p>
+                        </div>
+                                    
                         <div class="col-12 col-sm-6">
                             <div class="d-grid gap-1">
                                 <h4>Individual Rating</h4>
