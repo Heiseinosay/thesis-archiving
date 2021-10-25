@@ -9,7 +9,10 @@ from thesis_archiving.models import Group, IndividualRating, User, Thesis
 from thesis_archiving.validation import validate_input
 
 from thesis_archiving.group.validation import CreateGroupSchema, UpdateGroupSchema
+from thesis_archiving.quantitative_rating.validation import ManuscriptGradeSchema
 from thesis_archiving.group.utils import check_panelists
+
+from pprint import pprint
 
 group = Blueprint("group", __name__, url_prefix="/group")
 
@@ -216,13 +219,30 @@ def grading(group_id, thesis_id):
         "valid" : {},
         "invalid" : {}
     }
+
+    if request.method == "POST":
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+        data["criteria"] = [ c.name for c in thesis_.quantitative_rating.criteria ]
+        data["max_grade"] = thesis_.quantitative_rating.max_grade
+        result = validate_input(data, ManuscriptGradeSchema)
     
     # revision textarea
-    # submit for save
-    # submit for final (do proper checking + checkbox lang)
-    # each criteria will have unique validations
     # unahin muna revision list + saving dahil mas madali
     # CONFIRMATION MODALS
+
+    # post process error msg for each grade
+    invalid_grades = result["invalid"]["grades"] if result["invalid"].get("grades") else None
+    if invalid_grades:
+        # list() to create a copy of keys and prevent runtime error dict size changing
+        for g in list(invalid_grades):
+            result["invalid"][g] = result["invalid"]["grades"].pop(g)
+
+    # post process success msg for each grade
+    valid_grades = result["valid"]["grades"] if result["valid"].get("grades") else None
+    if valid_grades:
+        for g in list(valid_grades):
+            result["valid"][g] = result["valid"]["grades"].pop(g)
 
     return render_template(
         'group/grading.html', 

@@ -1,5 +1,5 @@
 from thesis_archiving import quantitative_rating
-from marshmallow import Schema, fields, validate, ValidationError, validates, validates_schema
+from marshmallow import Schema, fields, validate, ValidationError, validates, validates_schema, pre_load
 
 from thesis_archiving.validation import validate_empty
 from thesis_archiving.models import QuantitativeCriteria, QuantitativeRating
@@ -53,9 +53,27 @@ class ManuscriptGradeSchema(Schema):
 
     grades = fields.Dict(keys=fields.Str(), values=fields.Int())
     
-    max_grade = fields.Int(Required=True)
+    max_grade = fields.Int(required=True)
 
     is_final = fields.Bool()
+
+    @pre_load
+    def field_inputs(self, in_data, **kwargs):
+        
+        # obtain each value and pop to items
+        data = {}
+        data["csrf_token"] = in_data.pop("csrf_token").strip()
+        data["criteria"] = in_data.pop("criteria")
+        data["max_grade"] = in_data.pop("max_grade")
+        data["is_final"] = in_data.pop("is_final") if in_data.get("is_final") else False
+	    
+        data["grades"] = {}
+        # loop over the items left
+        for c in data["criteria"]:
+            if in_data.get(c):
+                data["grades"][c] = in_data[c]
+
+        return data
 
     @validates_schema
     def validate_is_final(self, data, **kwargs):
@@ -68,7 +86,7 @@ class ManuscriptGradeSchema(Schema):
         err = {}
         
         if data.get("is_final"):
-            # check if all criteria are filled and within range (1 to max grade)
+            # check if each criteria is included in submitted form
             for c in data["criteria"]:
                 if c not in data["grades"]:
                     err[c] = ["Field cannot be empty."]
@@ -85,11 +103,23 @@ class ManuscriptGradeSchema(Schema):
         err = {}
         
         for k, v in data["grades"].items():
+            
+            error = []
+            
+            # invalid criteria
+            if k not in data["criteria"]:
+                error.append("Criteria is invalid.")
+            
             # graded and not within range
-            if v and v not in range(1, data["max_grade"] + 1):
-                err[k] = ["Grade is not within range."]
+            else:
+                if v and v not in range(1, data["max_grade"] + 1):
+                    error.append("Grade is not within range.")
+            
+            if error:
+                err[k] = error
+
         
-        # try invoking both the schema errors
+        # try invoking all errors at same time
         if err:
             raise ValidationError(err)
 

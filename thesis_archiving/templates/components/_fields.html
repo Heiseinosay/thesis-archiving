@@ -195,7 +195,7 @@
         {% for i in range(1, max_grade + 1) %}
         
         <div>
-            <input class="{{radio_class}}" type="radio" name="{{name}}" value="{{loop.revindex}}" {{ "checked" if i == value|int else ""}}>
+            <input class="{{radio_class}}" type="radio" name="{{name}}" value="{{loop.revindex}}" {{ "checked" if loop.revindex == value|int else ""}}>
         
             <label class="form-check-label">
                 {{ loop.revindex }}

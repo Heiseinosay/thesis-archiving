@@ -4,6 +4,7 @@
 {% extends "base.html" %}
 
 {% block body %}
+
 <div class="container py-3">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-8 mb-3">
@@ -59,6 +60,23 @@
 
                                     
                                 </ol>
+
+                                <div class="mt-5 mb-3 mx-3 d-flex justify-content-between">
+                                    
+                                    <div>
+
+                                        {{ field_checkbox(
+                                            "is_final",
+                                            result,
+                                            "Mark as final to be included for grading.",
+                                            request.form["is_final"] if request.form["is_final"] else quantitative_panelist_grade["is_final"]
+                                            ) 
+                                        }}
+                                    </div>
+
+                                    <button type="submit" class="btn btn-ueccss">Save</button>
+
+                                </div>
                             </form>
                             <p>link to manuscript grading</p>
                             <p>link to capstone grading</p>
