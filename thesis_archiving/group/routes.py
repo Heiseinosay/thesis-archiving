@@ -223,8 +223,8 @@ def grading(group_id, thesis_id):
     if request.method == "POST":
         # contains form data converted to mutable dict
         data = request.form.to_dict()
-        data["criteria"] = [ c.name for c in thesis_.quantitative_rating.criteria ]
-        data["max_grade"] = thesis_.quantitative_rating.max_grade
+        data["criteria"] = [ c.name for c in thesis_.manuscript_rating.criteria ]
+        data["max_grade"] = thesis_.manuscript_rating.max_grade
         result = validate_input(data, ManuscriptGradeSchema)
     
     # revision textarea

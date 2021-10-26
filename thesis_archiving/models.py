@@ -129,7 +129,7 @@ class User(db.Model, UserMixin):
 			
 			# fetch each criteria of the rating for the thesis
 			# might raise an error if the thesis HAS NO quantitative grading criteria selected
-			criteria = thesis.quantitative_rating.criteria
+			criteria = thesis.manuscript_rating.criteria
 
 			# create grade for each criteria
 			for criterion in criteria:
@@ -213,9 +213,14 @@ class Thesis(db.Model):
 	program_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('program.id'), nullable=False)
 	proponents = db.relationship('User', secondary=proponents, lazy='dynamic', backref=db.backref('theses', lazy='dynamic'))
 
+	# manuscript selection
 	quantitative_rating_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_rating.id'))
 
+	# developed thesis project
+	quantitative_rating_developed_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_rating.id'))
+
 	quantitative_panelist_grades = db.relationship('QuantitativePanelistGrade', backref='thesis', lazy='dynamic', cascade="all, delete")
+
 
 	revision_lists = db.relationship('RevisionList', backref='thesis', lazy='dynamic', cascade="all, delete")
 
@@ -278,8 +283,11 @@ class QuantitativeRating(db.Model):
 	name = db.Column(db.String(120), unique=True)
 	max_grade = db.Column(db.Integer, default=5)
 
-	# theses using this rating template
-	theses = db.relationship('Thesis', backref='quantitative_rating', lazy='dynamic')
+	# theses using this rating template for MANUSCRIPT
+	theses = db.relationship('Thesis', backref='manuscript_rating', lazy='dynamic', foreign_keys='Thesis.quantitative_rating_id')
+
+	# theses using this rating template for DEVELOPED THESIS PROJECT
+	developed_theses = db.relationship('Thesis', backref='developed_thesis_rating', lazy='dynamic', foreign_keys='Thesis.quantitative_rating_developed_id')
 
 	# adding new criteria will not reflect on ongoing gradings
 	criteria = db.relationship('QuantitativeCriteria', backref='rating', lazy='dynamic', cascade="all, delete")
