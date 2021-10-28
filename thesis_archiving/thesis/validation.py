@@ -1,6 +1,6 @@
 from thesis_archiving.validation import validate_empty
 from thesis_archiving.models import User, Program, Category, Group, QuantitativeRating
-from marshmallow import Schema, fields, validate, pre_load, post_load, validates, ValidationError
+from marshmallow import Schema, fields, validate, pre_load, post_load, validates, ValidationError, validates_schema
 from datetime import datetime
 import pytz
 import os
@@ -111,6 +111,7 @@ class UpdateThesisSchema(Schema):
 	program_id = fields.Int(required=True)
 	group_id = fields.Int()
 	quantitative_rating_id = fields.Int()
+	quantitative_rating_developed_id = fields.Int()
 
 	proposal_form = fields.Raw()
 
@@ -121,8 +122,47 @@ class UpdateThesisSchema(Schema):
 		in_data["overview"] = in_data["overview"].strip()
 		in_data["area"] = in_data["area"].strip()
 		in_data["keywords"] = in_data["keywords"].strip()
+
+		quantitative_rating_id = in_data.get("quantitative_rating_id")
 		
+		# pop manuscript rating id if not a digit
+		if quantitative_rating_id:
+			try:
+				int(quantitative_rating_id)
+			except:
+				in_data.pop("quantitative_rating_id")
+		
+		quantitative_rating_developed_id = in_data.get("quantitative_rating_developed_id")
+		
+		# pop developed thesis proj rating id if not a digit
+		if quantitative_rating_developed_id:
+			try:
+				int(quantitative_rating_developed_id)
+			except:
+				in_data.pop("quantitative_rating_developed_id")
+		
+		# check that manuscript and develpoed thesis rating must not be the same
+
 		return in_data
+
+	@validates_schema
+	def validate_quantitative_ratings(self, data, **kwargs):
+		'''
+			Raise error on same ratings
+		'''
+		
+		err = {}
+		
+		quantitative_rating_id = data.get("quantitative_rating_id")
+		quantitative_rating_developed_id = data.get("quantitative_rating_developed_id")
+		
+		if quantitative_rating_id and quantitative_rating_developed_id:
+			if quantitative_rating_id == quantitative_rating_developed_id:
+				err["quantitative_rating_id"] = ["Cannot be the same."]
+				err["quantitative_rating_developed_id"] = ["Cannot be the same."]
+		
+		if err:
+			raise ValidationError(err)
 
 	@validates("group_id")
 	def validate_group_id(self, data):

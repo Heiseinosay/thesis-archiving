@@ -2,12 +2,14 @@ from flask import current_app
 from flask.helpers import flash
 from flask_login import UserMixin
 from sqlalchemy.dialects.mysql import INTEGER, BOOLEAN, BIGINT
+from sqlalchemy import and_
 
 from thesis_archiving import db, login_manager
 
 from datetime import datetime
 import pytz
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -114,10 +116,27 @@ class User(db.Model, UserMixin):
 
 		return User.query.get(_user_id)
 
-	def check_quantitative_panelist_grade(self, thesis):
+	def check_quantitative_panelist_grade(self, thesis, quantitative_rating):
 		
 		# fetch the panel's quantatitative grades for the thesis
-		panelist_grade = self.quantitative_panelist_grades.filter_by(thesis_id=thesis.id).first()
+		# panelist_grade = self.quantitative_panelist_grades.filter_by(thesis_id=thesis.id).first()
+
+		panelist_grade = db.session.query(QuantitativePanelistGrade).where(
+			and_(
+					# get the panelist id who graded those criteria
+					QuantitativePanelistGrade.id.in_(
+						db.session.query(QuantitativeCriteriaGrade.quantitative_panelist_grade_id).where(
+							# get id of grades pointing to those criteria
+							QuantitativeCriteriaGrade.quantitative_criteria_id.in_(
+								# obtain all id ng MANUSCRIPT rating criteria ng thesis
+								db.session.query(QuantitativeCriteria.id).where(QuantitativeCriteria.quantitative_rating_id == quantitative_rating.id)        
+							)
+						)
+					),
+					QuantitativePanelistGrade.thesis_id == thesis.id,
+					QuantitativePanelistGrade.panelist_id == self.id
+				)
+			).first()
 
 		# create if there is none
 		if not panelist_grade:
@@ -129,7 +148,7 @@ class User(db.Model, UserMixin):
 			
 			# fetch each criteria of the rating for the thesis
 			# might raise an error if the thesis HAS NO quantitative grading criteria selected
-			criteria = thesis.manuscript_rating.criteria
+			criteria = quantitative_rating.criteria
 
 			# create grade for each criteria
 			for criterion in criteria:

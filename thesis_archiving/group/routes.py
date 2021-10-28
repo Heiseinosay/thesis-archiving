@@ -203,10 +203,6 @@ def grading(group_id, thesis_id):
     if thesis_ not in group_.presentors:
         abort(406)
 
-    current_user.check_quantitative_panelist_grade(thesis_)
-
-    quantitative_panelist_grade_ = current_user.quantitative_panelist_grades.filter_by(thesis_id=thesis_.id).first()
-
     individual_ratings = { 
         proponent.id : IndividualRating.query.filter_by(
             thesis_id=thesis_id, 
@@ -215,39 +211,8 @@ def grading(group_id, thesis_id):
             ).first() for proponent in thesis_.proponents 
             }
 
-    result = {
-        "valid" : {},
-        "invalid" : {}
-    }
-
-    if request.method == "POST":
-        # contains form data converted to mutable dict
-        data = request.form.to_dict()
-        data["criteria"] = [ c.name for c in thesis_.manuscript_rating.criteria ]
-        data["max_grade"] = thesis_.manuscript_rating.max_grade
-        result = validate_input(data, ManuscriptGradeSchema)
-    
-    # revision textarea
-    # unahin muna revision list + saving dahil mas madali
-    # CONFIRMATION MODALS
-
-    # post process error msg for each grade
-    invalid_grades = result["invalid"]["grades"] if result["invalid"].get("grades") else None
-    if invalid_grades:
-        # list() to create a copy of keys and prevent runtime error dict size changing
-        for g in list(invalid_grades):
-            result["invalid"][g] = result["invalid"]["grades"].pop(g)
-
-    # post process success msg for each grade
-    valid_grades = result["valid"]["grades"] if result["valid"].get("grades") else None
-    if valid_grades:
-        for g in list(valid_grades):
-            result["valid"][g] = result["valid"]["grades"].pop(g)
-
     return render_template(
         'group/grading.html', 
         thesis=thesis_,
-        individual_ratings=individual_ratings,
-        quantitative_panelist_grade=quantitative_panelist_grade_,
-        result=result
+        individual_ratings=individual_ratings
         )

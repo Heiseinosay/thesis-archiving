@@ -63,7 +63,7 @@
     {% endif %}
     
     <select class="{{ select_class }}" name="{{ name }}">
-        <option selected disabled value="">...</option>
+        <option>None</option>
         {% for k, v in choices.items() %}
             {% if value and k == value | int %}
                 <option selected value="{{ k }}">{{ v }}</option>

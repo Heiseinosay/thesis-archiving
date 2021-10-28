@@ -2,10 +2,10 @@ from flask import Blueprint, render_template, request, redirect, url_for, send_f
 from flask.helpers import send_file
 from flask_login import login_required, current_user
 
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 
 from thesis_archiving import db
-from thesis_archiving.models import QuantitativeCriteria, QuantitativePanelistGrade, QuantitativeRating, Thesis, User, Program, Category, Group
+from thesis_archiving.models import QuantitativeCriteria, QuantitativePanelistGrade, QuantitativeRating, Thesis, User, Program, Category, Group, QuantitativeCriteriaGrade
 from thesis_archiving.utils import export_to_excel, has_roles
 from thesis_archiving.validation import validate_input
 
@@ -241,12 +241,12 @@ def update(thesis_id):
                     _thesis.group = group_
 
                 
+                # when assigned new manuscript rating,
                 if data.get('quantitative_rating_id'):
 
+                    # id of new rating
                     id = data['quantitative_rating_id']
                     
-                    # when assigned new quanti rating,
-                    # delete its current quanti grades and assign to new rating
                     if id != _thesis.quantitative_rating_id:
                         
                         # https://stackoverflow.com/questions/39773560/sqlalchemy-how-do-you-delete-multiple-rows-without-querying    
@@ -254,16 +254,131 @@ def update(thesis_id):
                         # bulk deletes bypasses in-python cascades but not fk(ondelete='cascade')
                         # https://stackoverflow.com/questions/46904273/sqlalchemy-delete-all-items-and-not-just-the-first#comment80807412_46904371
 
+                        # madelete lang dapat ay yung manuscript lang hindi lahat!
+                        # query = QuantitativePanelistGrade.__table__.delete()\
+                        #     .where(QuantitativePanelistGrade.thesis_id == _thesis.id)
+                        
+                        # delete its current quanti grades
                         query = QuantitativePanelistGrade.__table__.delete()\
-                            .where(QuantitativePanelistGrade.thesis_id == _thesis.id)
-
+                            .where(    
+                                and_(
+                                    # get the panelist grade id who graded those criteria
+                                    QuantitativePanelistGrade.id.in_(
+                                        db.session.query(QuantitativeCriteriaGrade.quantitative_panelist_grade_id).where(
+                                            # get id of grades pointing to those criteria
+                                            QuantitativeCriteriaGrade.quantitative_criteria_id.in_(
+                                                # obtain all id ng MANUSCRIPT rating criteria ng thesis
+                                                db.session.query(QuantitativeCriteria.id).where(QuantitativeCriteria.quantitative_rating_id == _thesis.quantitative_rating_id)        
+                                            )
+                                        )
+                                    ),
+                                    QuantitativePanelistGrade.thesis_id == _thesis.id
+                                )
+                            )
+                        
+                        # assign to new manuscript rating
                         _thesis.quantitative_rating_id = id
 
                         try:
                             db.session.execute(query)
-                            flash("Successfully deleted current quantitative rating grades.", "success")
+                            flash("Successfully deleted current manuscript rating grades.", "success")
                         except:
-                            flash("An error occured while deleting current quantitative grades.", "danger")
+                            flash("An error occured while deleting current manuscript grades.", "danger")
+                else:
+                    id = _thesis.quantitative_rating_id
+
+                    # delete current manuscript rating if None is selected
+                    if id:
+                        query = QuantitativePanelistGrade.__table__.delete()\
+                                .where(    
+                                    and_(
+                                        # get the panelist id who graded those criteria
+                                        QuantitativePanelistGrade.id.in_(
+                                            db.session.query(QuantitativeCriteriaGrade.quantitative_panelist_grade_id).where(
+                                                # get id of grades pointing to those criteria
+                                                QuantitativeCriteriaGrade.quantitative_criteria_id.in_(
+                                                    # obtain all id ng MANUSCRIPT rating criteria ng thesis
+                                                    db.session.query(QuantitativeCriteria.id).where(QuantitativeCriteria.quantitative_rating_id == id)        
+                                                )
+                                            )
+                                        ),
+                                        QuantitativePanelistGrade.thesis_id == _thesis.id
+                                    )
+                                )
+                        
+                        # set to none
+                        _thesis.quantitative_rating_id = None
+
+                        try:
+                            db.session.execute(query)
+                            flash("Successfully deleted current manuscript rating grades.", "success")
+                        except:
+                            flash("An error occured while deleting current manuscript grades.", "danger")
+                    
+                # when assigned new developed thesis project rating,
+                if data.get('quantitative_rating_developed_id'):
+
+                    # id of new rating
+                    id = data['quantitative_rating_developed_id']
+                    
+                    if id != _thesis.quantitative_rating_developed_id:
+                        
+                        # delete its current quanti grades
+                        query = QuantitativePanelistGrade.__table__.delete()\
+                            .where(    
+                                and_(
+                                    # get the panelist grade id who graded those criteria
+                                    QuantitativePanelistGrade.id.in_(
+                                        db.session.query(QuantitativeCriteriaGrade.quantitative_panelist_grade_id).where(
+                                            # get id of grades pointing to those criteria
+                                            QuantitativeCriteriaGrade.quantitative_criteria_id.in_(
+                                                # obtain all id ng developed thesis project rating criteria ng thesis
+                                                db.session.query(QuantitativeCriteria.id).where(QuantitativeCriteria.quantitative_rating_id == _thesis.quantitative_rating_developed_id)        
+                                            )
+                                        )
+                                    ),
+                                    QuantitativePanelistGrade.thesis_id == _thesis.id
+                                )
+                            )
+                        
+                        # assign to new developed thesis project rating
+                        _thesis.quantitative_rating_developed_id = id
+
+                        try:
+                            db.session.execute(query)
+                            flash("Successfully deleted current developed thesis project rating grades.", "success")
+                        except:
+                            flash("An error occured while deleting current developed thesis project grades.", "danger")
+                else:
+                    id = _thesis.quantitative_rating_developed_id
+
+                    # delete current developed thesis project rating if None is selected
+                    if id:
+                        query = QuantitativePanelistGrade.__table__.delete()\
+                                .where(    
+                                    and_(
+                                        # get the panelist id who graded those criteria
+                                        QuantitativePanelistGrade.id.in_(
+                                            db.session.query(QuantitativeCriteriaGrade.quantitative_panelist_grade_id).where(
+                                                # get id of grades pointing to those criteria
+                                                QuantitativeCriteriaGrade.quantitative_criteria_id.in_(
+                                                    # obtain all id ng developed thesis project rating criteria ng thesis
+                                                    db.session.query(QuantitativeCriteria.id).where(QuantitativeCriteria.quantitative_rating_id == id)        
+                                                )
+                                            )
+                                        ),
+                                        QuantitativePanelistGrade.thesis_id == _thesis.id
+                                    )
+                                )
+                        
+                        # set to none
+                        _thesis.quantitative_rating_developed_id = None
+
+                        try:
+                            db.session.execute(query)
+                            flash("Successfully deleted current developed thesis project rating grades.", "success")
+                        except:
+                            flash("An error occured while deleting current developed thesis project grades.", "danger")
 
                 if data.get('proposal_form'):
                     
