@@ -211,8 +211,13 @@ def grading(group_id, thesis_id):
             ).first() for proponent in thesis_.proponents 
             }
 
+    panelist_grades = [grade.is_final for grade in thesis_.quantitative_panelist_grades.filter_by(panelist_id=current_user.id).all()]
+
+    quantitative_status = all(panelist_grades) if len(panelist_grades) > 0 else False
+    
     return render_template(
         'group/grading.html', 
         thesis=thesis_,
-        individual_ratings=individual_ratings
+        individual_ratings=individual_ratings,
+        quantitative_status=quantitative_status
         )

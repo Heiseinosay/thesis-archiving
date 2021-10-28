@@ -14,11 +14,15 @@
                     <h3 class="card-title mb-3">
                         {{ thesis.title }}
                     </h3>
-
                     <div class="row">
                         <div class="col-12 col-sm-6">
                             <div class="d-grid gap-1">
-                                <h4>Quantitative Rating</h4>
+                                
+                                <h4>
+                                    <span class="badge bg-{{ 'success' if quantitative_status else 'warning' }}">{{ 'DONE' if quantitative_status else 'ONGOING' }}</span>
+                                    Quantitative Rating
+                                </h4>
+                                
                                 {% if thesis.quantitative_rating_id %}
                                     <a class="btn btn-sm btn-ueccss" href="{{ url_for('quantitative_rating.grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=thesis.quantitative_rating_id) }}" role="button" target="_blank">Manuscript Rating</a>
                                 {% endif %}
@@ -40,8 +44,19 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <!-- revision here -->
+                    <div class="row mt-5">
+                        <form action="" method="POST">
+                            {% include "components/csrf_token.html" %}
+
+                            <div class="mb-3">
+                                <label>Revisions</label>
+                                <textarea class="form-control" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="mb-3 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-ueccss">Save</button>
+                            </div>
+                        </form>
                     </div>
                 
                 </div>
