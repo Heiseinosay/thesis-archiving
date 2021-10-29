@@ -48,3 +48,10 @@ class UpdateGroupSchema(Schema):
     # def validate_thesis_id(self, data):
     #     if not Thesis.query.get(data):
     #         raise ValidationError("Thesis does not exist.")
+
+class UpdateRevisionSchema(Schema):
+    csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
+
+    comment = fields.Str(validate=validate.And(validate.Length(max=10000)))
+
+    is_final = fields.Bool()

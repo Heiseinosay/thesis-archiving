@@ -94,7 +94,7 @@
 
     {% endif %}
 
-    <textarea name="{{name}}" placeholder="Brief thesis overview..." class="{{ textarea_class }}" rows="10">{{value}}</textarea>
+    <textarea name="{{name}}" class="{{ textarea_class }}" rows="10">{{ value if value else ''}}</textarea>
     <!-- feedback div for ajax -->
     {{ feedback(feedback_class, result["invalid"][name]) }}
 

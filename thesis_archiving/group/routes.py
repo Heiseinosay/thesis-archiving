@@ -8,8 +8,7 @@ from thesis_archiving.utils import has_roles
 from thesis_archiving.models import Group, IndividualRating, User, Thesis
 from thesis_archiving.validation import validate_input
 
-from thesis_archiving.group.validation import CreateGroupSchema, UpdateGroupSchema
-from thesis_archiving.quantitative_rating.validation import ManuscriptGradeSchema
+from thesis_archiving.group.validation import CreateGroupSchema, UpdateGroupSchema, UpdateRevisionSchema
 from thesis_archiving.group.utils import check_panelists
 
 from pprint import pprint
@@ -215,9 +214,43 @@ def grading(group_id, thesis_id):
 
     quantitative_status = all(panelist_grades) if len(panelist_grades) > 0 else False
     
+    revision = thesis_.check_revision_lists(current_user)
+
+    result = {
+        "valid" : {},
+        "invalid" : {}
+    }
+
+    if request.method == "POST":
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+                
+        result = validate_input(data, UpdateRevisionSchema)
+        
+        if not result['invalid']:
+
+            # prevent premature flushing
+            with db.session.no_autoflush:
+
+                # values for validated and filtered input
+                data = result['valid']
+
+                revision.comment = data["comment"]
+                revision.is_final = data["is_final"] if data.get("is_final") else False
+                
+                try:
+                    db.session.commit()
+                    flash("Successfully saved revision.", "success")
+                    return redirect(request.referrer)
+
+                except:
+                    flash("An error occured", "danger")
+    
     return render_template(
         'group/grading.html', 
         thesis=thesis_,
         individual_ratings=individual_ratings,
-        quantitative_status=quantitative_status
+        quantitative_status=quantitative_status,
+        revision = revision,
+        result = result
         )

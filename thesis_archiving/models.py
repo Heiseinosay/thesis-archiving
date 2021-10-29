@@ -269,6 +269,29 @@ class Thesis(db.Model):
 		thesis = Thesis.query.filter_by(is_old=False).filter(Thesis.number.isnot(None)).order_by(Thesis.number.desc()).first()
 
 		return thesis.number + 1 if (thesis and thesis.number) else 1 
+	
+	def check_revision_lists(self, user):
+		'''
+			Returns revision list for the panel.
+
+			If none, create one
+		'''
+
+		revision = self.revision_lists.filter_by(panelist_id=user.id).first()
+		
+		if not revision:
+			revision = RevisionList()
+			revision.thesis_id = self.id
+			revision.panelist_id = user.id
+
+			try:
+				db.session.add(revision)
+				db.session.commit()
+				flash("Successfully created new revision.","success")
+			except:
+				flash("An error occured.","danger")
+
+		return revision
 
 class Group(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
