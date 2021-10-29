@@ -252,5 +252,6 @@ def grading(group_id, thesis_id):
         individual_ratings=individual_ratings,
         quantitative_status=quantitative_status,
         revision = revision,
-        result = result
+        result = result,
+        group = group_
         )
