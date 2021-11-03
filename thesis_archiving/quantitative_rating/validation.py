@@ -1,4 +1,4 @@
-from thesis_archiving import quantitative_rating
+# from thesis_archiving import quantitative_rating
 from marshmallow import Schema, fields, validate, ValidationError, validates, validates_schema, pre_load
 
 from thesis_archiving.validation import validate_empty

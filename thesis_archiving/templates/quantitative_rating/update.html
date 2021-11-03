@@ -73,6 +73,11 @@
                                             {{ criterion.name }}
                                         </td>
                                         <td>
+                                            <a 
+                                                class="btn btn-sm btn-primary bi bi-pencil align-self-start mr-1" 
+                                                href="{{ url_for('quantitative_criteria.update', quantitative_criteria_id=criterion.id) }}" 
+                                                role="button"
+                                            ></a>
                                             <!-- gawan modal to na mareremove all grades concerned -->
                                             {{ delete_modal(
                                                 url_for('quantitative_criteria.delete', 

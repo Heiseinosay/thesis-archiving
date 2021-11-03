@@ -336,10 +336,19 @@ class QuantitativeRating(db.Model):
 
 class QuantitativeCriteria(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
-	name =  db.Column(db.String(64))
+	name =  db.Column(db.String(64), nullable=False)
+	description =  db.Column(db.String(500))
 	quantitative_rating_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_rating.id', ondelete='cascade'), nullable=False)
 
 	grades = db.relationship('QuantitativeCriteriaGrade', backref='criteria', lazy='dynamic', cascade="all, delete")
+
+	ratings = db.relationship('QuantitativeCriteriaRating', backref='criteria', lazy='dynamic', cascade="all, delete")
+
+class QuantitativeCriteriaRating(db.Model):
+	id = db.Column(INTEGER(unsigned=True), primary_key=True)
+	rate = db.Column(INTEGER(unsigned=True), nullable=False)
+	description =  db.Column(db.String(500))
+	quantitative_criteria_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_criteria.id', ondelete='cascade'), nullable=False)
 
 # collection of grades a panel has
 class QuantitativePanelistGrade(db.Model):

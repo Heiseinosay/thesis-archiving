@@ -1,0 +1,108 @@
+{% from "components/_fields.html" import field %}
+{% from "components/_delete_modal.html" import delete_modal %}
+
+{% extends "base.html" %}
+
+{% block body %}
+
+{% 
+
+    set quantitative_criteria = {
+        'id': quantitative_criteria.id,
+        'name': request.form['name'] if request.form['name'] else quantitative_criteria.name,
+        'description': request.form['description'] if request.form['description'] else (quantitative_criteria.description if quantitative_criteria.description else ''),
+        'rating_rate': request.form['rating_rate'] if request.form['rating_rate'] else '',
+        'rating_description': request.form['rating_description'] if request.form['rating_description'] else '',
+        'ratings': quantitative_criteria.ratings
+    }
+
+%}
+
+	<div class="container py-3">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-7">
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h3 class="card-title">
+							Update Quantitative Criteria
+						</h3>
+                        <h5>
+							{{quantitative_criteria.name}}
+						</h5>
+                        
+                        <form action="" method="POST">
+                            {% include "components/csrf_token.html" %}
+
+                            <!-- name -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Name</label>
+                                {{ field("text", "name", result, quantitative_criteria['name']) }}
+                            </div>
+
+                            <!-- description -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Description</label>
+                                {{ field("text", "description", result, quantitative_criteria['description']) }}
+                            </div>
+
+                            <!-- rating to add -->
+                            <div class="row mb-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label h6">Add a rating</label>
+                                    {{ field("text", "rating_rate", result) }}
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label h6">Rating description</label>
+                                {{ field("text", "rating_description", result) }}
+                                </div>
+                            </div>
+                            
+                            <!-- update button -->
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-ueccss" type="submit">Update</button>    
+                            </div>
+                        </form>
+                        
+                        <h5>Rating</h5>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Rate</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+        
+                                {% for rating in quantitative_criteria['ratings'] %}
+                                    <tr>
+                                        
+                                        {% include "components/csrf_token.html" %}
+                                        <td>
+                                            {{ rating.rate }}
+                                        </td>
+                                        <td>
+                                            {{ rating.description }}
+                                        </td>
+                                        <td>
+                                            
+                                        </td>
+                                        
+                                    </tr>
+                                {% endfor %}
+                                
+                            </tbody>
+            
+                        </table>
+                           
+                    </div>
+                </div>
+                
+            </div>
+        </div>		
+	</div>
+	
+	
+	
+{% endblock %}
