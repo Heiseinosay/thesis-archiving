@@ -86,7 +86,12 @@
                                             {{ rating.description }}
                                         </td>
                                         <td>
-                                            
+                                            {{ delete_modal(
+                                                url_for('quantitative_criteria_rating.delete', 
+                                                quantitative_criteria_rating_id=rating.id), 
+                                                rating.id, 'rating ' + rating.rate|string, 
+                                                ""
+                                                ) }}
                                         </td>
                                         
                                     </tr>
