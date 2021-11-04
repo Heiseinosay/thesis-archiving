@@ -60,6 +60,7 @@
                             <thead>
                                 <tr>
                                     <th scope="col">Name</th>
+                                    <th scope="col">Description</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -71,6 +72,9 @@
                                         {% include "components/csrf_token.html" %}
                                         <td>
                                             {{ criterion.name }}
+                                        </td>
+                                        <td>
+                                            {{ criterion.description }}
                                         </td>
                                         <td>
                                             <a 
