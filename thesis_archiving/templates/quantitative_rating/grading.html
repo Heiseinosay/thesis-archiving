@@ -5,7 +5,7 @@
 {% block body %}
 <div class="container py-3">
     <div class="row justify-content-center">
-        <div class="col-12 col-lg-8 mb-3">
+        <div class="col-12 mb-3">
 
             <div class="card shadow-sm border-0">
                 <div class="card-body">
@@ -25,29 +25,56 @@
                                 {% include "components/csrf_token.html" %}
 
                                 {% set grades = {} %}
-                                
+                                {% set rating_descriptions = {} %}
                                 {# update dictionary values #}
                                 
                                 {% for grade in quantitative_panelist_grade.grades %}
+                                    {# updating dictionary with for loops does not persist
+                                        until it comes bock to the block level of the dictionary
+                                        itself
+
+                                        hence, in this loop, updates will reflect only
+                                        after the outloop block #}
+                                    
+                                    {% set criteria_name = grade.criteria.name %}
+
                                     {% set grades = grades.update(
                                             {
-                                                grade.criteria.name:
-                                                    request.form[grade.criteria.name] if request.form[grade.criteria.name] else grade.grade
+                                                criteria_name:
+                                                    [request.form[criteria_name] if request.form[criteria_name] else grade.grade, grade.criteria.description]
                                             }
                                         ) 
                                     %}
+                                    
+                                    {# this update will persist right away since loop exits
+                                        at its level #}
+                                    {% set rate_desc = {} %}
+                                    
+                                    {% for rating in grade.criteria.ratings %}
+                                            
+                                        {% set rate_desc = rate_desc.update(
+                                                {
+                                                    rating.rate:rating.description
+                                                }
+                                            ) 
+                                        %}
+                                    {% endfor %}
 
+                                    {# set the value to the external variable #}
+                                    {% set rating_descriptions = rating_descriptions.update(
+                                            {
+                                                criteria_name: rate_desc
+                                            }
+                                        ) 
+                                    %}
                                 {% endfor %}
 
+
                                 <ol>    
-                                    {#
-                                        create a field na mag rerestrict ng maximum grade
-                                        #}
                                     {% for name, value in grades.items() %}
-                                    
                                         <li>
-                                            <div class="mb-3">
-                                                {{ field_quantitative_rating(name, result, value, quantitative_rating.max_grade) }}
+                                            <div class="mt-4 mb-5">
+                                                {{ field_quantitative_rating(name, result, value[0], quantitative_rating.max_grade, value[1], rating_descriptions[name]) }}
                                             </div>
                                         </li>
                                     {% endfor %}

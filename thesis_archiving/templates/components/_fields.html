@@ -170,7 +170,7 @@
 {% endmacro %}
 
 <!-- quantitative rating -->
-{% macro field_quantitative_rating(name, result, value, max_grade) %}
+{% macro field_quantitative_rating(name, result, value, max_grade, description, descriptions) %}
 
     {% set radio_class = "form-check-input" %}
     {% set feedback_class = "" %}
@@ -185,8 +185,9 @@
 
     {% endif %}
 
+    {# descriptions sort #}
             
-    <label class="form-label h6">{{name}}</label>
+    <label class="form-label"><strong>{{name}}</strong> <small><i>{{ ' - ' + description if description else '' }}</i></small></label>
     
     <br>
 
@@ -194,11 +195,11 @@
 
         {% for i in range(1, max_grade + 1) %}
         
-        <div>
+        <div class="d-flex flex-wrap justify-content-center border-end border-dark p-2">
             <input class="{{radio_class}}" type="radio" name="{{name}}" value="{{loop.revindex}}" {{ "checked" if loop.revindex == value|int else ""}}>
         
-            <label class="form-check-label">
-                {{ loop.revindex }}
+            <label class="form-check-label ">
+                <small><strong>{{loop.revindex}}</strong> - {{ descriptions[loop.revindex] }}</small>
             </label>
             
         </div>
