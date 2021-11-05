@@ -239,11 +239,10 @@ def grading(group_id, thesis_id):
         elif request.form["form_name"] == "revision":
             # contains form data converted to mutable dict
             data = request.form.to_dict()
+            data.pop("form_name")
                     
             result = validate_input(data, UpdateRevisionSchema)
-            
             if not result['invalid']:
-
                 # prevent premature flushing
                 with db.session.no_autoflush:
 
