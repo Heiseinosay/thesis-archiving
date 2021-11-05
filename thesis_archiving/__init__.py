@@ -41,6 +41,7 @@ def create_app(config_class=Config):
     from thesis_archiving.group.routes import group
     from thesis_archiving.quantitative_rating.routes import quantitative_rating
     from thesis_archiving.quantitative_criteria.routes import quantitative_criteria
+    from thesis_archiving.quantitative_criteria_rating.routes import quantitative_criteria_rating
     from thesis_archiving.individual_rating.routes import individual_rating
 
     app.register_blueprint(main)
@@ -52,6 +53,7 @@ def create_app(config_class=Config):
     app.register_blueprint(group)
     app.register_blueprint(quantitative_rating)
     app.register_blueprint(quantitative_criteria)
+    app.register_blueprint(quantitative_criteria_rating)
     app.register_blueprint(individual_rating)
     
     

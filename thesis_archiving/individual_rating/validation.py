@@ -25,21 +25,21 @@ class IndividualRatingSchema(Schema):
 
         err = {}
         
-        if data["is_final"]:
+        if data.get("is_final"):
 
-            if not data["intelligent_response"]:
+            if not data.get("intelligent_response"):
                 err["intelligent_response"] = ["Field cannot be empty."]
             
-            if not data["respectful_response"]:
+            if not data.get("respectful_response"):
                 err["respectful_response"] = ["Field cannot be empty."]
 
-            if not data["communication_skills"]:
+            if not data.get("communication_skills"):
                 err["communication_skills"] = ["Field cannot be empty."]
 
-            if not data["confidence"]:
+            if not data.get("confidence"):
                 err["confidence"] = ["Field cannot be empty."]
 
-            if not data["attire"]:
+            if not data.get("attire"):
                 err["attire"] = ["Field cannot be empty."]
 
         if err:

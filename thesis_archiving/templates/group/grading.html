@@ -1,8 +1,10 @@
 {% from 'components/_proponent_card.html' import proponent_card %}
+{% from "components/_fields.html" import field_checkbox, field_textarea, field_individual_rating %}
 
 {% extends "base.html" %}
 
 {% block body %}
+
 <div class="container py-3">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-8 mb-3">
@@ -12,16 +14,26 @@
                     <h3 class="card-title mb-3">
                         {{ thesis.title }}
                     </h3>
-
                     <div class="row">
                         <div class="col-12 col-sm-6">
-                            <h4>Qualitative Rating</h4>
-                            
-                            {% for grade in quantitative_panelist_grade.grades %}
-                                <p>{{ grade.criteria.name }} </p>
-                            {% endfor %}
-                        </div>
+                            <div class="d-grid gap-1">
+                                
+                                <h4>
+                                    <span class="badge bg-{{ 'success' if quantitative_status else 'warning' }}">{{ 'DONE' if quantitative_status else 'ONGOING' }}</span>
+                                    Quantitative Rating
+                                </h4>
+                                
+                                {% if thesis.quantitative_rating_id %}
+                                    <a class="btn btn-sm btn-ueccss" href="{{ url_for('quantitative_rating.grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=thesis.quantitative_rating_id) }}" role="button" target="_blank">Manuscript Rating</a>
+                                {% endif %}
+    
+                                {% if thesis.quantitative_rating_developed_id %}
+                                    <a class="btn btn-sm btn-ueccss" href="{{ url_for('quantitative_rating.grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=thesis.quantitative_rating_developed_id) }}" role="button" target="_blank">Developed Thesis Project Rating</a>
+                                {% endif %}
 
+                            </div>                            
+                        </div>
+                                    
                         <div class="col-12 col-sm-6">
                             <div class="d-grid gap-1">
                                 <h4>Individual Rating</h4>
@@ -32,8 +44,42 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <!-- revision here -->
+                    <div class="row mt-5">
+                        <form action="" method="POST">
+                            
+                            {% set revision = {
+                                "comment" : request.form["comment"] if request.form["comment"] else revision.comment,
+                                "is_final" : request.form["is_final"] if request.form["is_final"] else revision.is_final
+                            } %}
+
+                            {% include "components/csrf_token.html" %}
+
+                            <div>
+                                <label class="form-label h6">Revision notes</label>
+                                {{ field_textarea("comment", result, revision["comment"]) }}
+                            </div>
+                            
+                            <div>
+                                {{ field_checkbox(
+                                    "is_final",
+                                    result,
+                                    "Mark as final to be included for submission.",
+                                    revision["is_final"]
+                                    ) 
+                                }}
+                            </div>
+
+
+                            <div class="d-flex justify-content-end">
+                                {% if group.chairman == current_user %}
+                                    <button type="button" class="btn btn-outline-ueccss me-2" data-bs-toggle="modal" data-bs-target="#compiledRevisionNotes">
+                                        See compiled revision notes
+                                    </button>
+                                {% endif %}
+
+                                <button type="submit" class="btn btn-ueccss">Save revision notes</button>
+                            </div>
+                        </form>
                     </div>
                 
                 </div>
@@ -44,4 +90,30 @@
     </div>		
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="compiledRevisionNotes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Compiled revision notes</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+
+            {% for revision in thesis.revision_lists %}
+
+            <div class="mb-3">
+                <label class="form-label h6">{{'You' if revision.panelist == current_user else revision.panelist.full_name}}</label>
+                <textarea class="form-control" rows="5" disabled>{{revision.comment}}</textarea>
+              </div>
+          {% endfor %}
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-ueccss">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

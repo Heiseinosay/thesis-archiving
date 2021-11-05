@@ -8,8 +8,10 @@ from thesis_archiving.utils import has_roles
 from thesis_archiving.models import Group, IndividualRating, User, Thesis
 from thesis_archiving.validation import validate_input
 
-from thesis_archiving.group.validation import CreateGroupSchema, UpdateGroupSchema
+from thesis_archiving.group.validation import CreateGroupSchema, UpdateGroupSchema, UpdateRevisionSchema
 from thesis_archiving.group.utils import check_panelists
+
+from pprint import pprint
 
 group = Blueprint("group", __name__, url_prefix="/group")
 
@@ -200,27 +202,56 @@ def grading(group_id, thesis_id):
     if thesis_ not in group_.presentors:
         abort(406)
 
-    current_user.check_quantitative_panelist_grade(thesis_)
-
-    quantitative_panelist_grade_ = current_user.quantitative_panelist_grades.filter_by(thesis_id=thesis_.id).first()
-
     individual_ratings = { 
         proponent.id : IndividualRating.query.filter_by(
             thesis_id=thesis_id, 
             student_id=proponent.id, 
-            panelist_id=current_user.id).first() for proponent in thesis_.proponents 
+            panelist_id=current_user.id
+            ).first() for proponent in thesis_.proponents 
             }
-    
-    # revision textarea
-    # submit for save
-    # submit for final (do proper checking + checkbox lang)
-    # each criteria will have unique validations
-    # unahin muna revision list + saving dahil mas madali
-    # CONFIRMATION MODALS
 
+    panelist_grades = [grade.is_final for grade in thesis_.quantitative_panelist_grades.filter_by(panelist_id=current_user.id).all()]
+
+    quantitative_status = all(panelist_grades) if len(panelist_grades) > 0 else False
+    
+    revision = thesis_.check_revision_lists(current_user)
+
+    result = {
+        "valid" : {},
+        "invalid" : {}
+    }
+
+    if request.method == "POST":
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+                
+        result = validate_input(data, UpdateRevisionSchema)
+        
+        if not result['invalid']:
+
+            # prevent premature flushing
+            with db.session.no_autoflush:
+
+                # values for validated and filtered input
+                data = result['valid']
+
+                revision.comment = data["comment"]
+                revision.is_final = data["is_final"] if data.get("is_final") else False
+                
+                try:
+                    db.session.commit()
+                    flash("Successfully saved revision.", "success")
+                    return redirect(request.referrer)
+
+                except:
+                    flash("An error occured", "danger")
+    
     return render_template(
         'group/grading.html', 
         thesis=thesis_,
         individual_ratings=individual_ratings,
-        quantitative_panelist_grade=quantitative_panelist_grade_
+        quantitative_status=quantitative_status,
+        revision = revision,
+        result = result,
+        group = group_
         )

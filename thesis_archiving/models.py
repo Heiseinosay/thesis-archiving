@@ -2,12 +2,14 @@ from flask import current_app
 from flask.helpers import flash
 from flask_login import UserMixin
 from sqlalchemy.dialects.mysql import INTEGER, BOOLEAN, BIGINT
+from sqlalchemy import and_
 
 from thesis_archiving import db, login_manager
 
 from datetime import datetime
 import pytz
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -114,10 +116,27 @@ class User(db.Model, UserMixin):
 
 		return User.query.get(_user_id)
 
-	def check_quantitative_panelist_grade(self, thesis):
+	def check_quantitative_panelist_grade(self, thesis, quantitative_rating):
 		
 		# fetch the panel's quantatitative grades for the thesis
-		panelist_grade = self.quantitative_panelist_grades.filter_by(thesis_id=thesis.id).first()
+		# panelist_grade = self.quantitative_panelist_grades.filter_by(thesis_id=thesis.id).first()
+
+		panelist_grade = db.session.query(QuantitativePanelistGrade).where(
+			and_(
+					# get the panelist id who graded those criteria
+					QuantitativePanelistGrade.id.in_(
+						db.session.query(QuantitativeCriteriaGrade.quantitative_panelist_grade_id).where(
+							# get id of grades pointing to those criteria
+							QuantitativeCriteriaGrade.quantitative_criteria_id.in_(
+								# obtain all id ng MANUSCRIPT rating criteria ng thesis
+								db.session.query(QuantitativeCriteria.id).where(QuantitativeCriteria.quantitative_rating_id == quantitative_rating.id)        
+							)
+						)
+					),
+					QuantitativePanelistGrade.thesis_id == thesis.id,
+					QuantitativePanelistGrade.panelist_id == self.id
+				)
+			).first()
 
 		# create if there is none
 		if not panelist_grade:
@@ -129,7 +148,7 @@ class User(db.Model, UserMixin):
 			
 			# fetch each criteria of the rating for the thesis
 			# might raise an error if the thesis HAS NO quantitative grading criteria selected
-			criteria = thesis.quantitative_rating.criteria
+			criteria = quantitative_rating.criteria
 
 			# create grade for each criteria
 			for criterion in criteria:
@@ -150,12 +169,14 @@ class User(db.Model, UserMixin):
 			except:
 				flash('An error occured while creating quantitative rating grades.','danger')
 
-	def check_student_individual_rating(self, student, thesis_id):
-		
+	def check_student_individual_rating(self, student, thesis_id, panelist_id):
+		'''
+			return individual rating
+		'''
 		# check for existing rating for the thesis and corresponding student
 		rating = student.student_individual_ratings.filter_by(
 			thesis_id = thesis_id,
-			panelist_id = self.id
+			panelist_id = panelist_id
 		).first()
 		
 		# create a rating if there is none
@@ -163,7 +184,7 @@ class User(db.Model, UserMixin):
 			rating = IndividualRating()
 			rating.student_id = student.id
 			rating.thesis_id = thesis_id
-			rating.panelist_id = self.id
+			rating.panelist_id = panelist_id
 
 			try:
 				db.session.add(rating)
@@ -211,9 +232,14 @@ class Thesis(db.Model):
 	program_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('program.id'), nullable=False)
 	proponents = db.relationship('User', secondary=proponents, lazy='dynamic', backref=db.backref('theses', lazy='dynamic'))
 
+	# manuscript selection
 	quantitative_rating_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_rating.id'))
 
+	# developed thesis project
+	quantitative_rating_developed_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_rating.id'))
+
 	quantitative_panelist_grades = db.relationship('QuantitativePanelistGrade', backref='thesis', lazy='dynamic', cascade="all, delete")
+
 
 	revision_lists = db.relationship('RevisionList', backref='thesis', lazy='dynamic', cascade="all, delete")
 
@@ -243,6 +269,29 @@ class Thesis(db.Model):
 		thesis = Thesis.query.filter_by(is_old=False).filter(Thesis.number.isnot(None)).order_by(Thesis.number.desc()).first()
 
 		return thesis.number + 1 if (thesis and thesis.number) else 1 
+	
+	def check_revision_lists(self, user):
+		'''
+			Returns revision list for the panel.
+
+			If none, create one
+		'''
+
+		revision = self.revision_lists.filter_by(panelist_id=user.id).first()
+		
+		if not revision:
+			revision = RevisionList()
+			revision.thesis_id = self.id
+			revision.panelist_id = user.id
+
+			try:
+				db.session.add(revision)
+				db.session.commit()
+				flash("Successfully created new revision.","success")
+			except:
+				flash("An error occured.","danger")
+
+		return revision
 
 class Group(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
@@ -274,18 +323,32 @@ class Group(db.Model):
 class QuantitativeRating(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
 	name = db.Column(db.String(120), unique=True)
+	max_grade = db.Column(db.Integer, default=5)
 
-	# theses using this rating template
-	theses = db.relationship('Thesis', backref='quantitative_rating', lazy='dynamic')
+	# theses using this rating template for MANUSCRIPT
+	theses = db.relationship('Thesis', backref='manuscript_rating', lazy='dynamic', foreign_keys='Thesis.quantitative_rating_id')
 
+	# theses using this rating template for DEVELOPED THESIS PROJECT
+	developed_theses = db.relationship('Thesis', backref='developed_thesis_rating', lazy='dynamic', foreign_keys='Thesis.quantitative_rating_developed_id')
+
+	# adding new criteria will not reflect on ongoing gradings
 	criteria = db.relationship('QuantitativeCriteria', backref='rating', lazy='dynamic', cascade="all, delete")
 
 class QuantitativeCriteria(db.Model):
 	id = db.Column(INTEGER(unsigned=True), primary_key=True)
-	name =  db.Column(db.String(64))
+	name =  db.Column(db.String(64), nullable=False)
+	description =  db.Column(db.String(500))
 	quantitative_rating_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_rating.id', ondelete='cascade'), nullable=False)
 
 	grades = db.relationship('QuantitativeCriteriaGrade', backref='criteria', lazy='dynamic', cascade="all, delete")
+
+	ratings = db.relationship('QuantitativeCriteriaRating', backref='criteria', lazy='dynamic', cascade="all, delete")
+
+class QuantitativeCriteriaRating(db.Model):
+	id = db.Column(INTEGER(unsigned=True), primary_key=True)
+	rate = db.Column(INTEGER(unsigned=True), nullable=False)
+	description =  db.Column(db.String(500))
+	quantitative_criteria_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('quantitative_criteria.id', ondelete='cascade'), nullable=False)
 
 # collection of grades a panel has
 class QuantitativePanelistGrade(db.Model):
