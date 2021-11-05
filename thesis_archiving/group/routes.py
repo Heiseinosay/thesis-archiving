@@ -209,6 +209,15 @@ def grading(group_id, thesis_id):
             panelist_id=current_user.id
             ).first() for proponent in thesis_.proponents 
             }
+    
+    qualitative_ratings = {
+        None : None,
+        "PASSED" : "A “Passed” qualitative rating is given if the panel members perceived that the project satisfactorily met all criteria.",
+        "CONDITIONAL PASS" : "This rating is a borderline between \"Pass\" and \"Redefense\" remarks. This rating may be given if the panel members viewed that 1) the project/paper needs revisions, 2) the revisions can be done within three days, and 3) there is a need to present the revisions to at least one of the panel members.",
+        "REDEFENSE" : "If the following conditions are met, then the rating \"Redefense\" is justifiable: 1) the project/paper needs revisions, 2) the revisions require one week to comply, and 3) the panel members feel that there is a need to present the revisions to the three-man committee.",
+        "FAILED" : "The project/paper did not satisfactorily meet all of the criteria. For the Software Project Stage, the minimum requirements are not satisfied."
+    }
+        
 
     panelist_grades = [grade.is_final for grade in thesis_.quantitative_panelist_grades.filter_by(panelist_id=current_user.id).all()]
 
@@ -222,29 +231,35 @@ def grading(group_id, thesis_id):
     }
 
     if request.method == "POST":
-        # contains form data converted to mutable dict
-        data = request.form.to_dict()
-                
-        result = validate_input(data, UpdateRevisionSchema)
-        
-        if not result['invalid']:
+        if request.form["form_name"] == "qualitative":
+            # make necessary checks before commiting to new rating
+            # make necessary checks before generating docs
+            flash("bruh", "success")
 
-            # prevent premature flushing
-            with db.session.no_autoflush:
+        elif request.form["form_name"] == "revision":
+            # contains form data converted to mutable dict
+            data = request.form.to_dict()
+                    
+            result = validate_input(data, UpdateRevisionSchema)
+            
+            if not result['invalid']:
 
-                # values for validated and filtered input
-                data = result['valid']
+                # prevent premature flushing
+                with db.session.no_autoflush:
 
-                revision.comment = data["comment"]
-                revision.is_final = data["is_final"] if data.get("is_final") else False
-                
-                try:
-                    db.session.commit()
-                    flash("Successfully saved revision.", "success")
-                    return redirect(request.referrer)
+                    # values for validated and filtered input
+                    data = result['valid']
 
-                except:
-                    flash("An error occured", "danger")
+                    revision.comment = data["comment"]
+                    revision.is_final = data["is_final"] if data.get("is_final") else False
+                    
+                    try:
+                        db.session.commit()
+                        flash("Successfully saved revision.", "success")
+                        return redirect(request.referrer)
+
+                    except:
+                        flash("An error occured", "danger")
     
     return render_template(
         'group/grading.html', 
@@ -253,5 +268,6 @@ def grading(group_id, thesis_id):
         quantitative_status=quantitative_status,
         revision = revision,
         result = result,
-        group = group_
+        group = group_,
+        qualitative_ratings = qualitative_ratings
         )
