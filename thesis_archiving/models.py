@@ -240,6 +240,8 @@ class Thesis(db.Model):
 
 	quantitative_panelist_grades = db.relationship('QuantitativePanelistGrade', backref='thesis', lazy='dynamic', cascade="all, delete")
 
+	individual_rating_panelist_grades = db.relationship('IndividualRating', backref='thesis', lazy='dynamic', cascade="all, delete")
+
 
 	revision_lists = db.relationship('RevisionList', backref='thesis', lazy='dynamic', cascade="all, delete")
 

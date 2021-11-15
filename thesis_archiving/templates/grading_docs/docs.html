@@ -1,0 +1,320 @@
+<html>
+<head>
+    <style>
+        @page {
+            size: a4 landscape;
+            @frame content_frame {
+                left: 0.5in;
+                top: 0.5in;
+                width: 10.7in;
+                height: 7.3in;
+            }
+        }
+
+        table { 
+            -pdf-keep-with-next: true; 
+            -pdf-keep-in-frame-mode: shrink;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 2px;
+        }
+
+        div.page {-pdf-keep-in-frame-mode: shrink;}
+
+        .center {
+            text-align: center;
+        }
+        .my-0 {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+        .left {
+            text-align: left;
+        }
+
+        .h0 {
+            font-size: 1.75em;
+        }
+
+        .ind {
+            text-indent: 50px;
+        }
+
+        p {
+            font-size: 1.2em;
+        }
+
+        li {
+            font-size: 1.2em;
+        }
+
+    </style>
+<head>
+
+<body>
+
+    <!-- quali -->
+    <div class="page">
+        <div class="center">
+            <h1 class="my-0 h0">UNIVERSITY OF THE EAST - MANILA</h1>
+            <h1 class="my-0 h0">College of Computer Studies and Systems</h1>
+            <h1 class="my-0 h0">THESIS PROJECT DEFENSE RATING SHEETS FOR CCS 4990 ##DYNAMIC DAPAT</h1>
+            <h1 class="left h0">TITLE OF THESIS: {{thesis.title}}</h1>
+            <hr>
+        </div>
+
+        <div>
+            <h1 class="h0">QUALITATIVE RATING</h1>
+            <p class="ind my-0">
+                The qualitative rating aims to determine the overall assessment of the thesis/software project (herein referred to as a project) of the students. Panel members have to deliberate which of the remarks below should be given. They must choose ONLY ONE remark. The project should be qualitatively assessed using the same criteria of the Quantitative Rating.
+            </p>
+            
+            <br>
+            
+            <div style="margin-left: 50px;">
+                <h1 class="my-0">[ {{ '&#10003;' if thesis.qualitative_rating == 'PASSED' else '' }} ] PASSED</h1>
+                <p class="my-0 ind">
+                    - A “Passed” qualitative rating is given if the panel members perceived that the project satisfactorily met all criteria.
+                </p>
+                <br>
+                <h1 class="my-0">[ {{ '&#10003;' if thesis.qualitative_rating == 'CONDITIONAL PASS' else '' }} ] CONDITIONAL PASS</h1>
+                <p class="my-0 ind">
+                    - This rating is a borderline between “Pass” and “Redefense” remarks. This rating may be given if the panel members viewed that 1) the project/paper needs revisions, 2) the
+                    revisions can be done within three days, and 3) there is a need to present the revisions to at least one of the panel members.
+                </p>
+                <br>
+                <h1 class="my-0">[ {{ '&#10003;' if thesis.qualitative_rating == 'REDEFENSE' else '' }} ] REDEFENSE</h1>
+                <p class="my-0 ind">
+                    - If the following conditions are met, then the rating “Redefense” is justifiable: 1) the project/paper needs revisions, 2) the revisions require one week to comply, and 3) the
+                    panel members feel that there is a need to present the revisions to the three-man committee.
+                </p>
+                <br>
+                <h1 class="my-0">[ {{ '&#10003;' if thesis.qualitative_rating == 'FAILED' else '' }} ] FAILED</h1>
+                <p class="my-0 ind">
+                    - The project/paper did not satisfactorily meet all of the criteria. 
+                </p>
+                <p class="my-0 ind">
+                    - For the Software Project Stage, the minimum requirements are not satisfied.
+                </p>
+            </div>
+
+            <p><b>Guide:</b></p>
+            <div style="margin-left: 50px;">
+                <ol>
+                    <li>
+                        The “Passed”, “Conditional Pass”, and “Failed” rating marks should have quantitative equivalents. Thus, the Quantitative Rating should be utilized after the Qualitative Assessment.
+                    </li>
+                    <li>
+                        A Software Project that did not meet the minimum requirements means that the Functionality, Completeness, and Reliability of the software can no longer be assessed. Hence, a “Failed”
+                    mark should be given.
+                    </li>
+                    <li>
+                        Exhaustive comments/suggestions/recommendations SHOULD be written in the Revision Lists.
+                    </li>
+                    <li>
+                        Individual Rating is utilized only if the students have a qualitative rating of “Passed” or “Conditional Passed”.
+                    </li>
+                    <li>
+                        Ensure that the Qualitative and Quantitative Ratings corroborate each other.
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    
+    {% for panelist in panelists %}
+        <!-- quanti -->
+        {% if thesis.quantitative_rating_id %}
+        <div class="page">
+            <h1>QUANTITATIVE RATING FOR {{thesis.program.name}} MANUSCRIPT</h1>
+            <table>
+                <tr>
+                    <th>
+                        CRITERIA
+                    </th>
+                    
+                    {% for i in range(thesis.manuscript_rating.max_grade) %}
+                    <th>
+                        {{loop.revindex}}
+                    </th>
+                    {% endfor %}
+                    <th>LEGEND</th>
+                </tr>
+
+                {% for criteria in thesis.manuscript_rating.criteria %}
+                <tr>
+                    <td>
+                        <h5>criteria.name</h5>
+                        <small>
+                            <p>
+                                criteria.description
+                            </p>
+                        </small>
+                    </td>
+                    {% for rating in criteria.ratings.order_by(QuantitativeCriteriaRating.rate) %}
+                        <td>
+                            {{rating.description}}
+                        </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% endif %}
+
+
+        <!-- individual rating -->
+        <pdf:nextpage /> 
+
+        <div class="page">
+            <h1>INDIVIDUAL RATING</h1>
+            <p class="ind">Rate the students on the following criteria using the scale:<strong> 1 – Poor 2 – Below average 3 – Average 4 – Good 5 – Very Good</strong></p>
+            
+            <table>
+                <tr>
+                    <th>
+                        CRITERIA
+                    </th>
+                    {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
+                    <th>{{ k }}</th>
+                    {% endfor %}
+                    <th colspan="2" rowspan="8">
+                        <h1>LEGEND</h1>
+                        <table>
+                            <tr>
+                                <th>
+                                    PTS
+                                </th>
+                                <th>
+                                    GRADE
+                                </th>
+                                <th>
+                                    EQUIVALENT
+                                </th>
+                            </tr>
+                            
+                            
+
+                        </table>
+                    </th>
+                </tr>
+                
+                <!-- oral presentation -->
+                <tr>
+                    <td>
+                        <h5>ORAL PRESENTATION</h5>
+                        <small>
+                            <p>
+                                For his assigned part, the student
+                                used the presentation resources
+                                as a guide to provide an
+                                exhaustive explanation, while
+                                keeping the
+                                panel members' attention
+                                engaged.
+                            </p>
+                        </small>
+                    </td>
+                    {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
+                        <td>{{ v.respectful_response }}</td>
+                    {% endfor %}                    
+                </tr>
+
+                <!-- comuncaiton skills -->
+                <tr>
+                    <td>
+                        <h5>COMMUNICATION SKILLS</h5>
+                        <small>
+                            <p>
+                                The student conveyed his/her
+                                ideas clearly, and with a pleasant
+                                tone.
+                            </p>
+                        </small>
+                    </td>
+                    {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
+                        <td>{{ v.communication_skills }}</td>
+                    {% endfor %}
+                </tr>
+
+                <!-- INTELLIGENT RESPONSE -->
+                <tr>
+                    <td>
+                        <h5>INTELLIGENT RESPONSE</h5>
+                        <small>
+                            <p>
+                                The student exhibited mastery of
+                                the body of work when answering
+                                questions.
+                            </p>
+                        </small>
+                    </td>
+                    {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
+                        <td>{{ v.intelligent_response }}</td>
+                    {% endfor %}
+                </tr>
+
+                <!-- CONFIDENCE -->
+                <tr>
+                    <td>
+                        <h5>CONFIDENCE</h5>
+                        <small>
+                            <p>
+                                The student demonstrated poise
+                                even under pressure. He/she
+                                interacts in a polite and
+                                considerate manner.
+                            </p>
+                        </small>
+                    </td>
+                    {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
+                        <td>{{ v.confidence }}</td>
+                    {% endfor %}
+                </tr>
+
+                <!-- APPREANCE -->
+                <tr>
+                    <td>
+                        <h5>APPREANCE</h5>
+                        <small>
+                            <p>
+                                The student demonstrated poise
+                                even under pressure. He/she
+                                interacts in a polite and
+                                considerate manner.
+                            </p>
+                        </small>
+                    </td>
+                    {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
+                        <td>{{ v.attire }}</td>
+                    {% endfor %}
+                </tr>
+
+                <tr>
+                    <th>TOTAL RAW SCORE</th>
+                    {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
+                        <td>{{ v.respectful_response + v.communication_skills + v.intelligent_response + v.confidence + v.attire }}</td>
+                    {% endfor %}
+                </tr>
+
+                <tr>
+                    <th>GRADE EQUIVALENT</th>
+                    {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
+                        <td> </td>
+                    {% endfor %}
+                </tr>
+            </table>
+        </div>
+        
+
+    {% endfor %}
+  
+</body>

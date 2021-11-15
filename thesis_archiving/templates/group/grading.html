@@ -50,7 +50,27 @@
                                                 {% endfor %}
                                         
                                                 <div class="d-grid gap-1">
-                                                    <button type="submit" class="btn btn-sm btn-ueccss">Submit qualitative rating</button>
+                                                    <button type="button" class="btn btn-sm btn-ueccss" data-bs-toggle="modal" data-bs-target="#confirmQualitative">
+                                                        Submit qualitative rating
+                                                    </button>
+
+                                                    <div class="modal fade" id="confirmQualitative" tabindex="-1" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                          <div class="modal-content">
+                                                            <div class="modal-header">
+                                                              <h5 class="modal-title" id="exampleModalLabel">Confirm grading</h5>
+                                                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Are you sure you want to finalize the grading and generate documents for this thesis?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                              <button type="submit" class="btn btn-ueccss">Submit</button>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
                                                 </div>
 
                                             </form>
@@ -168,7 +188,6 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-ueccss">Save changes</button>
         </div>
       </div>
     </div>

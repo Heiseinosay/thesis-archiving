@@ -5,11 +5,11 @@ from flask_login import login_required, current_user
 from thesis_archiving import db
 
 from thesis_archiving.utils import has_roles
-from thesis_archiving.models import Group, IndividualRating, User, Thesis
+from thesis_archiving.models import Group, IndividualRating, RevisionList, User, Thesis, QuantitativePanelistGrade
 from thesis_archiving.validation import validate_input
 
 from thesis_archiving.group.validation import CreateGroupSchema, UpdateGroupSchema, UpdateRevisionSchema
-from thesis_archiving.group.utils import check_panelists
+from thesis_archiving.group.utils import check_panelists, export_grading_docs
 
 from pprint import pprint
 
@@ -231,10 +231,103 @@ def grading(group_id, thesis_id):
     }
 
     if request.method == "POST":
-        if request.form["form_name"] == "qualitative":
+        if request.form["form_name"] == "qualitative" and request.form.get("qualitative_rating") in ["PASSED", "CONDITIONAL PASS", "REDEFENSE", "FAILED"]:
             # make necessary checks before commiting to new rating
             # make necessary checks before generating docs
-            flash("bruh", "success")
+
+            # {
+            #     "chairman": chairman,
+            #     "qualitative_rating": rating,
+            #     "panelists": {
+            #         "is_final" : True,
+            #         "quantitative_rating": {"manuscript": None, "developed_thesis_project": None},
+            #         "individual_rating": {student: {rating_n: grade, ...}}, #sort by stud no.
+            #         "revision_notes" : notes
+            #         }
+            #     "grades": {
+            #         "quantitative",
+            #         "overall"
+            #     }
+            # }
+            details = {}
+
+            # details["title"] = thesis_.title
+            # details["chairman"] = group_.chairman
+            # details["defense_date"] = date today
+            # details["program"] = thesis_.program.name
+            # details["adviser"] = thesis_.adviser.full_name
+            # if thesis_.quantitative_rating_id:
+            not_final = []
+            
+            for panelist in group_.panelists:
+
+                # if some of the grading component is not final yet
+                if thesis_.quantitative_panelist_grades.filter(QuantitativePanelistGrade.is_final != True, QuantitativePanelistGrade.panelist_id == panelist.id).all()\
+                    or thesis_.individual_rating_panelist_grades.filter(IndividualRating.is_final != True, IndividualRating.panelist_id == panelist.id).all()\
+                        or thesis_.revision_lists.filter(RevisionList.is_final != True, RevisionList.panelist_id == panelist.id).all():
+                    not_final.append(panelist.full_name)
+
+            if not_final:
+                flash("The following panelists are not yet done grading: " + ", ".join(map(str,not_final)) ,"warning")
+            else:
+                revision_list = {}
+
+                individual_ratings = {}
+                
+                manuscript = {}
+
+                developed_thesis = {}
+
+                for panelist in group_.panelists:
+                    
+                    revision_list[panelist] = thesis_.revision_lists.filter_by(panelist_id=panelist.id)
+
+                    individual_ratings[panelist] = { proponent.full_name : thesis_.individual_rating_panelist_grades.filter_by(student_id=proponent.id, panelist_id=panelist.id).first()\
+                        for proponent in thesis_.proponents }
+                    
+                return export_grading_docs(group_.panelists, thesis_, revision_list, individual_ratings)
+
+                    # if thesis_.quantitative_rating_id:
+                    #     manuscript = { panelist : for rating in thesis_.quantitative_panelist_grades.filter_by()}
+                    # quantitative_ratings[panelist]
+
+                    
+                pass
+            # for panelist in group_.panelists:
+            #     panelists[panelist] = {
+            #         "not_final" : thesis_.quantitative_panelist_grades.filter(QuantitativePanelistGrade.is_final != True, QuantitativePanelistGrade.panelist_id == panelist.id)\
+            #             or thesis_.individual_rating_panelist_grades.filter(IndividualRating.is_final != True, IndividualRating.panelist_id == panelist.id)\
+            #                 or thesis_.revision_lists.filter(RevisionList.is_final != True, RevisionList.panelist_id == panelist.id),
+            #         "quantitative_rating" : {},
+            #         "individual_rating" : {},
+            #         "revision_notes" : thesis_.
+            #     }
+
+                
+            #     # manuscript
+            #     if thesis_.quantitative_rating_id:
+            #         panelists[panelist]["quantitative_rating"]["manuscript"] = thesis_.quantitative_panelist_grades.filter_by()
+            
+            # "qualitative_rating" : None,
+            # panelists = { panelist : True for panelist in group panelists }
+            
+            # proponents = thesis proponents
+            
+            # for proponents in thesis
+                
+            #     # indiv rating
+            #     for rating in proponents where thesis.id = thesis.id and is_final is not true:
+            #         panelist[rating .panelist] = False
+
+            #     # manuscript
+            #     if thesis manuscript:
+            #         for ratings in quanti paneslit grade where thesisid = thesis is and manuscirpt == manu id and is_final not true
+            #         panelist[rating .panelist] = False
+
+            #     # developed same as above
+
+            #     # revision same as indiv ratings
+
 
         elif request.form["form_name"] == "revision":
             # contains form data converted to mutable dict
