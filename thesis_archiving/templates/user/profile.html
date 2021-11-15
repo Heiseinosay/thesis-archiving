@@ -11,12 +11,14 @@
         <div class="col-12 col-xl-10 py-3">
             <div class="d-grid gap-3">
 
-                <h6>Your theses ({{theses.count()}})</h6>
+                {% if groups %}
+                    <h6>Your panel groups ({{groups.count()}})</h6>
+                    
+                    {% for group in groups %}
+                        {{ group_card(group, current_user)}}	
+                    {% endfor %}
+                {% endif %}
 
-                {% for thesis in theses %}
-                    {{ thesis_card(thesis, current_user) }}	
-                {% endfor %}
-                
                 {% if advisees %}
                     <h6>Your advisees ({{advisees.count()}})</h6>
                     
@@ -25,11 +27,11 @@
                     {% endfor %}
                 {% endif %}
 
-                {% if groups %}
-                    <h6>Your panel groups ({{groups.count()}})</h6>
-                    
-                    {% for group in groups %}
-                        {{ group_card(group, current_user)}}	
+                {% if current_user.is_student %}
+                    <h6>Your theses ({{theses.count()}})</h6>
+
+                    {% for thesis in theses %}
+                        {{ thesis_card(thesis, current_user) }}	
                     {% endfor %}
                 {% endif %}
 
