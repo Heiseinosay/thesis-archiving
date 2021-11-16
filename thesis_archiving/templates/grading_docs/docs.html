@@ -16,9 +16,13 @@
             -pdf-keep-in-frame-mode: shrink;
         }
 
-        table, th, td {
+        table.border, th, td {
             border: 1px solid black;
             border-collapse: collapse;
+        }
+
+        table.border0, th.border0, td.border0 {
+            border: none;
         }
 
         th, td {
@@ -54,11 +58,15 @@
             font-size: 1.2em;
         }
 
+        td.highlight {
+            background-color: yellow;
+        }
+
     </style>
 <head>
 
 <body>
-
+    
     <!-- quali -->
     <div class="page">
         <div class="center">
@@ -131,9 +139,11 @@
     
     {% for panelist in panelists %}
         <!-- quanti -->
+        
+        <!-- manuscript -->
         {% if thesis.quantitative_rating_id %}
         <div class="page">
-            <h1>QUANTITATIVE RATING FOR {{thesis.program.name}} MANUSCRIPT</h1>
+            <h1>QUANTITATIVE RATING FOR {{thesis.program.name}} MANUSCRIPT - {{ panelist.full_name }}</h1>
             <table>
                 <tr>
                     <th>
@@ -145,40 +155,101 @@
                         {{loop.revindex}}
                     </th>
                     {% endfor %}
-                    <th>LEGEND</th>
+                    <th rowspan="{{ thesis.manuscript_rating.criteria.count() + 1 }}" colspan="2">
+                        
+                        <h1>LEGEND:</h1>
+                        <table class="border0">
+                            <tr>
+                                <th class="border0">
+                                    PTS
+                                </th>
+                                <th class="border0">
+                                    GRADE
+                                </th>
+                                <th class="border0">
+                                    EQUIVALENT
+                                </th>
+                            </tr>
+                            {##}
+                            {% for k, v in legend.items() %}
+                                <tr>
+                                    <td class="border0">
+                                        {{ '<=12' if k == 12 else k}}
+                                    </td>
+                                    <td class="border0">
+                                        {{ '74-60' if v.grade == 74 else v.grade}}
+                                    </td>
+                                    <td class="border0">
+                                        {{v.equivalent}}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            <tr>
+                                <td>TOTAL RAW SCORE</td>
+                                <td colspan="2">{{ manuscript[panelist]["total"] }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>GRADE</td>
+                                <td colspan="2">{{manuscript[panelist]["legend"]["grade"] }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>EQUIVALENT</td>
+                                <td colspan="2">{{manuscript[panelist]["legend"]["equivalent"]}}</td>
+                            </tr>
+
+                            <tr>
+                                <td>WEIGHTED EQUIVALENT (PERCENT)</td>
+                                <td colspan="2">PERCENT</td>
+                            </tr>
+                        </table>
+                                
+                    </th>
                 </tr>
 
                 {% for criteria in thesis.manuscript_rating.criteria %}
                 <tr>
                     <td>
-                        <h5>criteria.name</h5>
+                        <h5>{{criteria.name}}</h5>
                         <small>
                             <p>
-                                criteria.description
+                                {{ criteria.description if criteria.description else ''}}
                             </p>
                         </small>
                     </td>
-                    {% for rating in criteria.ratings.order_by(QuantitativeCriteriaRating.rate) %}
-                        <td>
-                            {{rating.description}}
+
+                    {% for i in range(thesis.manuscript_rating.max_grade) %}
+                        {% set rating = criteria.ratings.filter_by(rate=loop.revindex).first() %}
+
+                        <td class="{{ 'highlight' if rating.rate == manuscript[panelist]['grades'].grades.filter_by(quantitative_criteria_id=criteria.id).first().grade else '' }}">
+                            <h5 class="center">{{rating.rate}}</h5>
+                            <small>
+                                <p>
+                                    {{ rating.description if rating.description else ''}}
+                                </p>
+                            </small>
+                            
                         </td>
                     {% endfor %}
+                    
                 </tr>
                 {% endfor %}
             </table>
         </div>
 
         {% endif %}
-
+        
 
         <!-- individual rating -->
         <pdf:nextpage /> 
 
         <div class="page">
-            <h1>INDIVIDUAL RATING</h1>
+            <h1>INDIVIDUAL RATING - {{panelist.full_name}}</h1>
             <p class="ind">Rate the students on the following criteria using the scale:<strong> 1 – Poor 2 – Below average 3 – Average 4 – Good 5 – Very Good</strong></p>
             
-            <table>
+            <table class="border">
                 <tr>
                     <th>
                         CRITERIA
@@ -187,21 +258,33 @@
                     <th>{{ k }}</th>
                     {% endfor %}
                     <th colspan="2" rowspan="8">
-                        <h1>LEGEND</h1>
-                        <table>
+                        <h1>LEGEND:</h1>
+                        <table class="border0">
                             <tr>
-                                <th>
+                                <th class="border0">
                                     PTS
                                 </th>
-                                <th>
+                                <th class="border0">
                                     GRADE
                                 </th>
-                                <th>
+                                <th class="border0">
                                     EQUIVALENT
                                 </th>
                             </tr>
-                            
-                            
+
+                            {% for k, v in legend.items() %}
+                                <tr>
+                                    <td class="border0">
+                                        {{ '<=12' if k == 12 else k}}
+                                    </td>
+                                    <td class="border0">
+                                        {{ '74-60' if v.grade == 74 else v.grade}}
+                                    </td>
+                                    <td class="border0">
+                                        {{v.equivalent}}
+                                    </td>
+                                </tr>
+                            {% endfor %}
 
                         </table>
                     </th>
@@ -224,7 +307,7 @@
                         </small>
                     </td>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v.respectful_response }}</td>
+                        <td>{{ v['grades'].respectful_response }}</td>
                     {% endfor %}                    
                 </tr>
 
@@ -241,7 +324,7 @@
                         </small>
                     </td>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v.communication_skills }}</td>
+                        <td>{{ v['grades'].communication_skills }}</td>
                     {% endfor %}
                 </tr>
 
@@ -258,7 +341,7 @@
                         </small>
                     </td>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v.intelligent_response }}</td>
+                        <td>{{ v['grades'].intelligent_response }}</td>
                     {% endfor %}
                 </tr>
 
@@ -276,7 +359,7 @@
                         </small>
                     </td>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v.confidence }}</td>
+                        <td>{{ v['grades'].confidence }}</td>
                     {% endfor %}
                 </tr>
 
@@ -294,27 +377,27 @@
                         </small>
                     </td>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v.attire }}</td>
+                        <td>{{ v['grades'].attire }}</td>
                     {% endfor %}
                 </tr>
 
                 <tr>
                     <th>TOTAL RAW SCORE</th>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v.respectful_response + v.communication_skills + v.intelligent_response + v.confidence + v.attire }}</td>
+                        <td>{{ v['total'] }}</td>
                     {% endfor %}
                 </tr>
 
                 <tr>
                     <th>GRADE EQUIVALENT</th>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td> </td>
+                        <td> {{ v['legend']['grade'] }} ({{v['legend']['equivalent'] }}) </td>
                     {% endfor %}
                 </tr>
             </table>
         </div>
         
-
+        <pdf:nextpage /> 
     {% endfor %}
   
 </body>

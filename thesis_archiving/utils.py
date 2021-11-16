@@ -6,6 +6,9 @@ from flask_login import current_user
 from flask import flash, abort
 from functools import wraps
 
+from thesis_archiving import db
+from thesis_archiving.models import QuantitativePanelistGrade, QuantitativeCriteriaGrade, QuantitativeCriteria
+
 def export_to_excel(file_prefix, data, columns):
 
     # https://pandas.pydata.org/pandas-docs/stable/user_guide/io.html#writing-excel-files-to-memory
@@ -68,3 +71,28 @@ def has_roles(*roles):
         return wrapped_function
 
     return decorator
+
+
+def get_quantitative_panelist_grade(quantitative_rating_id, thesis_id, panelist_id=None):
+    '''
+        Returns a query object for the thesis's quantitative panelist grades
+    
+    '''
+    query = QuantitativePanelistGrade.query.filter(
+            # get the panelist grade id who graded those criteria
+            QuantitativePanelistGrade.id.in_(
+                db.session.query(QuantitativeCriteriaGrade.quantitative_panelist_grade_id).where(
+                    # get id of grades pointing to those criteria
+                    QuantitativeCriteriaGrade.quantitative_criteria_id.in_(
+                        # obtain all id ng MANUSCRIPT rating criteria ng thesis
+                        db.session.query(QuantitativeCriteria.id).where(QuantitativeCriteria.quantitative_rating_id == quantitative_rating_id)        
+                    )
+                )
+            ),
+            QuantitativePanelistGrade.thesis_id == thesis_id
+        )
+
+    if panelist_id:
+        query.filter_by(panelist_id=panelist_id)
+    
+    return query

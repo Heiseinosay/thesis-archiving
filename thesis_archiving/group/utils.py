@@ -13,9 +13,23 @@ def check_panelists(current_user, group):
         return redirect('user.profile')
 
 
-def export_grading_docs(panelists, thesis, revision_list, individual_ratings):
+def export_grading_docs(panelists, thesis, revision_list, individual_ratings, legend, manuscript=None, developed_thesis=None):
 
-    html = render_template("grading_docs/docs.html",panelists=panelists, thesis=thesis, revision_list=revision_list, individual_ratings=individual_ratings)
+    context = {
+        "panelists":panelists, 
+        "thesis":thesis, 
+        "revision_list":revision_list, 
+        "individual_ratings":individual_ratings,
+        "legend":legend
+    }
+
+    if manuscript:
+        context["manuscript"] = manuscript
+    
+    if developed_thesis:
+        context["developed_thesis"] = developed_thesis
+
+    html = render_template("grading_docs/docs.html", **context)
 
     pdf = BytesIO()
     

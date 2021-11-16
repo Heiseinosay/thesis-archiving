@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 
 from thesis_archiving import db
 
-from thesis_archiving.utils import has_roles
+from thesis_archiving.utils import has_roles, get_quantitative_panelist_grade
 from thesis_archiving.models import Group, IndividualRating, RevisionList, User, Thesis, QuantitativePanelistGrade
 from thesis_archiving.validation import validate_input
 
@@ -270,22 +270,100 @@ def grading(group_id, thesis_id):
             if not_final:
                 flash("The following panelists are not yet done grading: " + ", ".join(map(str,not_final)) ,"warning")
             else:
+                
+                legend = {
+                    25 : {"grade" : 100, "equivalent" : 1.00 },
+                    24 : {"grade" : 98, "equivalent" : 1.00 },
+                    23 : {"grade" : 96, "equivalent" : 1.25 },
+                    22 : {"grade" : 94, "equivalent" : 1.5 },
+                    21 : {"grade" : 92, "equivalent" : 1.5 },
+                    20 : {"grade" : 90, "equivalent" : 1.75 },
+                    19 : {"grade" : 88, "equivalent" : 2.00 },
+                    18 : {"grade" : 86, "equivalent" : 2.00 },
+                    17 : {"grade" : 84, "equivalent" : 2.25 },
+                    16 : {"grade" : 82, "equivalent" : 2.5 },
+                    15 : {"grade" : 80, "equivalent" : 2.5 },
+                    14 : {"grade" : 78, "equivalent" : 2.75 },
+                    13 : {"grade" : 76, "equivalent" : 3.00 },
+                    12 : {"grade" : 74, "equivalent" : 5.00 },
+                }
+
                 revision_list = {}
 
                 individual_ratings = {}
                 
                 manuscript = {}
+                manuscript_query = get_quantitative_panelist_grade(thesis_.quantitative_rating_id, thesis_.id) if thesis_.quantitative_rating_id else None
 
                 developed_thesis = {}
+                developed_thesis_query = get_quantitative_panelist_grade(thesis_.quantitative_rating_developed_id, thesis_.id) if thesis_.quantitative_rating_developed_id else None
 
                 for panelist in group_.panelists:
                     
                     revision_list[panelist] = thesis_.revision_lists.filter_by(panelist_id=panelist.id)
-
-                    individual_ratings[panelist] = { proponent.full_name : thesis_.individual_rating_panelist_grades.filter_by(student_id=proponent.id, panelist_id=panelist.id).first()\
-                        for proponent in thesis_.proponents }
                     
-                return export_grading_docs(group_.panelists, thesis_, revision_list, individual_ratings)
+                    individual_ratings[panelist] = {}
+                    
+                    for proponent in thesis_.proponents:
+                        
+                        individual_ratings[panelist][proponent.username + ' - ' + proponent.full_name] = {}
+                        
+                        # function to get the grade for criteria
+                        get_grade = lambda criteria : criteria if criteria else 0
+
+                        # fetch the proponent's individual rating for the thesis
+                        grades = thesis_.individual_rating_panelist_grades.filter_by(student_id=proponent.id, panelist_id=panelist.id).first()
+
+                        
+                        individual_ratings[panelist][proponent.username + ' - ' + proponent.full_name]["grades"] = grades
+                        individual_ratings[panelist][proponent.username + ' - ' + proponent.full_name]["total"] = get_grade(grades.intelligent_response) + get_grade(grades.respectful_response) + get_grade(grades.communication_skills) + get_grade(grades.confidence) + get_grade(grades.attire)
+
+                        total = individual_ratings[panelist][proponent.username + ' - ' + proponent.full_name]["total"]
+
+                        individual_ratings[panelist][proponent.username + ' - ' + proponent.full_name]["legend"] = legend[12] if total <= 12 else legend[total]
+                    
+                    if thesis_.quantitative_rating_id:
+                        
+                        manuscript[panelist] = {}
+
+                        manuscript[panelist]["grades"] = manuscript_query.filter_by(panelist_id = panelist.id).first()
+
+                        total = 0
+
+                        for grade in manuscript[panelist]["grades"].grades:
+                            total += grade.grade
+                             
+                        manuscript[panelist]["total"] = total
+                        manuscript[panelist]["legend"] = legend[12] if total <= 12 else legend[total]
+
+
+                        # PERCENTAGE
+
+                    if thesis_.quantitative_rating_developed_id:
+
+                        developed_thesis[panelist] = {}
+                        
+                        developed_thesis[panelist]["grades"] = developed_thesis_query.filter_by(panelist_id = panelist.id).first()
+
+                        total = 0
+
+                        for grade in developed_thesis[panelist]["grades"].grades:
+                            total += grade.grade
+                             
+                        developed_thesis[panelist]["total"] = total
+                        developed_thesis[panelist]["legend"] = legend[12] if total <= 12 else legend[total]
+
+                        # PERCENTAGE
+                    
+                return export_grading_docs(
+                    group_.panelists, 
+                    thesis_, 
+                    revision_list, 
+                    individual_ratings, 
+                    legend, 
+                    manuscript if manuscript else None,
+                    developed_thesis if developed_thesis else None
+                    )
 
                     # if thesis_.quantitative_rating_id:
                     #     manuscript = { panelist : for rating in thesis_.quantitative_panelist_grades.filter_by()}
