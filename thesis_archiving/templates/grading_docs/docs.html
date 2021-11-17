@@ -1,13 +1,23 @@
 <html>
 <head>
     <style>
-        @page {
-            size: a4 landscape;
+        @page{
+            size: letter portrait;
+            @frame content_frame {
+                left: 1in;
+                top: 1in;
+                width: 6.5in;
+                height: 9.5in;
+            }
+        }
+
+        @page landscape{
+            size: letter landscape;
             @frame content_frame {
                 left: 0.5in;
                 top: 0.5in;
-                width: 10.7in;
-                height: 7.3in;
+                width: 10in;
+                height: 7.5in;
             }
         }
 
@@ -67,12 +77,128 @@
 
 <body>
     
+
+    <div class="page">
+        <h1 class="center h0">APPROVAL SHEET</h1>
+        <h1 class="center">UNIVERSITY OF THE EAST - MANILA</h1>
+        <h1 class="center">COLLEGE OF COMPUTER STUDIES AND SYSTEMS (CCSS)</h1>
+
+        <br>
+        <h1>TITLE OF THESIS:</h1>
+        <p class="ind">{{thesis.title}}</p>
+
+        <br>
+        <h1>RESEARCHERS:</h1>
+        {% for proponent in thesis.proponents %}
+            <p class="ind">{{proponent.full_name}}</p>
+        {% endfor %}
+
+        <br>
+        <h1>ENDORSEMENT</h1>
+        <p>
+            In partial fulfillment of the requirements for the Degree of {{thesis.program.name}}, this thesis proposal has been reviewed and recommended for defense.
+        </p>
+        
+        <table class="border0" style="border-collapse: separate;border-spacing: 20px;">
+            <tr>
+                <td class="border0 center">
+                    {{thesis.adviser.full_name}}
+                </td>
+                <td class="border0 center">
+                    ##########            
+                </td>
+            </tr>
+            <tr>
+                <td class="border0 center" style="border-top: 1px solid black;">
+                    ADVISER
+                </td>
+                <td class="border0 center" style="border-top: 1px solid black;">
+                    DATE
+                </td>
+            </tr>
+        </table>
+
+        <hr style="border-top-style: dotted;">
+        
+        <br>
+        <br>
+        <h1 class="center">PANEL OF EVALUATORS</h1>
+        <h1 class="center">Rated by the Panel of Evaluators for Oral Defense with a RATING of <u>{{defense_rating['rating']}} ({{defense_rating['words']|title}})</u>.</h1>
+
+        <br>
+        <br>
+        
+        <h1>Remarks:</h1>
+        <table class="border0">
+            <tr>
+                <td class="border0">
+                    <h1>[ {{ '✓' if thesis.qualitative_rating == 'PASSED' else '' }} ] PASSED</h1>
+                </td>
+                <td class="border0">
+                    <h1>[ {{ '✓' if thesis.qualitative_rating == 'REDEFENSE' else '' }} ] REDEFENSE</h1>
+                </td>
+            </tr>
+            <tr>
+                <td class="border0">
+                    <h1>[ {{ '✓' if thesis.qualitative_rating == 'CONDITIONAL PASS' else '' }} ] CONDITIONAL PASS</h1>
+                </td>
+                <td class="border0">
+                    <h1>[ {{ '✓' if thesis.qualitative_rating == 'FAILED' else '' }} ] FAILED</h1>
+                </td>
+            </tr>
+        </table>
+
+        chairman: {{group.chairman.full_name}}
+
+        {% for panelist in group.panelists %}
+            {% if panelist != group.chairman %}
+                panel member: {{panelist.full_name}}
+            {% endif %}
+        {% endfor %}
+
+        <br>
+        <br>
+
+        <table class="border0">
+            <tr>
+                <td class="border0 center">
+                    <h1>PROF. ???????????</h1>
+                </td>
+                <td class="border0 center">
+                    <h1>PROF. MA. TERESA F. BOREBOR</h1>
+                </td>
+            </tr>
+            <tr>
+                <td class="border0 center">
+                    <h1>Department Chair</h1>
+                </td>
+                <td class="border0 center">
+                    <h1>Dean, CCSS</h1>
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    <pdf:nextpage /> 
+
+    <div class="page">
+        {% for panelist, revision in revision_list.items() %}
+            {{panelist.full_name}}
+            {{revision.comment}}
+            <br>
+        {% endfor %}
+    </div>
+
+
+    <pdf:nexttemplate name="landscape" />
+    <pdf:nextpage /> 
+
     <!-- quali -->
     <div class="page">
         <div class="center">
             <h1 class="my-0 h0">UNIVERSITY OF THE EAST - MANILA</h1>
             <h1 class="my-0 h0">College of Computer Studies and Systems</h1>
-            <h1 class="my-0 h0">THESIS PROJECT DEFENSE RATING SHEETS FOR CCS 4990 ##DYNAMIC DAPAT</h1>
+            <h1 class="my-0 h0">THESIS PROJECT DEFENSE RATING SHEETS FOR CCS 4990/CPD 4990</h1>
             <h1 class="left h0">TITLE OF THESIS: {{thesis.title}}</h1>
             <hr>
         </div>
@@ -86,24 +212,24 @@
             <br>
             
             <div style="margin-left: 50px;">
-                <h1 class="my-0">[ {{ '&#10003;' if thesis.qualitative_rating == 'PASSED' else '' }} ] PASSED</h1>
+                <h1 class="my-0">[ {{ '✓' if thesis.qualitative_rating == 'PASSED' else '' }} ] PASSED</h1>
                 <p class="my-0 ind">
                     - A “Passed” qualitative rating is given if the panel members perceived that the project satisfactorily met all criteria.
                 </p>
                 <br>
-                <h1 class="my-0">[ {{ '&#10003;' if thesis.qualitative_rating == 'CONDITIONAL PASS' else '' }} ] CONDITIONAL PASS</h1>
+                <h1 class="my-0">[ {{ '✓' if thesis.qualitative_rating == 'CONDITIONAL PASS' else '' }} ] CONDITIONAL PASS</h1>
                 <p class="my-0 ind">
                     - This rating is a borderline between “Pass” and “Redefense” remarks. This rating may be given if the panel members viewed that 1) the project/paper needs revisions, 2) the
                     revisions can be done within three days, and 3) there is a need to present the revisions to at least one of the panel members.
                 </p>
                 <br>
-                <h1 class="my-0">[ {{ '&#10003;' if thesis.qualitative_rating == 'REDEFENSE' else '' }} ] REDEFENSE</h1>
+                <h1 class="my-0">[ {{ '✓' if thesis.qualitative_rating == 'REDEFENSE' else '' }} ] REDEFENSE</h1>
                 <p class="my-0 ind">
                     - If the following conditions are met, then the rating “Redefense” is justifiable: 1) the project/paper needs revisions, 2) the revisions require one week to comply, and 3) the
                     panel members feel that there is a need to present the revisions to the three-man committee.
                 </p>
                 <br>
-                <h1 class="my-0">[ {{ '&#10003;' if thesis.qualitative_rating == 'FAILED' else '' }} ] FAILED</h1>
+                <h1 class="my-0">[ {{ '✓' if thesis.qualitative_rating == 'FAILED' else '' }} ] FAILED</h1>
                 <p class="my-0 ind">
                     - The project/paper did not satisfactorily meet all of the criteria. 
                 </p>
@@ -137,11 +263,117 @@
     </div>
 
     
-    {% for panelist in panelists %}
+    
+    {% for panelist in group.panelists %}
         <!-- quanti -->
         
+        <!-- developed thesis -->
+        {% if thesis.quantitative_rating_developed_id %}
+        <pdf:nextpage /> 
+        <div class="page">
+            <h1>QUANTITATIVE RATING FOR {{thesis.program.name}} DEVELOPED THESIS PROJECT - {{ panelist.full_name }}</h1>
+            <table>
+                <tr>
+                    <th>
+                        CRITERIA
+                    </th>
+                    
+                    {% for i in range(thesis.developed_thesis_rating.max_grade) %}
+                    <th>
+                        {{loop.revindex}}
+                    </th>
+                    {% endfor %}
+                    <th rowspan="{{ thesis.developed_thesis_rating.criteria.count() + 1 }}" colspan="2">
+                        
+                        <h1>LEGEND:</h1>
+                        <table class="border0">
+                            <tr>
+                                <th class="border0">
+                                    PTS
+                                </th>
+                                <th class="border0">
+                                    GRADE
+                                </th>
+                                <th class="border0">
+                                    EQUIVALENT
+                                </th>
+                            </tr>
+                            {##}
+                            {% for k, v in legend.items() %}
+                                <tr>
+                                    <td class="border0">
+                                        {{ '<=12' if k == 12 else k}}
+                                    </td>
+                                    <td class="border0">
+                                        {{ '74-60' if v.grade == 74 else v.grade}}
+                                    </td>
+                                    <td class="border0">
+                                        {{v.equivalent}}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            <tr>
+                                <td>TOTAL RAW SCORE</td>
+                                <td colspan="2">{{ developed_thesis[panelist]["total"] }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>GRADE</td>
+                                <td colspan="2">{{developed_thesis[panelist]["legend"]["grade"] }}</td>
+                            </tr>
+
+                            <tr>
+                                <td>EQUIVALENT</td>
+                                <td colspan="2">{{developed_thesis[panelist]["legend"]["equivalent"]}}</td>
+                            </tr>
+
+                            <tr>
+                                <td>WEIGHTED EQUIVALENT (PERCENT)</td>
+                                <td colspan="2">{{developed_thesis[panelist]["weighted"]}}</td>
+                            </tr>
+                        </table>
+                                
+                    </th>
+                </tr>
+
+                {% for criteria in thesis.developed_thesis_rating.criteria %}
+                <tr>
+                    <td>
+                        <h5 class="center">{{criteria.name}}</h5>
+                        <small>
+                            <p>
+                                {{ criteria.description if criteria.description else ''}}
+                            </p>
+                        </small>
+                    </td>
+
+                    {% for i in range(thesis.developed_thesis_rating.max_grade) %}
+                        {% set rating = criteria.ratings.filter_by(rate=loop.revindex).first() %}
+
+                        <td class="{{ 'highlight' if rating.rate == developed_thesis[panelist]['grades'].grades.filter_by(quantitative_criteria_id=criteria.id).first().grade else '' }}">
+                            
+                            <small>
+                                <p>
+                                    {{ rating.description if rating.description else ''}}
+                                </p>
+                            </small>
+                            
+                        </td>
+                    {% endfor %}
+                    
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% endif %}
+
         <!-- manuscript -->
+        
+
         {% if thesis.quantitative_rating_id %}
+        <pdf:nextpage /> 
         <div class="page">
             <h1>QUANTITATIVE RATING FOR {{thesis.program.name}} MANUSCRIPT - {{ panelist.full_name }}</h1>
             <table>
@@ -202,7 +434,7 @@
 
                             <tr>
                                 <td>WEIGHTED EQUIVALENT (PERCENT)</td>
-                                <td colspan="2">PERCENT</td>
+                                <td colspan="2">{{manuscript[panelist]["weighted"]}}</td>
                             </tr>
                         </table>
                                 
@@ -212,7 +444,7 @@
                 {% for criteria in thesis.manuscript_rating.criteria %}
                 <tr>
                     <td>
-                        <h5>{{criteria.name}}</h5>
+                        <h5 class="center">{{criteria.name}}</h5>
                         <small>
                             <p>
                                 {{ criteria.description if criteria.description else ''}}
@@ -224,7 +456,7 @@
                         {% set rating = criteria.ratings.filter_by(rate=loop.revindex).first() %}
 
                         <td class="{{ 'highlight' if rating.rate == manuscript[panelist]['grades'].grades.filter_by(quantitative_criteria_id=criteria.id).first().grade else '' }}">
-                            <h5 class="center">{{rating.rate}}</h5>
+                            
                             <small>
                                 <p>
                                     {{ rating.description if rating.description else ''}}
@@ -293,7 +525,7 @@
                 <!-- oral presentation -->
                 <tr>
                     <td>
-                        <h5>ORAL PRESENTATION</h5>
+                        <h5 class="center">ORAL PRESENTATION</h5>
                         <small>
                             <p>
                                 For his assigned part, the student
@@ -314,7 +546,7 @@
                 <!-- comuncaiton skills -->
                 <tr>
                     <td>
-                        <h5>COMMUNICATION SKILLS</h5>
+                        <h5 class="center">COMMUNICATION SKILLS</h5>
                         <small>
                             <p>
                                 The student conveyed his/her
@@ -331,7 +563,7 @@
                 <!-- INTELLIGENT RESPONSE -->
                 <tr>
                     <td>
-                        <h5>INTELLIGENT RESPONSE</h5>
+                        <h5 class="center">INTELLIGENT RESPONSE</h5>
                         <small>
                             <p>
                                 The student exhibited mastery of
@@ -348,7 +580,7 @@
                 <!-- CONFIDENCE -->
                 <tr>
                     <td>
-                        <h5>CONFIDENCE</h5>
+                        <h5 class="center">CONFIDENCE</h5>
                         <small>
                             <p>
                                 The student demonstrated poise
@@ -366,7 +598,7 @@
                 <!-- APPREANCE -->
                 <tr>
                     <td>
-                        <h5>APPREANCE</h5>
+                        <h5 class="center">APPREANCE</h5>
                         <small>
                             <p>
                                 The student demonstrated poise
@@ -397,7 +629,6 @@
             </table>
         </div>
         
-        <pdf:nextpage /> 
     {% endfor %}
   
 </body>

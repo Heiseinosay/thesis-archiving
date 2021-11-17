@@ -12,6 +12,7 @@ from thesis_archiving.group.validation import CreateGroupSchema, UpdateGroupSche
 from thesis_archiving.group.utils import check_panelists, export_grading_docs
 
 from pprint import pprint
+from num2words import num2words as nw
 
 group = Blueprint("group", __name__, url_prefix="/group")
 
@@ -288,6 +289,11 @@ def grading(group_id, thesis_id):
                     12 : {"grade" : 74, "equivalent" : 5.00 },
                 }
 
+                weights = {
+                    'CS' : { "developed_thesis" : 0.7, "manuscript" : 0.3 },
+                    'IT' : { "developed_thesis" : 0.7, "manuscript" : 0.3 },
+                }
+
                 revision_list = {}
 
                 individual_ratings = {}
@@ -298,9 +304,14 @@ def grading(group_id, thesis_id):
                 developed_thesis = {}
                 developed_thesis_query = get_quantitative_panelist_grade(thesis_.quantitative_rating_developed_id, thesis_.id) if thesis_.quantitative_rating_developed_id else None
 
+                defense_rating = {
+                    "rating" : 0,
+                    "words" : "",
+                }
+
                 for panelist in group_.panelists:
                     
-                    revision_list[panelist] = thesis_.revision_lists.filter_by(panelist_id=panelist.id)
+                    revision_list[panelist] = thesis_.revision_lists.filter_by(panelist_id=panelist.id).first()
                     
                     individual_ratings[panelist] = {}
                     
@@ -313,7 +324,6 @@ def grading(group_id, thesis_id):
 
                         # fetch the proponent's individual rating for the thesis
                         grades = thesis_.individual_rating_panelist_grades.filter_by(student_id=proponent.id, panelist_id=panelist.id).first()
-
                         
                         individual_ratings[panelist][proponent.username + ' - ' + proponent.full_name]["grades"] = grades
                         individual_ratings[panelist][proponent.username + ' - ' + proponent.full_name]["total"] = get_grade(grades.intelligent_response) + get_grade(grades.respectful_response) + get_grade(grades.communication_skills) + get_grade(grades.confidence) + get_grade(grades.attire)
@@ -335,9 +345,9 @@ def grading(group_id, thesis_id):
                              
                         manuscript[panelist]["total"] = total
                         manuscript[panelist]["legend"] = legend[12] if total <= 12 else legend[total]
+                        manuscript[panelist]["weighted"] = round(manuscript[panelist]["legend"]["grade"] * ( weights[thesis_.program.code]["manuscript"] if thesis_.quantitative_rating_developed_id else 1), 2)
 
-
-                        # PERCENTAGE
+                        defense_rating["rating"] += manuscript[panelist]["weighted"]
 
                     if thesis_.quantitative_rating_developed_id:
 
@@ -352,60 +362,30 @@ def grading(group_id, thesis_id):
                              
                         developed_thesis[panelist]["total"] = total
                         developed_thesis[panelist]["legend"] = legend[12] if total <= 12 else legend[total]
+                        developed_thesis[panelist]["weighted"] = round(developed_thesis[panelist]["legend"]["grade"] * weights[thesis_.program.code]["developed_thesis"],2)
 
-                        # PERCENTAGE
+                        defense_rating["rating"] += developed_thesis[panelist]["weighted"]
                     
-                return export_grading_docs(
-                    group_.panelists, 
-                    thesis_, 
-                    revision_list, 
-                    individual_ratings, 
-                    legend, 
-                    manuscript if manuscript else None,
-                    developed_thesis if developed_thesis else None
-                    )
-
-                    # if thesis_.quantitative_rating_id:
-                    #     manuscript = { panelist : for rating in thesis_.quantitative_panelist_grades.filter_by()}
-                    # quantitative_ratings[panelist]
+                defense_rating["rating"] = defense_rating["rating"] / group_.panelists.count()
+                defense_rating["words"] = nw(round(defense_rating["rating"], 2))
 
                     
-                pass
-            # for panelist in group_.panelists:
-            #     panelists[panelist] = {
-            #         "not_final" : thesis_.quantitative_panelist_grades.filter(QuantitativePanelistGrade.is_final != True, QuantitativePanelistGrade.panelist_id == panelist.id)\
-            #             or thesis_.individual_rating_panelist_grades.filter(IndividualRating.is_final != True, IndividualRating.panelist_id == panelist.id)\
-            #                 or thesis_.revision_lists.filter(RevisionList.is_final != True, RevisionList.panelist_id == panelist.id),
-            #         "quantitative_rating" : {},
-            #         "individual_rating" : {},
-            #         "revision_notes" : thesis_.
-            #     }
-
+                thesis_.qualitative_rating = request.form.get("qualitative_rating")
                 
-            #     # manuscript
-            #     if thesis_.quantitative_rating_id:
-            #         panelists[panelist]["quantitative_rating"]["manuscript"] = thesis_.quantitative_panelist_grades.filter_by()
-            
-            # "qualitative_rating" : None,
-            # panelists = { panelist : True for panelist in group panelists }
-            
-            # proponents = thesis proponents
-            
-            # for proponents in thesis
-                
-            #     # indiv rating
-            #     for rating in proponents where thesis.id = thesis.id and is_final is not true:
-            #         panelist[rating .panelist] = False
-
-            #     # manuscript
-            #     if thesis manuscript:
-            #         for ratings in quanti paneslit grade where thesisid = thesis is and manuscirpt == manu id and is_final not true
-            #         panelist[rating .panelist] = False
-
-            #     # developed same as above
-
-            #     # revision same as indiv ratings
-
+                try:
+                    db.session.commit()
+                    return export_grading_docs(
+                        group_, 
+                        thesis_, 
+                        revision_list, 
+                        individual_ratings, 
+                        legend,
+                        defense_rating,
+                        manuscript if manuscript else None,
+                        developed_thesis if developed_thesis else None
+                        )
+                except:
+                    flash("An error occured while trying to generate documents.","danger")
 
         elif request.form["form_name"] == "revision":
             # contains form data converted to mutable dict

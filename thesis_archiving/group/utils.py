@@ -13,14 +13,15 @@ def check_panelists(current_user, group):
         return redirect('user.profile')
 
 
-def export_grading_docs(panelists, thesis, revision_list, individual_ratings, legend, manuscript=None, developed_thesis=None):
+def export_grading_docs(group, thesis, revision_list, individual_ratings, legend, defense_rating, manuscript=None, developed_thesis=None):
 
     context = {
-        "panelists":panelists, 
+        "group":group, 
         "thesis":thesis, 
         "revision_list":revision_list, 
         "individual_ratings":individual_ratings,
-        "legend":legend
+        "legend":legend,
+        "defense_rating":defense_rating
     }
 
     if manuscript:
