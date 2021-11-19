@@ -1,17 +1,18 @@
 from marshmallow import Schema, fields, validate, ValidationError, validates_schema
+from flask import flash
 
 class IndividualRatingSchema(Schema):
     csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
 
-    intelligent_response = fields.Int(validate=validate.Range(min=1, max=6))
+    intelligent_response = fields.Int(validate=validate.Range(min=1, max=5))
     
-    respectful_response = fields.Int(validate=validate.Range(min=1, max=6))
+    respectful_response = fields.Int(validate=validate.Range(min=1, max=5))
     
-    communication_skills = fields.Int(validate=validate.Range(min=1, max=6))
+    communication_skills = fields.Int(validate=validate.Range(min=1, max=5))
     
-    confidence = fields.Int(validate=validate.Range(min=1, max=6))
+    confidence = fields.Int(validate=validate.Range(min=1, max=5))
     
-    attire = fields.Int(validate=validate.Range(min=1, max=6))
+    attire = fields.Int(validate=validate.Range(min=1, max=5))
     
     is_final = fields.Bool()
 
@@ -43,4 +44,5 @@ class IndividualRatingSchema(Schema):
                 err["attire"] = ["Field cannot be empty."]
 
         if err:
+            flash("Cannot leave an empty field.", "danger")
             raise ValidationError(err)

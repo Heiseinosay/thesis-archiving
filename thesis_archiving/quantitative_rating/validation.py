@@ -4,6 +4,8 @@ from marshmallow import Schema, fields, validate, ValidationError, validates, va
 from thesis_archiving.validation import validate_empty
 from thesis_archiving.models import QuantitativeCriteria, QuantitativeRating
 
+from flask import flash
+
 class CreateQuantitativeRatingSchema(Schema):
     csrf_token = fields.Str(required=True) # no need for extra validations. handled by flask automatically.
 
@@ -92,6 +94,7 @@ class ManuscriptGradeSchema(Schema):
                     err[c] = ["Field cannot be empty."]
 
         if err:
+            flash("Cannot leave an empty field.", "danger")
             raise ValidationError(err)
 
     @validates_schema

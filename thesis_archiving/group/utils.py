@@ -2,6 +2,8 @@ from flask import flash, redirect, render_template
 from werkzeug.exceptions import abort
 from xhtml2pdf import pisa
 from io import StringIO, BytesIO
+from datetime import datetime
+import pytz
 
 def check_panelists(current_user, group):
     
@@ -18,6 +20,7 @@ def export_grading_docs(group, thesis, revision_list, individual_ratings, legend
     context = {
         "group":group, 
         "thesis":thesis, 
+        "date": datetime.now(tz=pytz.timezone('Asia/Manila')).strftime("%B %d, %Y"),
         "revision_list":revision_list, 
         "individual_ratings":individual_ratings,
         "legend_25":legend_25,
@@ -41,6 +44,6 @@ def export_grading_docs(group, thesis, revision_list, individual_ratings, legend
     
     headers = {
         'content-type': 'application.pdf',
-        'content-disposition': 'inline; filename=certificate.pdf'}
+        'content-disposition': f'inline; filename={thesis.call_number() + " defense"}.pdf'}
     
     return pdf, 200, headers
