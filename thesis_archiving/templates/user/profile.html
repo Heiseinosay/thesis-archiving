@@ -16,12 +16,12 @@
                     {% if groups %}
                     <div class="accordion-item">
                         <h6 class="accordion-header" id="headingPanelGroups">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePanelGroups" aria-expanded="true" aria-controls="collapsePanelGroups">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePanelGroups" aria-expanded="false" aria-controls="collapsePanelGroups">
                                 Your panel groups ({{groups.count()}})
                             </button>
                         </h6>
                         
-                        <div id="collapsePanelGroups" class="accordion-collapse collapse show" aria-labelledby="headingPanelGroups">
+                        <div id="collapsePanelGroups" class="accordion-collapse collapse" aria-labelledby="headingPanelGroups">
                         {% for group in groups %}
                             {{ group_card(group, current_user)}}	
                         {% endfor %}
@@ -33,12 +33,12 @@
                     {% if advisees %}
                     <div class="accordion-item">
                         <h6 class="accordion-header" id="headingAdvisees">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdvisees" aria-expanded="true" aria-controls="collapseAdvisees">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAdvisees" aria-expanded="false" aria-controls="collapseAdvisees">
                                 Your advisees ({{advisees.count()}})
                             </button>
                         </h6>
                         
-                        <div id="collapseAdvisees" class="accordion-collapse collapse show" aria-labelledby="headingAdvisees">
+                        <div id="collapseAdvisees" class="accordion-collapse collapse" aria-labelledby="headingAdvisees">
                         {% for advisee in advisees %}
                             {{ thesis_card(advisee, current_user) }}	
                         {% endfor %}
@@ -49,12 +49,12 @@
                     {% if current_user.is_student %}
                     <div class="accordion-item">
                         <h6 class="accordion-header" id="headingTheses">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTheses" aria-expanded="true" aria-controls="collapseTheses">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTheses" aria-expanded="false" aria-controls="collapseTheses">
                                 Your theses ({{theses.count()}})
                             </button>
                         </h6>
                         
-                        <div id="collapseTheses" class="accordion-collapse collapse show" aria-labelledby="headingTheses">
+                        <div id="collapseTheses" class="accordion-collapse collapse" aria-labelledby="headingTheses">
                         {% for thesis in theses %}
                             {{ thesis_card(thesis, current_user) }}	
                         {% endfor %}
