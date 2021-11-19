@@ -236,28 +236,6 @@ def grading(group_id, thesis_id):
             # make necessary checks before commiting to new rating
             # make necessary checks before generating docs
 
-            # {
-            #     "chairman": chairman,
-            #     "qualitative_rating": rating,
-            #     "panelists": {
-            #         "is_final" : True,
-            #         "quantitative_rating": {"manuscript": None, "developed_thesis_project": None},
-            #         "individual_rating": {student: {rating_n: grade, ...}}, #sort by stud no.
-            #         "revision_notes" : notes
-            #         }
-            #     "grades": {
-            #         "quantitative",
-            #         "overall"
-            #     }
-            # }
-            details = {}
-
-            # details["title"] = thesis_.title
-            # details["chairman"] = group_.chairman
-            # details["defense_date"] = date today
-            # details["program"] = thesis_.program.name
-            # details["adviser"] = thesis_.adviser.full_name
-            # if thesis_.quantitative_rating_id:
             not_final = []
             
             for panelist in group_.panelists:
@@ -272,27 +250,70 @@ def grading(group_id, thesis_id):
                 flash("The following panelists are not yet done grading: " + ", ".join(map(str,not_final)) ,"warning")
             else:
                 
-                legend = {
-                    25 : {"grade" : 100, "equivalent" : 1.00 },
-                    24 : {"grade" : 98, "equivalent" : 1.00 },
-                    23 : {"grade" : 96, "equivalent" : 1.25 },
-                    22 : {"grade" : 94, "equivalent" : 1.5 },
-                    21 : {"grade" : 92, "equivalent" : 1.5 },
-                    20 : {"grade" : 90, "equivalent" : 1.75 },
-                    19 : {"grade" : 88, "equivalent" : 2.00 },
-                    18 : {"grade" : 86, "equivalent" : 2.00 },
-                    17 : {"grade" : 84, "equivalent" : 2.25 },
-                    16 : {"grade" : 82, "equivalent" : 2.5 },
-                    15 : {"grade" : 80, "equivalent" : 2.5 },
-                    14 : {"grade" : 78, "equivalent" : 2.75 },
-                    13 : {"grade" : 76, "equivalent" : 3.00 },
+                legend_25 = {
+                    0 : {"grade" : 0, "equivalent" : 0},
+                    1 : {"grade" : 52, "equivalent" : 5.00},
+                    2 : {"grade" : 54, "equivalent" : 5.00},
+                    3 : {"grade" : 56, "equivalent" : 5.00},
+                    4 : {"grade" : 58, "equivalent" : 5.00},
+                    5 : {"grade" : 60, "equivalent" : 5.00},
+                    6 : {"grade" : 62, "equivalent" : 5.00},
+                    7 : {"grade" : 64, "equivalent" : 5.00},
+                    8 : {"grade" : 66, "equivalent" : 5.00},
+                    9 : {"grade" : 68, "equivalent" : 5.00},
+                    10 : {"grade" : 70, "equivalent" : 5.00},
+                    11 : {"grade" : 72, "equivalent" : 5.00},
                     12 : {"grade" : 74, "equivalent" : 5.00 },
+                    13 : {"grade" : 76, "equivalent" : 3.00 },
+                    14 : {"grade" : 78, "equivalent" : 2.75 },
+                    15 : {"grade" : 80, "equivalent" : 2.5 },
+                    16 : {"grade" : 82, "equivalent" : 2.5 },
+                    17 : {"grade" : 84, "equivalent" : 2.25 },
+                    18 : {"grade" : 86, "equivalent" : 2.00 },
+                    19 : {"grade" : 88, "equivalent" : 2.00 },
+                    20 : {"grade" : 90, "equivalent" : 1.75 },
+                    21 : {"grade" : 92, "equivalent" : 1.5 },
+                    22 : {"grade" : 94, "equivalent" : 1.5 },
+                    23 : {"grade" : 96, "equivalent" : 1.25 },
+                    24 : {"grade" : 98, "equivalent" : 1.00 },
+                    25 : {"grade" : 100, "equivalent" : 1.00 },
                 }
 
-                weights = {
-                    'CS' : { "developed_thesis" : 0.7, "manuscript" : 0.3 },
-                    'IT' : { "developed_thesis" : 0.7, "manuscript" : 0.3 },
+                legend_30 = {
+                    0: {"grade" : 0, "equivalent" : 0},
+                    1: {"grade" : 52, "equivalent" : 5.00},
+                    2: {"grade" : 53, "equivalent" : 5.00},
+                    3: {"grade" : 55, "equivalent" : 5.00},
+                    4: {"grade" : 57, "equivalent" : 5.00},
+                    5: {"grade" : 58, "equivalent" : 5.00},
+                    6: {"grade" : 60, "equivalent" : 5.00},
+                    7: {"grade" : 62, "equivalent" : 5.00},
+                    8: {"grade" : 63, "equivalent" : 5.00},
+                    9: {"grade" : 65 , "equivalent" : 5.00},
+                    10: {"grade" :67 , "equivalent" : 5.00},
+                    11: {"grade" :68 , "equivalent" : 5.00},
+                    12: {"grade" :70 , "equivalent" : 5.00},
+                    13: {"grade" :72 , "equivalent" : 5.00},
+                    14: {"grade" :73 , "equivalent" : 5.00},
+                    15: {"grade" :75 , "equivalent" : 3},
+                    16: {"grade" :77 , "equivalent" : 3},
+                    17: {"grade" :78 , "equivalent" : 2.75},
+                    18: {"grade" :80 , "equivalent" : 2.5},
+                    19: {"grade" :82 , "equivalent" : 2.5},
+                    20: {"grade" :83 , "equivalent" : 2.25},
+                    21: {"grade" :85 , "equivalent" : 2.25},
+                    22: {"grade" :87 , "equivalent" : 2},
+                    23: {"grade" :88 , "equivalent" : 2},
+                    24: {"grade" :90 , "equivalent" : 1.75},
+                    25: {"grade" : 92, "equivalent" : 1.5},
+                    26: {"grade" : 93, "equivalent" : 1.5},
+                    27: {"grade" : 95, "equivalent" : 1.25},
+                    28: {"grade" : 97, "equivalent" : 1.25},
+                    29: {"grade" : 98, "equivalent" : 1},
+                    30: {"grade" : 100, "equivalent" : 1}
                 }
+
+                weights = { "developed_thesis" : 0.7, "manuscript" : 0.3 }
 
                 revision_list = {}
 
@@ -330,7 +351,7 @@ def grading(group_id, thesis_id):
 
                         total = individual_ratings[panelist][proponent.username + ' - ' + proponent.full_name]["total"]
 
-                        individual_ratings[panelist][proponent.username + ' - ' + proponent.full_name]["legend"] = legend[12] if total <= 12 else legend[total]
+                        individual_ratings[panelist][proponent.username + ' - ' + proponent.full_name]["legend"] = legend_25[total]
                     
                     if thesis_.quantitative_rating_id:
                         
@@ -344,8 +365,8 @@ def grading(group_id, thesis_id):
                             total += grade.grade
                              
                         manuscript[panelist]["total"] = total
-                        manuscript[panelist]["legend"] = legend[12] if total <= 12 else legend[total]
-                        manuscript[panelist]["weighted"] = round(manuscript[panelist]["legend"]["grade"] * ( weights[thesis_.program.code]["manuscript"] if thesis_.quantitative_rating_developed_id else 1), 2)
+                        manuscript[panelist]["legend"] = legend_25[total] if thesis_.manuscript_rating.criteria.count() == 5 else legend_30[total]
+                        manuscript[panelist]["weighted"] = round(manuscript[panelist]["legend"]["grade"] * ( 0.3 if thesis_.quantitative_rating_developed_id else 1), 2)
 
                         defense_rating["rating"] += manuscript[panelist]["weighted"]
 
@@ -361,8 +382,8 @@ def grading(group_id, thesis_id):
                             total += grade.grade
                              
                         developed_thesis[panelist]["total"] = total
-                        developed_thesis[panelist]["legend"] = legend[12] if total <= 12 else legend[total]
-                        developed_thesis[panelist]["weighted"] = round(developed_thesis[panelist]["legend"]["grade"] * weights[thesis_.program.code]["developed_thesis"],2)
+                        developed_thesis[panelist]["legend"] = legend_25[total] if thesis_.developed_thesis_rating.criteria.count() == 5 else legend_30[total]
+                        developed_thesis[panelist]["weighted"] = round(developed_thesis[panelist]["legend"]["grade"] * 0.7,2)
 
                         defense_rating["rating"] += developed_thesis[panelist]["weighted"]
                     
@@ -372,20 +393,21 @@ def grading(group_id, thesis_id):
                     
                 thesis_.qualitative_rating = request.form.get("qualitative_rating")
                 
-                try:
-                    db.session.commit()
-                    return export_grading_docs(
-                        group_, 
-                        thesis_, 
-                        revision_list, 
-                        individual_ratings, 
-                        legend,
-                        defense_rating,
-                        manuscript if manuscript else None,
-                        developed_thesis if developed_thesis else None
-                        )
-                except:
-                    flash("An error occured while trying to generate documents.","danger")
+                # try:
+                db.session.commit()
+                return export_grading_docs(
+                    group_, 
+                    thesis_, 
+                    revision_list, 
+                    individual_ratings, 
+                    legend_25,
+                    legend_30,
+                    defense_rating,
+                    manuscript if manuscript else None,
+                    developed_thesis if developed_thesis else None
+                    )
+                # except:
+                #     flash("An error occured while trying to generate documents.","danger")
 
         elif request.form["form_name"] == "revision":
             # contains form data converted to mutable dict

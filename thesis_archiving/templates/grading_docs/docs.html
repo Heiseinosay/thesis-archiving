@@ -76,13 +76,26 @@
 <head>
 
 <body>
+    {% set legend_25 = legend_25.items()|sort(attribute='0', reverse=true) %}
+    {% set legend_30 = legend_30.items()|sort(attribute='0', reverse=true) %}
     
+    {% set manu_legend = legend_25 if thesis.manuscript_rating.criteria.count() == 5 else legend_30 %}
+    {% set dev_legend = [] %}
+    
+    {% if thesis.quantitative_rating_developed_id %}
+        {% set dev_legend = legend_25 if thesis.developed_thesis_rating.criteria.count() == 5 else legend_30 %}
+    {% endif %}
 
+    <!-- 
+
+        approval sheet
+
+     -->
     <div class="page">
         <h1 class="center h0">APPROVAL SHEET</h1>
         <h1 class="center">UNIVERSITY OF THE EAST - MANILA</h1>
         <h1 class="center">COLLEGE OF COMPUTER STUDIES AND SYSTEMS (CCSS)</h1>
-
+            
         <br>
         <h1>TITLE OF THESIS:</h1>
         <p class="ind">{{thesis.title}}</p>
@@ -98,38 +111,43 @@
         <p>
             In partial fulfillment of the requirements for the Degree of {{thesis.program.name}}, this thesis proposal has been reviewed and recommended for defense.
         </p>
-        
-        <table class="border0" style="border-collapse: separate;border-spacing: 20px;">
-            <tr>
-                <td class="border0 center">
-                    {{thesis.adviser.full_name}}
-                </td>
-                <td class="border0 center">
-                    ##########            
-                </td>
-            </tr>
-            <tr>
-                <td class="border0 center" style="border-top: 1px solid black;">
-                    ADVISER
-                </td>
-                <td class="border0 center" style="border-top: 1px solid black;">
-                    DATE
-                </td>
-            </tr>
-        </table>
 
+        
+            <table class="border0" style="left: 150px;">
+                <tr>
+                    <th class="border0">
+                        <h1 style="margin-bottom: 0;">{{thesis.adviser.full_name}}</h1>
+                        <hr width="80%" style="margin-top: 0;">
+                    </th>
+                    <th class="border0">
+                        <h1 style="margin-bottom: 0;">{{defense_date}}</h1>
+                        <hr width="80%" style="margin-top: 0;">
+                    </th>
+                </tr>
+                <tr>
+                    <th class="border0">
+                        <p style="margin-bottom: 0; font-weight:normal;">ADVISER</p>
+                    </th>
+                    <th class="border0">
+                        <p style="margin-bottom: 0; font-weight:normal;">DATE</p>
+                    </th>
+                </tr>
+            </table>
+            
+        
+        <br><br>
         <hr style="border-top-style: dotted;">
         
         <br>
         <br>
         <h1 class="center">PANEL OF EVALUATORS</h1>
-        <h1 class="center">Rated by the Panel of Evaluators for Oral Defense with a RATING of <u>{{defense_rating['rating']}} ({{defense_rating['words']|title}})</u>.</h1>
+        <h1 class="center">Rated by the Panel of Evaluators for Oral Defense <br> with a RATING of <u>{{defense_rating['rating']}} ({{defense_rating['words']|title}})</u>.</h1>
 
         <br>
         <br>
         
         <h1>Remarks:</h1>
-        <table class="border0">
+        <table class="border0" style="margin-left: 100px;">
             <tr>
                 <td class="border0">
                     <h1>[ {{ '✓' if thesis.qualitative_rating == 'PASSED' else '' }} ] PASSED</h1>
@@ -148,21 +166,44 @@
             </tr>
         </table>
 
-        chairman: {{group.chairman.full_name}}
+        <br><br>
+        <table class="border0">
+            <tr>
+                <th class="border0" colspan="{{group.panelists.count() - 1}}">
+                    <h1 style="margin-bottom: 0;">{{group.chairman.full_name}}</h1>
+                    <hr width="30%" style="margin: 0;">
+                    <p style="margin: 0; font-weight:normal;">CHAIRMAN</p>
+                </th>
+            </tr>
+            <tr>
+                {% for panelist in group.panelists %}
+                    {% if panelist != group.chairman %}
+                        <th class="border0">
+                            <h1 style="margin-bottom: 0;">{{panelist.full_name}}</h1>
+                            <hr width="40%" style="margin: 0;">
+                            <p style="margin: 0; font-weight:normal;">MEMBER</p>
+                        </th>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        </table>
+        <br>
 
-        {% for panelist in group.panelists %}
-            {% if panelist != group.chairman %}
-                panel member: {{panelist.full_name}}
-            {% endif %}
-        {% endfor %}
+        
 
         <br>
         <br>
-
+        
         <table class="border0">
             <tr>
                 <td class="border0 center">
-                    <h1>PROF. ???????????</h1>
+                    <h1>{% if thesis.program.code == 'CS' %} 
+                        {{'PROF. GEECEE MAYBELLINE A. MANABAT'}} 
+                    {% elif thesis.program.code == 'IT' %} 
+                        {{'PROF. EDMON L. TORRES'}} 
+                    {% elif thesis.program.code == 'GD' or thesis.program.code == 'DA' %} 
+                        {{'PROF. MA. YMELDA C. BATALLA'}} 
+                    {% endif %}</h1>
                 </td>
                 <td class="border0 center">
                     <h1>PROF. MA. TERESA F. BOREBOR</h1>
@@ -181,19 +222,74 @@
     
     <pdf:nextpage /> 
 
+    <!-- 
+
+        revision list
+
+     -->
+
     <div class="page">
-        {% for panelist, revision in revision_list.items() %}
-            {{panelist.full_name}}
-            {{revision.comment}}
-            <br>
+        <h1 class="h0 center">REVISION LIST</h1>
+        <h1 class="center">UNIVERSITY OF THE EAST - MANILA</h1>
+        <h1 class="center">COLLEGE OF COMPUTER STUDIES AND SYSTEMS</h1>
+        
+        <br>
+
+        <h1>TOPIC PROPOSAL</h1>
+        <h1 class="ind">{{thesis.title}}</h1>
+
+        <br>
+
+        <h1>PROPONENTS</h1>
+        {% for proponent in thesis.proponents %}
+                <p class="ind">{{proponent.full_name}}</p>
         {% endfor %}
+
+        <br>
+
+        <h1>Comments/Items to be revised: </h1>
+        
+        {% for panelist, revision in revision_list.items() %}
+        <h2 class="ind">{{panelist.full_name}}</h2>
+        <p style="text-indent: 75px;">{{revision.comment}}</p>
+        {% endfor %}
+        
+        
+        <br>
+        <br>
+
+        <h1>Undertakings:</h1>
+
+        <p class="ind">We, the student proponents acknowledge that the Chairman of the Pnaelists carefully explained the items stipulated here. We agree to comply with the revisions to be incorporated in the next phase of our Project and to be presented in the subsequent Defense session.</p>
+
+        <table class="border0">
+            <tr>
+                <th class="border0 left">
+                    Signed
+                </th>
+                <th class="border0 left">
+                    <u>Agreement to the Revision List items</u>
+                </th>
+            </tr>
+            {% for proponent in thesis.proponents %}
+                <tr>
+                    <td class="border0">{{proponent.full_name}}</td>
+                    <td class="border0">YES/NO</td>
+                </tr>
+            {% endfor %}
+        </table>
+
     </div>
 
 
     <pdf:nexttemplate name="landscape" />
     <pdf:nextpage /> 
 
-    <!-- quali -->
+    <!-- 
+    
+        quali 
+    
+    -->
     <div class="page">
         <div class="center">
             <h1 class="my-0 h0">UNIVERSITY OF THE EAST - MANILA</h1>
@@ -260,6 +356,11 @@
                 </ol>
             </div>
         </div>
+
+        <br>
+        <p style="text-align: right;">
+            <span><b>SIGNATURE</b></span>
+        </p>
     </div>
 
     
@@ -299,7 +400,7 @@
                                 </th>
                             </tr>
                             {##}
-                            {% for k, v in legend.items() %}
+                            {% for k, v in dev_legend if k > 11 %}
                                 <tr>
                                     <td class="border0">
                                         {{ '<=12' if k == 12 else k}}
@@ -365,6 +466,11 @@
                 </tr>
                 {% endfor %}
             </table>
+
+            <br>
+        <p style="text-align: right;">
+            <span><b>SIGNATURE</b></span>
+        </p>
         </div>
 
         {% endif %}
@@ -403,7 +509,7 @@
                                 </th>
                             </tr>
                             {##}
-                            {% for k, v in legend.items() %}
+                            {% for k, v in manu_legend if k > 11 %}
                                 <tr>
                                     <td class="border0">
                                         {{ '<=12' if k == 12 else k}}
@@ -469,6 +575,10 @@
                 </tr>
                 {% endfor %}
             </table>
+            <br>
+        <p style="text-align: right;">
+            <span><b>SIGNATURE</b></span>
+        </p>
         </div>
 
         {% endif %}
@@ -504,13 +614,13 @@
                                 </th>
                             </tr>
 
-                            {% for k, v in legend.items() %}
+                            {% for k, v in legend_25 if k > 11 %}
                                 <tr>
                                     <td class="border0">
                                         {{ '<=12' if k == 12 else k}}
                                     </td>
                                     <td class="border0">
-                                        {{ '74-60' if v.grade == 74 else v.grade}}
+                                        {{ '74-60' if k == 12 else v.grade}}
                                     </td>
                                     <td class="border0">
                                         {{v.equivalent}}
@@ -627,6 +737,10 @@
                     {% endfor %}
                 </tr>
             </table>
+            <br>
+        <p style="text-align: right;">
+            <span><b>SIGNATURE</b></span>
+        </p>
         </div>
         
     {% endfor %}
