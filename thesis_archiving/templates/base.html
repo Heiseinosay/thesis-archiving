@@ -47,6 +47,26 @@
 		<!-- bootstrap js -->
 		<script src="{{ url_for('static', filename='bootstrap/bootstrap.bundle.min.js') }}"></script>
 
+		<!-- updating total scores @ grading forms -->
+		<script>
+		    function update_total_score() {
+		        let total_score = -1;
+
+		        for (elem of document.getElementsByClassName("form-check-input")){
+		            if (elem.checked) {
+		                total_score +=  parseInt(elem.value);
+		            };
+		        };
+
+		        let $total_score = document.getElementById("grading-score");
+		        $total_score.innerHTML = total_score;
+		    };
+
+		    window.onload = function () {
+		        update_total_score();
+		    };
+		</script>
+		
 		{% block script %}
 		
 		{% endblock %}

@@ -196,7 +196,7 @@
         {% for i in range(1, max_grade + 1) %}
         
         <div class="d-flex flex-wrap justify-content-center border-end border-dark p-2">
-            <input class="{{radio_class}}" type="radio" name="{{name}}" value="{{loop.revindex}}" {{ "checked" if loop.revindex == value|int else ""}}>
+            <input class="{{radio_class}}" type="radio" name="{{name}}" value="{{loop.revindex}}" onclick="update_total_score()" {{ "checked" if loop.revindex == value|int else ""}}>
         
             <label class="form-check-label ">
                 <small><strong>{{loop.revindex}}</strong> - {{ descriptions[loop.revindex] }}</small>
@@ -242,7 +242,7 @@
         {% for k,v in labels.items()|sort(attribute='1', reverse=True) %}
         
         <div>
-            <input class="{{radio_class}}" type="radio" name="{{name}}" value="{{v}}" {{ "checked" if v == value|int else ""}}>
+            <input class="{{radio_class}}" type="radio" name="{{name}}" value="{{v}}" onclick="update_total_score()" {{ "checked" if v == value|int else ""}}>
         
             <label class="form-check-label">
                 {{k}}
