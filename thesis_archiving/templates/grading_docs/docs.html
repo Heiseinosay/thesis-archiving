@@ -107,8 +107,8 @@
         {% endfor %}
 
         <br>
-        <h1>ENDORSEMENT</h1>
-        <p>
+        <h1 class="center">ENDORSEMENT</h1>
+        <p class="center">
             In partial fulfillment of the requirements for the Degree of {{thesis.program.name}}, this thesis proposal has been reviewed and recommended for defense.
         </p>
 
@@ -198,15 +198,15 @@
             <tr>
                 <td class="border0 center">
                     <h1>{% if thesis.program.code == 'CS' %} 
-                        {{'PROF. GEECEE MAYBELLINE A. MANABAT'}} 
+                        {{'Prof. Arne R. Bana'}} 
                     {% elif thesis.program.code == 'IT' %} 
-                        {{'PROF. EDMON L. TORRES'}} 
+                        {{'Prof. Edmon L. Torres'}} 
                     {% elif thesis.program.code == 'GD' or thesis.program.code == 'DA' %} 
-                        {{'PROF. MA. YMELDA C. BATALLA'}} 
+                        {{'Prof. Ma. Ymelda C. Batalla'}} 
                     {% endif %}</h1>
                 </td>
                 <td class="border0 center">
-                    <h1>PROF. MA. TERESA F. BOREBOR</h1>
+                    <h1>Prof. Ma. Teresa F. Borebor</h1>
                 </td>
             </tr>
             <tr>
@@ -260,7 +260,7 @@
 
         <h1>Undertakings:</h1>
 
-        <p class="ind">We, the student proponents acknowledge that the Chairman of the Pnaelists carefully explained the items stipulated here. We agree to comply with the revisions to be incorporated in the next phase of our Project and to be presented in the subsequent Defense session.</p>
+        <p class="ind">We, the student proponents acknowledge that the Chairman of the Panelists carefully explained the items stipulated here. We agree to comply with the revisions to be incorporated in the next phase of our Project and to be presented in the subsequent Defense session.</p>
 
         <table class="border0">
             <tr>
@@ -294,7 +294,7 @@
         <div class="center">
             <h1 class="my-0 h0">UNIVERSITY OF THE EAST - MANILA</h1>
             <h1 class="my-0 h0">College of Computer Studies and Systems</h1>
-            <h1 class="my-0 h0">THESIS PROJECT DEFENSE RATING SHEETS FOR CCS 4990/CPD 4990</h1>
+            <h1 class="my-0 h0">THESIS PROJECT DEFENSE RATING SHEETS FOR CCS 4990/CPD 4990/CCS 3102/CEM 3102/CMR 1101</h1>
             <h1 class="left h0">TITLE OF THESIS: {{thesis.title}}</h1>
             <hr>
         </div>
