@@ -393,21 +393,21 @@ def grading(group_id, thesis_id):
                     
                 thesis_.qualitative_rating = request.form.get("qualitative_rating")
                 
-                # try:
-                db.session.commit()
-                return export_grading_docs(
-                    group_, 
-                    thesis_, 
-                    revision_list, 
-                    individual_ratings, 
-                    legend_25,
-                    legend_30,
-                    defense_rating,
-                    manuscript if manuscript else None,
-                    developed_thesis if developed_thesis else None
-                    )
-                # except:
-                #     flash("An error occured while trying to generate documents.","danger")
+                try:
+                    db.session.commit()
+                    return export_grading_docs(
+                        group_, 
+                        thesis_, 
+                        revision_list, 
+                        individual_ratings, 
+                        legend_25,
+                        legend_30,
+                        defense_rating,
+                        manuscript if manuscript else None,
+                        developed_thesis if developed_thesis else None
+                        )
+                except Exception as e:
+                    flash(e,"danger")
 
         elif request.form["form_name"] == "revision":
             # contains form data converted to mutable dict
