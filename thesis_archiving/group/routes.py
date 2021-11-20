@@ -387,7 +387,7 @@ def grading(group_id, thesis_id):
 
                         defense_rating["rating"] += developed_thesis[panelist]["weighted"]
                     
-                defense_rating["rating"] = defense_rating["rating"] / group_.panelists.count()
+                defense_rating["rating"] = round(defense_rating["rating"] / group_.panelists.count(), 2)
                 defense_rating["words"] = nw(round(defense_rating["rating"], 2))
 
                     

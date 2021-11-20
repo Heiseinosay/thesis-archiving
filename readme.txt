@@ -17,3 +17,8 @@ setup:
 pulling w/ db updates:
     1. pull
     2. import new mysql data
+
+
+Reminders:
+    Replace requirements.txt versions to the last working version for packages or you may encounter pip install errors in godaddy
+
