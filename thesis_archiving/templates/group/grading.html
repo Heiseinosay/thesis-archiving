@@ -178,11 +178,12 @@
         <div class="modal-body">
 
             {% for revision in thesis.revision_lists %}
-
-            <div class="mb-3">
-                <label class="form-label h6">{{'You' if revision.panelist == current_user else revision.panelist.full_name}}</label>
-                <textarea class="form-control" rows="5" disabled>{{revision.comment}}</textarea>
-              </div>
+                {% if revision.panelist in group.panelists %}
+                <div class="mb-3">
+                    <label class="form-label h6">{{'You' if revision.panelist == current_user else revision.panelist.full_name}}</label>
+                    <textarea class="form-control" rows="5" disabled>{{revision.comment}}</textarea>
+                </div>
+                {% endif %}
           {% endfor %}
 
         </div>
