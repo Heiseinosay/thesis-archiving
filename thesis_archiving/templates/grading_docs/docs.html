@@ -92,7 +92,6 @@
 
      -->
     <div class="page">
-        <p><img src="{{ url_for('static', filename='ue_logo.PNG') }}"></p>
         <h1 class="center h0">APPROVAL SHEET</h1>
         <h1 class="center">UNIVERSITY OF THE EAST - MANILA</h1>
         <h1 class="center">COLLEGE OF COMPUTER STUDIES AND SYSTEMS (CCSS)</h1>
@@ -115,6 +114,14 @@
 
         
             <table class="border0" style="left: 150px;">
+                <tr>
+                    <td class="border0 center">
+                        (E-Signed by {{thesis.adviser.full_name}})
+                    </td>
+                    <td class="border0">
+                         
+                    </td>
+                </tr>
                 <tr>
                     <th class="border0">
                         <h1 style="margin-bottom: 0;">{{thesis.adviser.full_name}}</h1>
@@ -170,23 +177,33 @@
         <br><br>
         <table class="border0">
             <tr>
+                <td  class="border0 center" colspan="{{group.panelists.count() - 1}}">
+                    (E-Signed by {{group.chairman.full_name}})
+                </td>
+            </tr>
+            <tr>
                 <th class="border0" colspan="{{group.panelists.count() - 1}}">
                     <h1 style="margin-bottom: 0;">{{group.chairman.full_name}}</h1>
                     <hr width="30%" style="margin: 0;">
                     <p style="margin: 0; font-weight:normal;">CHAIRMAN</p>
                 </th>
             </tr>
-            <tr>
-                {% for panelist in group.panelists %}
-                    {% if panelist != group.chairman %}
-                        <th class="border0">
-                            <h1 style="margin-bottom: 0;">{{panelist.full_name}}</h1>
-                            <hr width="40%" style="margin: 0;">
-                            <p style="margin: 0; font-weight:normal;">MEMBER</p>
-                        </th>
-                    {% endif %}
-                {% endfor %}
-            </tr>
+            {% for panelist in group.panelists %}
+                {% if panelist != group.chairman %}
+                <tr>
+                    <td  class="border0 center">
+                        (E-Signed by {{panelist.full_name}})
+                    </td>
+                </tr>
+                <tr>
+                    <th class="border0">
+                        <h1 style="margin-bottom: 0;">{{panelist.full_name}}</h1>
+                        <hr width="40%" style="margin: 0;">
+                        <p style="margin: 0; font-weight:normal;">MEMBER</p>
+                    </th>
+                </tr>
+                {% endif %}
+            {% endfor %}
         </table>
         <br>
 
@@ -359,9 +376,26 @@
         </div>
 
         <br>
-        <p style="text-align: right;">
-            <span><b>SIGNATURE</b></span>
-        </p>
+        <br>
+
+        <table class="border0">
+            <tr>
+                {% for panelist in group.panelists %}
+                <td  class="border0 center">
+                    (E-Signed by {{panelist.full_name}})
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for panelist in group.panelists %}
+                    <th class="border0">
+                        <h1 style="margin-bottom: 0;">{{panelist.full_name}}</h1>
+                        <hr width="40%" style="margin: 0;">
+                        <p style="margin: 0; font-weight:normal;">{{ 'CHAIRMAN' if panelist.full_name == group.chairman.full_name else 'MEMBER'}}</p>
+                    </th>
+                {% endfor %}
+            </tr>
+        </table>
     </div>
 
     
@@ -469,9 +503,12 @@
             </table>
 
             <br>
-        <p style="text-align: right;">
-            <span><b>SIGNATURE</b></span>
-        </p>
+            <p style="text-align: right;">
+                <span>(E-signed by {{ panelist.full_name }})</span>
+            </p>
+            <p style="text-align: right;">
+                <span><b>SIGNATURE</b></span>
+            </p>
         </div>
 
         {% endif %}
@@ -577,9 +614,12 @@
                 {% endfor %}
             </table>
             <br>
-        <p style="text-align: right;">
-            <span><b>SIGNATURE</b></span>
-        </p>
+            <p style="text-align: right;">
+                <span>(E-signed by {{ panelist.full_name }})</span>
+            </p>
+            <p style="text-align: right;">
+                <span><b>SIGNATURE</b></span>
+            </p>
         </div>
 
         {% endif %}
@@ -739,9 +779,12 @@
                 </tr>
             </table>
             <br>
-        <p style="text-align: right;">
-            <span><b>SIGNATURE</b></span>
-        </p>
+            <p style="text-align: right;">
+                <span>(E-signed by {{ panelist.full_name }})</span>
+            </p>
+            <p style="text-align: right;">
+                <span><b>SIGNATURE</b></span>
+            </p>
         </div>
         
     {% endfor %}
