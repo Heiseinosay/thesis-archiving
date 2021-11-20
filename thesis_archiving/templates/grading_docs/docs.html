@@ -694,7 +694,7 @@
                         </small>
                     </td>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v['grades'].respectful_response }}</td>
+                        <td class="center" style="font-size: 1.5em; font-weight:bold;">{{ v['grades'].respectful_response }}</td>
                     {% endfor %}                    
                 </tr>
 
@@ -711,7 +711,7 @@
                         </small>
                     </td>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v['grades'].communication_skills }}</td>
+                        <td class="center" style="font-size: 1.5em; font-weight:bold;">{{ v['grades'].communication_skills }}</td>
                     {% endfor %}
                 </tr>
 
@@ -728,7 +728,7 @@
                         </small>
                     </td>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v['grades'].intelligent_response }}</td>
+                        <td class="center" style="font-size: 1.5em; font-weight:bold;">{{ v['grades'].intelligent_response }}</td>
                     {% endfor %}
                 </tr>
 
@@ -746,7 +746,7 @@
                         </small>
                     </td>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v['grades'].confidence }}</td>
+                        <td class="center" style="font-size: 1.5em; font-weight:bold;">{{ v['grades'].confidence }}</td>
                     {% endfor %}
                 </tr>
 
@@ -764,21 +764,21 @@
                         </small>
                     </td>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v['grades'].attire }}</td>
+                        <td class="center" style="font-size: 1.5em; font-weight:bold;">{{ v['grades'].attire }}</td>
                     {% endfor %}
                 </tr>
 
                 <tr>
                     <th>TOTAL RAW SCORE</th>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td>{{ v['total'] }}</td>
+                        <td class="center" style="font-size: 1.5em; font-weight:bold;">{{ v['total'] }}</td>
                     {% endfor %}
                 </tr>
 
                 <tr>
                     <th>GRADE EQUIVALENT</th>
                     {% for k, v in individual_ratings[panelist].items()|sort(attribute='0') %}
-                        <td> {{ v['legend']['grade'] }} ({{v['legend']['equivalent'] }}) </td>
+                        <td class="center" style="font-size: 1.5em; font-weight:bold;"> {{ v['legend']['grade'] }} ({{v['legend']['equivalent'] }}) </td>
                     {% endfor %}
                 </tr>
             </table>
