@@ -188,22 +188,26 @@
                     <p style="margin: 0; font-weight:normal;">CHAIRMAN</p>
                 </th>
             </tr>
+            <tr>
             {% for panelist in group.panelists %}
                 {% if panelist != group.chairman %}
-                <tr>
                     <td  class="border0 center">
                         (E-Signed by {{panelist.full_name}})
                     </td>
-                </tr>
-                <tr>
-                    <th class="border0">
-                        <h1 style="margin-bottom: 0;">{{panelist.full_name}}</h1>
-                        <hr width="40%" style="margin: 0;">
-                        <p style="margin: 0; font-weight:normal;">MEMBER</p>
-                    </th>
-                </tr>
                 {% endif %}
-            {% endfor %}
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for panelist in group.panelists %}
+                    {% if panelist != group.chairman %}
+                        <th class="border0">
+                            <h1 style="margin-bottom: 0;">{{panelist.full_name}}</h1>
+                            <hr width="40%" style="margin: 0;">
+                            <p style="margin: 0; font-weight:normal;">MEMBER</p>
+                        </th>
+                    {% endif %}
+                {% endfor %}
+            </tr>
         </table>
         <br>
 
