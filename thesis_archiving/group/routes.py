@@ -16,6 +16,10 @@ from num2words import num2words as nw
 
 group = Blueprint("group", __name__, url_prefix="/group")
 
+@group.route('/testing')
+def testing():
+    return render_template('group/testing.html')
+
 @group.route("/create", methods=["POST","GET"])
 @login_required
 @has_roles("is_admin")

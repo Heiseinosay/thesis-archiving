@@ -47,6 +47,8 @@
 		<!-- bootstrap js -->
 		<script src="{{ url_for('static', filename='bootstrap/bootstrap.bundle.min.js') }}"></script>
 
+		<script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
+
 		<!-- updating total scores @ grading forms -->
 		<script>
 		    function update_total_score() {
@@ -106,11 +108,12 @@
 		    window.onload = function () {
 		        update_total_score();
 		    };
+			
+			{% block script %}
+			
+			{% endblock %}
 		</script>
 		
-		{% block script %}
-		
-		{% endblock %}
 
 	</body>
 
