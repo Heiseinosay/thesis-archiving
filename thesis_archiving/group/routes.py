@@ -1,3 +1,4 @@
+from urllib import response
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from werkzeug.exceptions import abort
 from flask_login import login_required, current_user
@@ -16,9 +17,15 @@ from num2words import num2words as nw
 
 group = Blueprint("group", __name__, url_prefix="/group")
 
-@group.route('/testing')
-def testing():
-    return render_template('group/testing.html')
+@group.route('/test/<int:id>', methods=['POST','GET'])
+def test(id):
+    errors = []
+
+    if request.method == 'POST':
+        if request.form['username'] != 'admin':
+            errors.append('Wrong answer bitch')
+
+    return render_template('group/test.html', id=id, errors=errors)
 
 @group.route("/create", methods=["POST","GET"])
 @login_required
