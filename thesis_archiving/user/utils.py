@@ -18,6 +18,8 @@ def send_reset_request(user):
         If you did not make this request, please ignore and no changes will be made.
 
         For further concerns, please contact us through our Facebook page (https://www.facebook.com/CCSSRnD/).
+
+        This message is automated. Please do not reply.
     '''
 
     mail.send(msg)
