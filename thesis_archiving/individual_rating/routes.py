@@ -1,5 +1,6 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, abort, jsonify
 from werkzeug.exceptions import abort
+import time
 from flask_login import login_required, current_user
 
 from thesis_archiving import db
@@ -86,6 +87,48 @@ def grading(thesis_id, proponent_id):
     # print din kung ano yung value na nakukuha
 
     return render_template("individual_rating/grading.html", individual_rating=individual_rating_, result=result)
+
+@individual_rating.get("/ajax-grading/<int:thesis_id>/<int:proponent_id>")
+@login_required
+@has_roles("is_adviser", "is_guest_panelist")
+def ajax_grading(thesis_id, proponent_id):
+    # time.sleep(2);
+
+    # check if thesis is valid
+    thesis = Thesis.query.get_or_404(thesis_id)
+
+    # check if user is a student
+    proponent = User.query.filter_by(id=proponent_id, is_student=True).first_or_404()
+    
+    # check if user is thesis' proponent
+    if proponent not in thesis.proponents:
+        abort(406)
+    
+    # check if current user is panelist for the thesis
+    if current_user not in thesis.group.panelists:
+        abort(403)
+
+    # Check if there is already an individual rating for the student 
+    # if there is none, create a record for it
+    # returns individual rating
+    
+    individual_rating_ = proponent.check_student_individual_rating(
+        student = proponent,
+        thesis_id=thesis.id,
+        panelist_id=current_user.id
+
+        )
+    
+    result = {
+        "intelligent_response" : individual_rating_.intelligent_response,
+        "respectful_response" : individual_rating_.respectful_response,
+        "communication_skills" : individual_rating_.communication_skills,
+        "confidence" : individual_rating_.confidence,
+        "attire" : individual_rating_.attire,
+        "is_final" : individual_rating_.is_final
+    }
+
+    return jsonify(result)
 
 # @individual_rating.route("/grading/<int:thesis_id>/<int:individual_rating_id>", methods=["POST"])
 # @login_required

@@ -1,3 +1,4 @@
+{% from "components/_fields.html" import field_individual_rating %}
 {% macro proponent_card(proponent, thesis_id, individual_rating) %}
 
     <div class="card overflow-auto">
@@ -18,6 +19,115 @@
                     <!-- proceed to indiv rating-->
                     <div class="d-flex flex-nowrap">
                         <a class="btn btn-sm btn-ueccss bi bi-arrow-bar-right align-self-start mx-1" href="{{ url_for('individual_rating.grading', thesis_id=thesis_id, proponent_id=proponent.id) }}" role="button" target="_blank"></a>
+                    </div>
+                    
+                    
+                    <!-- Modal btn -->
+                    <button type="button" class="btn btn-sm btn-ueccss bi bi-arrow-bar-right align-self-start mx-1 individual-rating" data-bs-toggle="modal" data-bs-target="#individual-rating-{{proponent.id}}" id="test">
+                    </button>
+
+
+                    <!-- Model Grading form -->
+
+                    <div class="modal fade" id="individual-rating-{{proponent.id}}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        Individual Rating
+                                        <span class="text-muted h6">
+                                            {{individual_rating.student.username}} - {{individual_rating.student.full_name}}
+                                        </span>
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+
+                                <div class="modal-body">
+                                    <h3 class="loading">Loading...</h3>
+                                    <form>
+                                        <input type="hidden" name="link" value="{{ url_for('individual_rating.ajax_grading', thesis_id=thesis_id, proponent_id=proponent.id) }}">
+
+                                        <!-- thesis_id not needed since available naman sa grading.html as variable -->
+                                        <input type="hidden" name="proponent_id" value="{{proponent.id}}">
+                                        
+                                        <ol>
+                                            <li>
+                                                <div class="mb-3">
+                                                    {{ field_individual_rating(
+                                                        "Intelligent Response",
+                                                        "intelligent_response"
+                                                    ) }}
+                                                </div>
+                                            </li>
+
+                                            <li>
+                                                <div class="mb-3">
+                                                    {{ field_individual_rating(
+                                                        "Respectful Response",
+                                                        "respectful_response"
+                                                    ) }}
+                                                </div>
+                                            </li>
+
+                                            <li>
+                                                <div class="mb-3">
+                                                    {{ field_individual_rating(
+                                                        "Communication Skills",
+                                                        "communication_skills"
+                                                    ) }}
+                                                </div>
+                                            </li>
+
+                                            <li>
+                                                <div class="mb-3">
+                                                    {{ field_individual_rating(
+                                                        "Confidence",
+                                                        "confidence"
+                                                    ) }}
+                                                </div>
+                                            </li>
+
+                                            <li>
+                                                <div class="mb-3">
+                                                    {{ field_individual_rating(
+                                                        "Attire",
+                                                        "attire"
+                                                    ) }}
+                                                </div>
+                                            </li>
+
+                            
+
+                                        </ol>
+                                    </form>
+
+                                <div class="mt-5 mb-3 mx-3 d-flex justify-content-between">
+                                    
+                                    
+                                    <p><strong>Total Score: </strong> <span id="grading-score">0</span>/<span id="total-items">25</span></p>
+
+                                    <p><strong>Percentage: </strong> <span id="grading-percent">0</span></p>
+
+                                    <p><strong>11-Point: </strong> <span id="grading-point">0</span></p>
+                                    
+                                    <div>
+                                        <input class="{{ check_class }}" type="checkbox" value="1">
+                                        <label class="form-check-label">
+                                            Mark as final to be included for grading.
+                                        </label>
+
+                                    </div>
+                                </div>
+
+                                    </form>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn btn-ueccss">Save changes</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                 </div>

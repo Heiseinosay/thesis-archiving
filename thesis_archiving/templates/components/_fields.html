@@ -123,7 +123,7 @@
 
 
 <!-- indiv rating -->
-{% macro field_individual_rating(criteria, name, result, value) %}
+{% macro field_individual_rating(criteria, name) %}
 
     {% set labels = {
         'Poor': 1,
@@ -133,19 +133,6 @@
         'Good': 5,
         'Very Good' : 6
     } %}
-
-    {% set radio_class = "form-check-input" %}
-    {% set feedback_class = "" %}
-
-    {% if result["valid"][name] %}
-        {% set radio_class = radio_class + " is-valid" %}
-    {% endif %}
-    {% if result["invalid"][name] %}
-        {% set radio_class = radio_class + " is-invalid" %}
-        {% set feedback_class = "invalid-feedback" %}
-
-    {% endif %}
-
             
     <label class="form-label h6">{{criteria}}</label>
     
@@ -156,7 +143,7 @@
         {% for k,v in labels.items() %}
         
         <div>
-            <input class="{{radio_class}}" type="radio" name="{{name}}" value="{{v}}" {{ "checked" if v == value|int else ""}}>
+            <input class="form-check-input" type="radio" name="{{name}}" value="{{v}}">
         
             <label class="form-check-label">
                 {{k}}
@@ -200,52 +187,6 @@
         
             <label class="form-check-label ">
                 <small><strong>{{loop.revindex}}</strong> - {{ descriptions[loop.revindex] }}</small>
-            </label>
-            
-        </div>
-        {% endfor %}
-
-    </div>
-            
-{% endmacro %}
-
-<!-- indiv rating -->
-{% macro field_individual_rating(criteria, name, result, value) %}
-
-    {% set labels = {
-        'Poor': 1,
-        'Below Average': 2,
-        'Average': 3,
-        'Good': 4,
-        'Very Good' : 5
-    } %}
-
-    {% set radio_class = "form-check-input" %}
-    {% set feedback_class = "" %}
-
-    {% if result["valid"][name] %}
-        {% set radio_class = radio_class + " is-valid" %}
-    {% endif %}
-    {% if result["invalid"][name] %}
-        {% set radio_class = radio_class + " is-invalid" %}
-        {% set feedback_class = "invalid-feedback" %}
-
-    {% endif %}
-
-            
-    <label class="form-label h6">{{criteria}}</label>
-    
-    <br>
-
-    <div class="d-flex justify-content-around">
-
-        {% for k,v in labels.items()|sort(attribute='1', reverse=True) %}
-        
-        <div>
-            <input class="{{radio_class}}" type="radio" name="{{name}}" value="{{v}}" onclick="update_total_score()" {{ "checked" if v == value|int else ""}}>
-        
-            <label class="form-check-label">
-                {{k}}
             </label>
             
         </div>

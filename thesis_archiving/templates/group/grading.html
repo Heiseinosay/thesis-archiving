@@ -6,9 +6,8 @@
 {% block body %}
 
 <!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" id="test">
-    Launch demo modal
-  </button>
+<button type="button" class="btn btn-sm btn-ueccss bi bi-arrow-bar-right align-self-start mx-1" data-bs-toggle="modal" data-bs-target="#exampleModal" id="test">
+</button>
   
   <!-- Modal -->
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -220,53 +219,110 @@
 
 {% block script %}
 $(document).ready(function() {
-
     $.ajaxSetup({
         headers: {
           'X-CSRF-TOKEN':'{{csrf_token()}}'
         }
      });
 
-    $("#test").click(function() {
-        $("#test-in").html( function() {
-            test = $(this);
-            $.ajax("{{ url_for('group.test', id=14) }}")
-            .done(function(data) {
-                test.html(data);
-                
-                $("#test-form").submit(function(event) {
-                    event.preventDefault();
-                    data = $(this);
-                    username = data.find("input[name='username'");
+    
+    $("button.individual-rating").click(function() {
+        const modalId = $(this).attr('data-bs-target');
+        const modalDiv = $(modalId);
+        const modalBody = modalDiv.find('.modal-body');
+        const loadingDiv = modalBody.find('.loading');
+        const form = modalBody.find('form');
+        const link = form.find('input[name="link"]').val();
+        
+        form.hide();
+        $.ajax(
+            link
+        ).done(function(data) {
+            loadingDiv.hide();
+            form.show();
 
-                    
-                    $.ajax(
-                        {
-                            method: 'POST',
-                            url: "{{ url_for('group.test', id=14) }}",
-                            data: {'username':username.val() }
-                        }
-                    )
-                    .done(function(data){
-                        test.html(data);
-                        
-                    }).fail(function(jqXHR, textStatus){
-                        console.log('WAT' + textStatus);
+            form.submit(function(event) {
+                event.preventDefault();
 
-                    });
-                    
-                });
             })
 
-            
-            
-        });
-    });
+            console.log(data);
 
-    
+
+        }).fail(function(data) {
+            loadingDiv.html('<h3>An error occured. Please refresh.</h3>');
+        });
+
+
+    });
 
 });
 
 {% endblock %}
 
 {% endblock %}
+
+<!-- 
+    
+TODO
+// -onclick, show modal
+// -if fetch success on modal, add listener to '.individiual-rating-form'
+//-scripts in main grading page para salo lahat. function that will handle ONLY indiv ratings
+- loop object and set values if meron
+-grab all fields
+-send through ajax
+-check all fields if is final is checked
+    -issue necessary error
+        -check kung kaya kahit papulahin man lang per field
+
+-error msgs show din if any
+
+TODO
+
+-hidden fields thesis_id proponent_id
+
+-grab values
+
+// -check if thru ajax nadedetect din current user (para malaman kung gumagana yung decorators) 
+
+-error msgs loop through returned marshmallow dict
+-error msgs din ng server ipakita somewhere din
+
+-do everthing in context ng $(this)
+
+ -->
+$("#test").click(function() {
+    $("#test-in").html( function() {
+        test = $(this);
+        $.ajax("{{ url_for('group.test', id=14) }}")
+        .done(function(data) {
+            test.html(data);
+            
+            $("#test-form").submit(function(event) {
+                event.preventDefault();
+                data = $(this);
+                username = data.find("input[name='username'");
+
+                
+                $.ajax(
+                    {
+                        method: 'POST',
+                        url: "{{ url_for('group.test', id=14) }}",
+                        data: {'username':username.val() }
+                    }
+                )
+                .done(function(data){
+                    test.html(data);
+                    
+                }).fail(function(jqXHR, textStatus){
+                    console.log('WAT' + textStatus);
+
+                });
+                
+            });
+        })
+
+        
+        
+    });
+});
