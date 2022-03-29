@@ -6,3 +6,4 @@ script.py
 .env
 **/*pycache*
 thesis_archiving/static/thesis_attachments
+Pipfile
