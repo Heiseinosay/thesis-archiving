@@ -1,4 +1,15 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, abort, jsonify
+from flask import (
+    Blueprint, 
+    render_template, 
+    request, 
+    flash, 
+    redirect, 
+    url_for, 
+    abort, 
+    jsonify, 
+    make_response
+)
+
 from werkzeug.exceptions import abort
 import time
 from flask_login import login_required, current_user
@@ -88,7 +99,7 @@ def grading(thesis_id, proponent_id):
 
     return render_template("individual_rating/grading.html", individual_rating=individual_rating_, result=result)
 
-@individual_rating.get("/ajax-grading/<int:thesis_id>/<int:proponent_id>")
+@individual_rating.route("/ajax-grading/<int:thesis_id>/<int:proponent_id>", methods=['POST', 'GET'])
 @login_required
 @has_roles("is_adviser", "is_guest_panelist")
 def ajax_grading(thesis_id, proponent_id):
@@ -120,6 +131,44 @@ def ajax_grading(thesis_id, proponent_id):
         )
     
     result = {
+        'valid' : {},
+        'invalid' : {}
+    }
+
+
+    if request.method == 'POST':
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+        result = validate_input(data, IndividualRatingSchema)
+
+        if not result["invalid"]:
+            
+            data = result["valid"]
+
+            if data.get("intelligent_response"):
+                individual_rating_.intelligent_response = data["intelligent_response"]
+            
+            if data.get("respectful_response"):
+                individual_rating_.respectful_response = data["respectful_response"]
+
+            if data.get("communication_skills"):
+                individual_rating_.communication_skills = data["communication_skills"]
+
+            if data.get("confidence"):
+                individual_rating_.confidence = data["confidence"]
+
+            if data.get("attire"):
+                individual_rating_.attire = data["attire"]
+
+            individual_rating_.is_final = data["is_final"] if data.get("is_final") else False
+
+            # try:
+            #     db.session.commit()
+            #     flash("Successfully graded.","success")
+            # except:
+            #     flash("An error occured while trying to grade.","danger")
+    
+    individual_rating_ = {
         "intelligent_response" : individual_rating_.intelligent_response,
         "respectful_response" : individual_rating_.respectful_response,
         "communication_skills" : individual_rating_.communication_skills,
@@ -128,7 +177,10 @@ def ajax_grading(thesis_id, proponent_id):
         "is_final" : individual_rating_.is_final
     }
 
-    return jsonify(result)
+    if result['invalid']:
+        return jsonify(result), 406
+
+    return jsonify({'result': result, 'individual_rating': individual_rating_})
 
 # @individual_rating.route("/grading/<int:thesis_id>/<int:individual_rating_id>", methods=["POST"])
 # @login_required
