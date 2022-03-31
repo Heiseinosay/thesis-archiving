@@ -103,7 +103,6 @@ def grading(thesis_id, proponent_id):
 @login_required
 @has_roles("is_adviser", "is_guest_panelist")
 def ajax_grading(thesis_id, proponent_id):
-    # time.sleep(2);
 
     # check if thesis is valid
     thesis = Thesis.query.get_or_404(thesis_id)
@@ -137,6 +136,7 @@ def ajax_grading(thesis_id, proponent_id):
 
 
     if request.method == 'POST':
+        time.sleep(3);
         # contains form data converted to mutable dict
         data = request.form.to_dict()
         result = validate_input(data, IndividualRatingSchema)
@@ -162,11 +162,11 @@ def ajax_grading(thesis_id, proponent_id):
 
             individual_rating_.is_final = data["is_final"] if data.get("is_final") else False
 
-            # try:
-            #     db.session.commit()
-            #     flash("Successfully graded.","success")
-            # except:
-            #     flash("An error occured while trying to grade.","danger")
+            try:
+                db.session.commit()
+                flash("Successfully graded.","success")
+            except:
+                flash("An error occured while trying to grade.","danger")
     
     individual_rating_ = {
         "intelligent_response" : individual_rating_.intelligent_response,

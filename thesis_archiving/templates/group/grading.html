@@ -206,12 +206,17 @@ $(document).ready(function() {
         }
      });
     
+
+    
+
+
     $("button.individual-rating").click(function() {
         const modalId = $(this).attr('data-bs-target');
         const modalDiv = $(modalId);
         const modalBody = modalDiv.find('.modal-body');
         const loadingDiv = modalBody.find('.loading');
         const form = modalBody.find('form');
+        const submit_button = form.find("button[type=submit]");
         const link = form.find('input[name="link"]').val();
         
         form.hide();
@@ -222,6 +227,12 @@ $(document).ready(function() {
             // form listener
             form.submit(function(event) {
                 event.preventDefault();
+                
+                // show loader button
+                submit_button.attr('disabled', ' ');
+                submit_button.find('.spinner-border').removeClass('visually-hidden');
+                submit_button.find('.status').html('Saving...');
+                submit_button.find('.spinner-border');
                 
                 const data = {
                     csrf_token : '{{csrf_token()}}',
@@ -240,7 +251,18 @@ $(document).ready(function() {
                         data: data
                     }
                 ).done(function(data) {
-                    console.log(data['result']);
+                    
+                    // valid data
+                    $.each(data['result']['valid'], function(key, value) {
+                        var selector;
+                        if (!(key === 'is_final')) {
+                            selector = 'input[name=' + key + ']';
+                        }
+
+                        form.find(selector).removeClass("is-invalid");
+                        form.find(selector).addClass("is-valid");
+                    });
+
                 }).fail(function(data) {
 
                     // invalid data
@@ -265,6 +287,27 @@ $(document).ready(function() {
                         form.find(selector).removeClass("is-invalid");
                         form.find(selector).addClass("is-valid");
                     });
+
+                }).always(function() {
+
+                    // hide loader button
+                    submit_button.attr('disabled', null);
+                    submit_button.find('.spinner-border').addClass('visually-hidden');
+                    submit_button.find('.status').html('Save');
+
+                    const proponent_id = form.find("input[name=proponent_id").val();
+                    const selector = "#individual-rating-button-" + proponent_id;
+
+                    // Rated or Rating button
+                    if (data['is_final']) {
+                        $(selector).removeClass("btn-warning");
+                        $(selector).addClass("btn-ueccss");
+                        $(selector).html('Rated');
+                    } else {
+                        $(selector).removeClass("btn-ueccss");
+                        $(selector).addClass("btn-warning");
+                        $(selector).html('Rating');
+                    }
 
                 });
 
@@ -315,14 +358,14 @@ TODO
 //-grab all fields
 //-send through ajax
 -check all fields if is_final is checked
-    - commit all valid
-        - show if success posting
+    //- commit all valid
+    //    - show if success posting
     // - set invalid fields to invalid
-    - force a server error na hindi 406 
-        - when submitting a success form
+    - force a server error na hindi validation error
+        - when submitting
         - when commmiting 
-        - etc
--mark success/ongoing
+        - icatch lahat and show "An error occured. Please refresh the page."
+//-mark success/ongoing
 - delete yung indiv rating na hindi async?
 
 

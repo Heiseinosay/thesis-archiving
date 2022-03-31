@@ -13,17 +13,18 @@
                     {% set individual_rating_status = individual_rating.is_final if individual_rating else False %}
 
                     <div>
-                        <span class="badge bg-{{ 'success' if individual_rating_status else 'warning' }}">{{ 'DONE' if individual_rating_status else 'ONGOING' }}</span> {{ proponent.username }} - {{ proponent.full_name }}
+                        <!-- <span class="badge bg-{{ 'success' if individual_rating_status else 'warning' }}">{{ 'DONE' if individual_rating_status else 'ONGOING' }}</span>  -->
+                        {{ proponent.username }} - {{ proponent.full_name }}
                     </div>
 
                     <!-- proceed to indiv rating-->
-                    <div class="d-flex flex-nowrap">
+                    <!-- <div class="d-flex flex-nowrap">
                         <a class="btn btn-sm btn-ueccss bi bi-arrow-bar-right align-self-start mx-1" href="{{ url_for('individual_rating.grading', thesis_id=thesis_id, proponent_id=proponent.id) }}" role="button" target="_blank"></a>
-                    </div>
+                    </div> -->
                     
                     
                     <!-- Modal btn -->
-                    <button type="button" class="btn btn-sm btn-ueccss bi bi-arrow-bar-right align-self-start mx-1 individual-rating" data-bs-toggle="modal" data-bs-target="#individual-rating-{{proponent.id}}" id="test">
+                    <button type="button" class="btn btn-sm btn-{{ 'ueccss' if individual_rating_status else 'warning' }} align-self-start mx-1 individual-rating" data-bs-toggle="modal" data-bs-target="#individual-rating-{{proponent.id}}" id="individual-rating-button-{{proponent.id}}"> {{ 'Rated' if individual_rating_status else 'Rating' }}
                     </button>
 
 
@@ -118,7 +119,12 @@
 
                                             </div>
 
-                                            <button type="submit" class="btn btn-sm btn-ueccss">Save</button>
+                                            <!-- <button type="submit" class="btn btn-sm btn-ueccss individual-rating">Save</button> -->
+                                            
+                                            <button class="btn btn-sm btn-ueccss" type="submit">
+                                                <span class="spinner-border spinner-border-sm visually-hidden" role="status"></span>
+                                                <span class="status">Save</span>
+                                            </button>
                                         </div>
 
                                     </form>
