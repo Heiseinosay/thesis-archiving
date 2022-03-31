@@ -242,7 +242,29 @@ $(document).ready(function() {
                 ).done(function(data) {
                     console.log(data['result']);
                 }).fail(function(data) {
-                    console.log(data['responseJSON']);
+
+                    // invalid data
+                    $.each(data['responseJSON']['invalid'], function(key, value) {
+                        var selector;
+                        if (!(key === 'is_final')) {
+                            selector = 'input[name=' + key + ']';
+                        }
+
+
+                        form.find(selector).removeClass("is-valid");
+                        form.find(selector).addClass("is-invalid");
+                    });
+
+                    // valid data
+                    $.each(data['responseJSON']['valid'], function(key, value) {
+                        var selector;
+                        if (!(key === 'is_final')) {
+                            selector = 'input[name=' + key + ']';
+                        }
+
+                        form.find(selector).removeClass("is-invalid");
+                        form.find(selector).addClass("is-valid");
+                    });
 
                 });
 
@@ -294,14 +316,14 @@ TODO
 //-send through ajax
 -check all fields if is_final is checked
     - commit all valid
-        - show if success
-    - set invalid fields to invalid
+        - show if success posting
+    // - set invalid fields to invalid
     - force a server error na hindi 406 
         - when submitting a success form
         - when commmiting 
         - etc
+-mark success/ongoing
 - delete yung indiv rating na hindi async?
-
 
 
  -->
