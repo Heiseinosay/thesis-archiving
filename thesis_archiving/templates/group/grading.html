@@ -233,6 +233,7 @@ $(document).ready(function() {
                 submit_button.find('.spinner-border').removeClass('visually-hidden');
                 submit_button.find('.status').html('Saving...');
                 submit_button.find('.spinner-border');
+
                 
                 const data = {
                     csrf_token : '{{csrf_token()}}',
@@ -243,6 +244,9 @@ $(document).ready(function() {
                     attire : form.find('input[name="attire"]:checked').val(),
                     is_final : Boolean(form.find('input[name="is_final"]:checked').val())
                 }
+                
+                // disable is final
+                form.find('input[name=is_final]').attr('disabled','');
 
                 $.ajax(
                     {
@@ -264,29 +268,32 @@ $(document).ready(function() {
                     });
 
                 }).fail(function(data) {
-
-                    // invalid data
-                    $.each(data['responseJSON']['invalid'], function(key, value) {
-                        var selector;
-                        if (!(key === 'is_final')) {
-                            selector = 'input[name=' + key + ']';
-                        }
-
-
-                        form.find(selector).removeClass("is-valid");
-                        form.find(selector).addClass("is-invalid");
-                    });
-
-                    // valid data
-                    $.each(data['responseJSON']['valid'], function(key, value) {
-                        var selector;
-                        if (!(key === 'is_final')) {
-                            selector = 'input[name=' + key + ']';
-                        }
-
-                        form.find(selector).removeClass("is-invalid");
-                        form.find(selector).addClass("is-valid");
-                    });
+                    if (data.status === 406) {
+                        // invalid data
+                        $.each(data['responseJSON']['invalid'], function(key, value) {
+                            var selector;
+                            if (!(key === 'is_final')) {
+                                selector = 'input[name=' + key + ']';
+                            }
+    
+    
+                            form.find(selector).removeClass("is-valid");
+                            form.find(selector).addClass("is-invalid");
+                        });
+    
+                        // valid data
+                        $.each(data['responseJSON']['valid'], function(key, value) {
+                            var selector;
+                            if (!(key === 'is_final')) {
+                                selector = 'input[name=' + key + ']';
+                            }
+    
+                            form.find(selector).removeClass("is-invalid");
+                            form.find(selector).addClass("is-valid");
+                        });
+                    } else {
+                        alert('An error occured. Please refresh the page.');
+                    }
 
                 }).always(function() {
 
@@ -308,6 +315,9 @@ $(document).ready(function() {
                         $(selector).addClass("btn-warning");
                         $(selector).html('Rating');
                     }
+
+                    //enable is final
+                    form.find('input[name=is_final]').attr('disabled', null);
 
                 });
 
@@ -357,15 +367,20 @@ TODO
 // - loop object and set values if meron
 //-grab all fields
 //-send through ajax
--check all fields if is_final is checked
+//-check all fields if is_final is checked
     //- commit all valid
     //    - show if success posting
     // - set invalid fields to invalid
-    - force a server error na hindi validation error
-        - when submitting
-        - when commmiting 
-        - icatch lahat and show "An error occured. Please refresh the page."
+    //- force a server error na hindi validation error
+      //  - when submitting
+        //- when commmiting 
+        //- icatch lahat and show "An error occured. Please refresh the page."
+
+//- disable is final habang nag susubmit para safe
 //-mark success/ongoing
+- nag error sa Very Good maski complete data
+    - http://localhost:5000/group/grading/14/235
+- http://localhost:5000/group/grading/14/460
 - delete yung indiv rating na hindi async?
 
 

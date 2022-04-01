@@ -137,6 +137,7 @@ def ajax_grading(thesis_id, proponent_id):
 
     if request.method == 'POST':
         time.sleep(3);
+        
         # contains form data converted to mutable dict
         data = request.form.to_dict()
         result = validate_input(data, IndividualRatingSchema)
