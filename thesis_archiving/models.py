@@ -1,4 +1,4 @@
-from flask import current_app
+from flask import current_app, abort
 from flask.helpers import flash
 from flask_login import UserMixin
 from sqlalchemy.dialects.mysql import INTEGER, BOOLEAN, BIGINT
@@ -189,9 +189,8 @@ class User(db.Model, UserMixin):
 			try:
 				db.session.add(rating)
 				db.session.commit()
-				flash("Created new individual rating.",'success')
 			except:
-				flash("An error occured.",'danger')
+				abort(500)
 				
 		return rating
 

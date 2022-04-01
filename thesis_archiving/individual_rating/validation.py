@@ -44,5 +44,4 @@ class IndividualRatingSchema(Schema):
                 err["attire"] = ["Field cannot be empty."]
 
         if err:
-            flash("Cannot leave an empty field.", "danger")
             raise ValidationError(err)

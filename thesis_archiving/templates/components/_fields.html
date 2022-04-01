@@ -129,9 +129,8 @@
         'Poor': 1,
         'Below Average': 2,
         'Average': 3,
-        'Above Average': 4,
-        'Good': 5,
-        'Very Good' : 6
+        'Good': 4,
+        'Very Good' : 5
     } %}
             
     <label class="form-label h6">{{criteria}}</label>
@@ -140,10 +139,10 @@
 
     <div class="d-flex justify-content-around">
 
-        {% for k,v in labels.items() %}
+        {% for k,v in labels.items()|sort(attribute='1', reverse=True) %}
         
         <div>
-            <input class="form-check-input" type="radio" name="{{name}}" value="{{v}}">
+            <input class="form-check-input" type="radio" name="{{name}}" onclick="update_total_score()" value="{{v}}">
         
             <label class="form-check-label">
                 {{k}}

@@ -60,38 +60,38 @@ def grading(thesis_id, proponent_id):
         'invalid' : {}
     }
 
-    if request.method == "POST":
+    # if request.method == "POST":
         
-        # contains form data converted to mutable dict
-        data = request.form.to_dict()
-        result = validate_input(data, IndividualRatingSchema)
+    #     # contains form data converted to mutable dict
+    #     data = request.form.to_dict()
+    #     result = validate_input(data, IndividualRatingSchema)
 
-        if not result["invalid"]:
+    #     if not result["invalid"]:
             
-            data = result["valid"]
+    #         data = result["valid"]
 
-            if data.get("intelligent_response"):
-                individual_rating_.intelligent_response = data["intelligent_response"]
+    #         if data.get("intelligent_response"):
+    #             individual_rating_.intelligent_response = data["intelligent_response"]
             
-            if data.get("respectful_response"):
-                individual_rating_.respectful_response = data["respectful_response"]
+    #         if data.get("respectful_response"):
+    #             individual_rating_.respectful_response = data["respectful_response"]
 
-            if data.get("communication_skills"):
-                individual_rating_.communication_skills = data["communication_skills"]
+    #         if data.get("communication_skills"):
+    #             individual_rating_.communication_skills = data["communication_skills"]
 
-            if data.get("confidence"):
-                individual_rating_.confidence = data["confidence"]
+    #         if data.get("confidence"):
+    #             individual_rating_.confidence = data["confidence"]
 
-            if data.get("attire"):
-                individual_rating_.attire = data["attire"]
+    #         if data.get("attire"):
+    #             individual_rating_.attire = data["attire"]
 
-            individual_rating_.is_final = data["is_final"] if data.get("is_final") else False
+    #         individual_rating_.is_final = data["is_final"] if data.get("is_final") else False
 
-            try:
-                db.session.commit()
-                flash("Successfully graded.","success")
-            except:
-                flash("An error occured while trying to grade.","danger")
+    #         try:
+    #             db.session.commit()
+    #             flash("Successfully graded.","success")
+    #         except:
+    #             flash("An error occured while trying to grade.","danger")
     # submit for SAVE
     # submit for GRADING (is_final) boolean nalang to lol checkable
     # CONFIRMATION MODALS
@@ -136,7 +136,6 @@ def ajax_grading(thesis_id, proponent_id):
 
 
     if request.method == 'POST':
-        time.sleep(3);
         
         # contains form data converted to mutable dict
         data = request.form.to_dict()
@@ -165,9 +164,8 @@ def ajax_grading(thesis_id, proponent_id):
 
             try:
                 db.session.commit()
-                flash("Successfully graded.","success")
             except:
-                flash("An error occured while trying to grade.","danger")
+                abort(500)
     
     individual_rating_ = {
         "intelligent_response" : individual_rating_.intelligent_response,

@@ -44,8 +44,6 @@ def login():
                 log = Log(description=f"Logged in.")
                 log.user = current_user
 
-                print("WWWWWWWWWWWWWWWWWWWww")
-
                 try:
                     db.session.add(log)
                     db.session.commit()

@@ -17,16 +17,6 @@ from num2words import num2words as nw
 
 group = Blueprint("group", __name__, url_prefix="/group")
 
-@group.route('/test/<int:id>', methods=['POST','GET'])
-def test(id):
-    errors = []
-
-    if request.method == 'POST':
-        if request.form['username'] != 'admin':
-            errors.append('Wrong answer bitch')
-
-    return render_template('group/test.html', id=id, errors=errors)
-
 @group.route("/create", methods=["POST","GET"])
 @login_required
 @has_roles("is_admin")
