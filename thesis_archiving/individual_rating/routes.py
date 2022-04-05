@@ -103,7 +103,6 @@ def grading(thesis_id, proponent_id):
 @login_required
 @has_roles("is_adviser", "is_guest_panelist")
 def ajax_grading(thesis_id, proponent_id):
-
     # check if thesis is valid
     thesis = Thesis.query.get_or_404(thesis_id)
 

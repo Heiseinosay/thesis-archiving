@@ -149,7 +149,7 @@
 
                             <div class="d-flex justify-content-end">
                                 {% if group.chairman == current_user %}
-                                    <button type="button" class="btn btn-outline-ueccss me-2" data-bs-toggle="modal" data-bs-target="#compiledRevisionNotes">
+                                    <button type="button" class="btn btn-outline-ueccss me-2 compiled-revision" data-bs-toggle="modal" data-bs-target="#compiledRevision">
                                         See compiled revision notes
                                     </button>
                                 {% endif %}
@@ -168,7 +168,8 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="compiledRevisionNotes" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<div class="modal fade" id="compiledRevision" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -176,15 +177,23 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+            <input type="hidden" name="link" value="{{url_for('thesis.ajax_revision_list', thesis_id=thesis.id)}}">
 
-            {% for revision in thesis.revision_lists %}
-                {% if revision.panelist in group.panelists %}
-                <div class="mb-3">
-                    <label class="form-label h6">{{'You' if revision.panelist == current_user else revision.panelist.full_name}}</label>
-                    <textarea class="form-control" rows="5" disabled>{{revision.comment}}</textarea>
-                </div>
-                {% endif %}
-          {% endfor %}
+            <h3 class="loading">Loading...</h3>
+
+            <div class="compilation">
+                <!-- removed -->
+                {#
+                {% for revision in thesis.revision_lists %}
+                    {% if revision.panelist in group.panelists %}
+                    <div class="mb-3">
+                        <label class="form-label h6">{{'You' if revision.panelist == current_user else revision.panelist.full_name}}</label>
+                        <textarea class="form-control" rows="5" disabled>{{revision.comment}}</textarea>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                #}
+            </div>
 
         </div>
         <div class="modal-footer">
@@ -196,6 +205,21 @@
 
 {% endblock %}
 
+<!-- 
+TODO
+//- .sleep the route
+//- .fail catch
+// - grab yung current input and overwrite yung na fetch for the chairman
+//- display revisions
+// - delete old loop
+- test 
+    - kung nag rereflect and notes (login another user)
+    - delete revisions ng mga panel
+    //- invoke an error, open the modal twice
+    //    - try din to sa indiv rating
+    //    - baka hindi nag rereflect yung error by the second open
+-->
+
 {% block script %}
 $(document).ready(function() {
     console.log('ready');
@@ -206,7 +230,48 @@ $(document).ready(function() {
         }
      });
     
+    
+     $("button.compiled-revision").click(function() {
+        const modalId = $(this).attr('data-bs-target');
+        const modalDiv = $(modalId);
+        const modalBody = modalDiv.find('.modal-body');
+        const loadingDiv = modalBody.find('.loading');
+        const compilation = modalBody.find('.compilation');
+        const link = modalBody.find('input[name="link"]').val();
+        const revisionInput = $("textarea[name=comment]").val();
 
+        // loading indicator
+        loadingDiv.html('Loading...');
+        loadingDiv.show();
+        compilation.hide();
+        
+        $.ajax(
+            link
+        ).done(function(data){
+
+            // hide loading
+            loadingDiv.hide();
+            compilation.show();
+            
+            data['revision']['You'] = revisionInput;
+            var revisionNotesHTML = ``;
+            // loop each revision
+            $.each(data['revision'], function(panelist, revisionNotes) {
+                revisionNotesHTML = revisionNotesHTML + `
+<div class="mb-3">
+    <label class="form-label h6">`+panelist+`</label>
+    <textarea class="form-control" rows="5" disabled>`+revisionNotes+`</textarea>
+</div>
+                `;
+            });
+
+            compilation.html(revisionNotesHTML);
+
+        }).fail(function(data) {
+            loadingDiv.html('An error occured. Please refresh the page.');
+        });
+
+     });
     
 
 
@@ -219,7 +284,10 @@ $(document).ready(function() {
         const submit_button = form.find("button[type=submit]");
         const link = form.find('input[name="link"]').val();
         
+        loadingDiv.html('Loading...');
+        loadingDiv.show();
         form.hide();
+        
         $.ajax(
             link
         ).done(function(data) {

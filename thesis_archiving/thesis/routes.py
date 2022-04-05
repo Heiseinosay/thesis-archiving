@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, send_from_directory, flash, abort, current_app
 from flask.helpers import send_file
 from flask_login import login_required, current_user
+import time
 
 from sqlalchemy import or_, and_
 
@@ -480,3 +481,19 @@ def download_proposal_form(thesis_id):
         return send_file(path, attachment_filename=thesis.proposal_form, as_attachment=False, mimetype='application/pdf')
     else:
         abort(404)
+
+@thesis.route("<int:thesis_id>/revision-list")
+@login_required
+@has_roles("is_adviser", "is_guest_panelist")
+def ajax_revision_list(thesis_id):
+
+    thesis_ = Thesis.query.get_or_404(thesis_id)
+    revision = thesis_.check_revision_lists(current_user)
+    revision = {
+        
+        ('You' if revision.panelist == current_user else revision.panelist.full_name)\
+            :revision.comment
+        for revision in thesis_.revision_lists
+    }
+
+    return {'revision':revision}
