@@ -1,0 +1,30 @@
+{% macro quantitative_rating(label, thesis, quantitative_rating) %}
+<button type="button" class="btn btn-sm btn-ueccss quantitative-rating" data-bs-toggle="modal" data-bs-target="#quantitative-rating-{{quantitative_rating.id}}" id="quantitative-rating-button"> {{label}}
+</button>
+
+<div class="modal fade" id="quantitative-rating-{{quantitative_rating.id}}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>
+                    Quantitative Rating
+                    <span class="text-muted h5">{{thesis.title}}</span>
+                </h5>
+            </div>
+            
+            <div class="modal-body">
+                <h6>
+                    {{ quantitative_rating.name }}
+                </h6>
+
+                
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endmacro %}

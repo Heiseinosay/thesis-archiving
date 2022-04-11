@@ -1,6 +1,6 @@
 {% from 'components/_proponent_card.html' import proponent_card %}
 {% from "components/_fields.html" import field_checkbox, field_textarea, field_individual_rating %}
-
+{% from "components/_quantitative_rating.html" import quantitative_rating %}
 {% extends "base.html" %}
 
 {% block body %}
@@ -98,10 +98,24 @@
                                             <div class="d-grid gap-2">
                                                 {% if thesis.quantitative_rating_id %}
                                                 <a class="btn btn-sm btn-ueccss" href="{{ url_for('quantitative_rating.grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=thesis.quantitative_rating_id) }}" role="button" target="_blank">Manuscript Rating</a>
+                                                
+                                                {{quantitative_rating(
+                                                    label="Manuscript Rating",
+                                                    thesis=thesis,
+                                                    quantitative_rating=thesis.manuscript_rating
+                                                    )}}
+                                                
+
                                                 {% endif %}
                                                 
                                                 {% if thesis.quantitative_rating_developed_id %}
                                                 <a class="btn btn-sm btn-ueccss" href="{{ url_for('quantitative_rating.grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=thesis.quantitative_rating_developed_id) }}" role="button" target="_blank">Developed Thesis Project Rating</a>
+                                                    
+                                                {{quantitative_rating(
+                                                    label="Developed Thesis Project Rating",
+                                                    thesis=thesis,
+                                                    quantitative_rating=thesis.developed_thesis_rating
+                                                    )}}
                                                 {% endif %}
                                                 
                                             </div>
@@ -169,6 +183,7 @@
 
 <!-- Modal -->
 
+<!-- revision notes -->
 <div class="modal fade" id="compiledRevision" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -203,6 +218,8 @@
     </div>
   </div>
 
+
+
 {% endblock %}
 
 <!-- 
@@ -220,6 +237,35 @@ TODO
     //    - baka hindi nag rereflect yung error by the second open
 -->
 
+
+<!-- 
+    
+TODO QUANTITATIVE
+-onclick, show modal
+-if fetch success on modal, add listener to '.quantitative-rating-form'
+- loop object and set values if meron
+-grab all fields
+-send through ajax
+-check all fields if is_final is checked
+    - commit all valid
+        - show if success posting
+     - set invalid fields to invalid
+    - force a server error na hindi validation error
+        - when submitting
+        - when commmiting 
+        - icatch lahat and show "An error occured. Please refresh the page."
+
+- disable is final habang nag susubmit para safe
+-mark success/ongoing
+- nag error sa Very Good maski complete data
+    - http://localhost:5000/group/grading/14/235
+- error pag walang indiv rating
+   - http://localhost:5000/group/grading/14/460
+- comment out yung POST ng indiv rating na hindi async
+
+
+ -->
+
 {% block script %}
 $(document).ready(function() {
     console.log('ready');
@@ -230,7 +276,13 @@ $(document).ready(function() {
         }
      });
     
-    
+    //==================REVISION NOTES===============================
+     $("button.quantitative-rating").click(function() {
+         console.log("suh");
+
+     });
+
+    //==================REVISION NOTES===============================
      $("button.compiled-revision").click(function() {
         const modalId = $(this).attr('data-bs-target');
         const modalDiv = $(modalId);
@@ -275,6 +327,7 @@ $(document).ready(function() {
     
 
 
+     //==================INDIVIDUAL NOTES===============================
     $("button.individual-rating").click(function() {
         const modalId = $(this).attr('data-bs-target');
         const modalDiv = $(modalId);
