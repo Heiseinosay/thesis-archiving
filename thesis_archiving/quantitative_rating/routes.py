@@ -227,6 +227,11 @@ def grading(group_id, thesis_id, quantitative_rating_id):
         result=result
         )
 
+@quantitative_rating.route("/grading/<int:group_id>/<int:thesis_id>/<int:quantitative_rating_id>", methods=['POST','GET'])
+@login_required
+@has_roles("is_adviser", "is_guest_panelist")
+def ajax_grading(group_id, thesis_id, quantitative_rating_id):
+    return "hey"
 
 
 @quantitative_rating.route("/delete/<int:quantitative_rating_id>", methods=['POST'])

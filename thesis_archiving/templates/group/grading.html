@@ -241,28 +241,22 @@ TODO
 <!-- 
     
 TODO QUANTITATIVE
--onclick, show modal
--if fetch success on modal, add listener to '.quantitative-rating-form'
-- loop object and set values if meron
--grab all fields
--send through ajax
--check all fields if is_final is checked
-    - commit all valid
-        - show if success posting
-     - set invalid fields to invalid
-    - force a server error na hindi validation error
-        - when submitting
-        - when commmiting 
-        - icatch lahat and show "An error occured. Please refresh the page."
-
-- disable is final habang nag susubmit para safe
--mark success/ongoing
-- nag error sa Very Good maski complete data
-    - http://localhost:5000/group/grading/14/235
-- error pag walang indiv rating
-   - http://localhost:5000/group/grading/14/460
-- comment out yung POST ng indiv rating na hindi async
-
+//-onclick, show modal
+    - render fields w/ proper names
+    -fetch panelist grade
+        - loading display maski hanggang nth click
+        - success
+            - loop val set in field
+        - fail
+            - msg
+- on submit
+    - check quanti status, update DONE indicator
+    - loading indicator
+    - disable checkbox
+    - success
+        - is-valid
+    - fail
+        - is-invalid
 
  -->
 
@@ -276,11 +270,22 @@ $(document).ready(function() {
         }
      });
     
-    //==================REVISION NOTES===============================
-     $("button.quantitative-rating").click(function() {
-         console.log("suh");
+    //==================QUANTIATIVE RATING===============================
+    $("button.quantitative-rating").click(function() {
+        const modalId = $(this).attr('data-bs-target');
+        const modalDiv = $(modalId);
+        const modalBody = modalDiv.find('.modal-body');
+        //const loadingDiv = modalBody.find('.loading');
+        const form = modalBody.find('form');
+        //const submit_button = form.find("button[type=submit]");
+        const link = form.find('input[name="link"]').val();
 
-     });
+        console.log(link);
+
+    });
+
+
+
 
     //==================REVISION NOTES===============================
      $("button.compiled-revision").click(function() {
@@ -327,7 +332,7 @@ $(document).ready(function() {
     
 
 
-     //==================INDIVIDUAL NOTES===============================
+     //==================INDIVIDUAL GRADING===============================
     $("button.individual-rating").click(function() {
         const modalId = $(this).attr('data-bs-target');
         const modalDiv = $(modalId);

@@ -1,4 +1,4 @@
-{% macro quantitative_rating(label, thesis, quantitative_rating) %}
+{% macro quantitative_rating(label, group_id, thesis, quantitative_rating) %}
 <button type="button" class="btn btn-sm btn-ueccss quantitative-rating" data-bs-toggle="modal" data-bs-target="#quantitative-rating-{{quantitative_rating.id}}" id="quantitative-rating-button"> {{label}}
 </button>
 
@@ -16,6 +16,9 @@
                 <h6>
                     {{ quantitative_rating.name }}
                 </h6>
+                <form>
+                    <input type="hidden" name="link" value="{{ url_for('quantitative_rating.ajax_grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=quantitative_rating.id) }}">
+                </form>
 
                 
             </div>
