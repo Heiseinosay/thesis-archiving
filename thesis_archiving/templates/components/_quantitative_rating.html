@@ -1,3 +1,5 @@
+{% from "components/_fields.html" import field_checkbox, field_ajax_quantitative_rating %}
+
 {% macro quantitative_rating(label, group_id, thesis, quantitative_rating) %}
 <button type="button" class="btn btn-sm btn-ueccss quantitative-rating" data-bs-toggle="modal" data-bs-target="#quantitative-rating-{{quantitative_rating.id}}" id="quantitative-rating-button"> {{label}}
 </button>
@@ -18,6 +20,36 @@
                 </h6>
                 <form>
                     <input type="hidden" name="link" value="{{ url_for('quantitative_rating.ajax_grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=quantitative_rating.id) }}">
+
+                    <ol>    
+
+                        {% for criteria in quantitative_rating.criteria %}
+                            {% set descriptions = {} %}
+                            
+                            {% for rating in criteria.ratings %}
+                                {% set descriptions = descriptions.update(
+                                        {rating.rate:rating.description}
+                                    )
+                                %}
+
+                            {% endfor %}
+
+                            <li>
+                                <div class="mt-4 mb-5">
+                                    {{ 
+                                        field_ajax_quantitative_rating(
+                                            name=criteria.name, 
+                                            max_grade=quantitative_rating.max_grade, 
+                                            description=criteria.description, 
+                                            descriptions=descriptions
+                                            ) 
+                                    }}
+                                </div>
+                            </li>
+                        {% endfor %}
+                        
+                        
+                    </ol>
                 </form>
 
                 
@@ -31,3 +63,4 @@
 </div>
 
 {% endmacro %}
+

@@ -242,8 +242,10 @@ TODO
     
 TODO QUANTITATIVE
 //-onclick, show modal
-    - render fields w/ proper names
-    -fetch panelist grade
+    // - fetch criteria and stuff
+    // - render fields w/ proper names
+     - is final
+    // - fetch panelist grade
         - loading display maski hanggang nth click
         - success
             - loop val set in field
@@ -251,13 +253,14 @@ TODO QUANTITATIVE
             - msg
 - on submit
     - check quanti status, update DONE indicator
+    - is_final
     - loading indicator
     - disable checkbox
     - success
         - is-valid
     - fail
         - is-invalid
-
+- 2021 - BSEMC-DA - CEM 4980 not showing description and stuff
  -->
 
 {% block script %}
@@ -280,7 +283,11 @@ $(document).ready(function() {
         //const submit_button = form.find("button[type=submit]");
         const link = form.find('input[name="link"]').val();
 
-        console.log(link);
+        $.ajax(
+            link
+        ).done(function(data){
+            console.log(data);
+        });
 
     });
 

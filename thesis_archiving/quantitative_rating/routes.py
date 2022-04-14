@@ -227,11 +227,59 @@ def grading(group_id, thesis_id, quantitative_rating_id):
         result=result
         )
 
-@quantitative_rating.route("/grading/<int:group_id>/<int:thesis_id>/<int:quantitative_rating_id>", methods=['POST','GET'])
+@quantitative_rating.route("/ajax-grading/<int:group_id>/<int:thesis_id>/<int:quantitative_rating_id>", methods=['POST','GET'])
 @login_required
 @has_roles("is_adviser", "is_guest_panelist")
 def ajax_grading(group_id, thesis_id, quantitative_rating_id):
-    return "hey"
+    
+    group_ = Group.query.get_or_404(group_id)
+    thesis_ = Thesis.query.get_or_404(thesis_id)
+    
+    check_panelists(current_user, group_)
+
+    if thesis_ not in group_.presentors:
+        abort(406)
+    
+    quantitative_rating_ = QuantitativeRating.query.get_or_404(quantitative_rating_id)
+
+    # if not in either manuscript or developed
+    if not (thesis_ in quantitative_rating_.theses or thesis_ in quantitative_rating_.developed_theses):
+        abort(406)
+
+    current_user.check_quantitative_panelist_grade(thesis_, quantitative_rating_)
+
+    quantitative_panelist_grade_ = db.session.query(QuantitativePanelistGrade).where(
+			and_(
+					# get the panelist id who graded those criteria
+					QuantitativePanelistGrade.id.in_(
+						db.session.query(QuantitativeCriteriaGrade.quantitative_panelist_grade_id).where(
+							# get id of grades pointing to those criteria
+							QuantitativeCriteriaGrade.quantitative_criteria_id.in_(
+								# obtain all id ng MANUSCRIPT rating criteria ng thesis
+								db.session.query(QuantitativeCriteria.id).where(QuantitativeCriteria.quantitative_rating_id == quantitative_rating_.id)        
+							)
+						)
+					),
+					QuantitativePanelistGrade.thesis_id == thesis_.id,
+					QuantitativePanelistGrade.panelist_id == current_user.id
+				)
+			).first()
+    
+    quantitative_panelist_grade_ = {
+        grade.criteria.name : {
+            "grade" : grade.grade,
+            "description" : grade.criteria.description,
+            "ratings" : {
+                rating.rate : rating.description
+                for rating in grade.criteria.ratings
+            }
+        }
+        for grade in quantitative_panelist_grade_.grades
+    }
+    
+    return {
+        "quantitative_panelist_grade" : quantitative_panelist_grade_
+    }
 
 
 @quantitative_rating.route("/delete/<int:quantitative_rating_id>", methods=['POST'])
