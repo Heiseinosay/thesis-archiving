@@ -243,14 +243,13 @@ TODO
 TODO QUANTITATIVE
 //-onclick, show modal
     // - fetch criteria and stuff
-    // - render fields w/ proper names
-     - is final
+    // - render fields w/ proper names, is final
     // - fetch panelist grade
-        - loading display maski hanggang nth click
-        - success
-            - loop val set in field
-        - fail
-            - msg
+        // - loading display maski hanggang nth click
+        //- success
+          //  - loop val set in field
+        //- fail
+          //  - msg
 - on submit
     - check quanti status, update DONE indicator
     - is_final
@@ -260,7 +259,10 @@ TODO QUANTITATIVE
         - is-valid
     - fail
         - is-invalid
+- test
+    - check if mag generate ng grade pag wala pa
 - 2021 - BSEMC-DA - CEM 4980 not showing description and stuff
+- scoring js
  -->
 
 {% block script %}
@@ -278,15 +280,120 @@ $(document).ready(function() {
         const modalId = $(this).attr('data-bs-target');
         const modalDiv = $(modalId);
         const modalBody = modalDiv.find('.modal-body');
-        //const loadingDiv = modalBody.find('.loading');
+        const loadingDiv = modalBody.find('.loading');
         const form = modalBody.find('form');
         //const submit_button = form.find("button[type=submit]");
         const link = form.find('input[name="link"]').val();
 
+        loadingDiv.html('Loading...');
+        loadingDiv.show();
+        form.hide();
+
         $.ajax(
             link
         ).done(function(data){
+            // form listener
+            form.submit(function(event) {
+                event.preventDefault();
+                
+                // show loader button
+                //submit_button.attr('disabled', ' ');
+                //submit_button.find('.spinner-border').removeClass('visually-hidden');
+                //submit_button.find('.status').html('Saving...');
+                //submit_button.find('.spinner-border');
+                
+                let quantitativeRatingFields = form.find('input.field-quantitative-rating:checked')
+                
+                let data = {}
+                $.each(quantitativeRatingFields, function(key, value) {
+                    data[$(value).attr("name")] = $(value).val();
+                });
+
+                data["is_final"] = Boolean(form.find('input[name="is_final"]:checked').val();
+
+                console.log(data);
+                // disable is final
+                form.find('input[name=is_final]').attr('disabled','');
+
+                $.ajax(
+                    {
+                        method: 'POST',
+                        url: link,
+                        data: data
+                    }
+                ).done(function(data) {
+                    
+                    // valid data
+                    $.each(data['result']['valid'], function(key, value) {
+                        var selector;
+                        if (!(key === 'is_final')) {
+                            selector = 'input[name=' + key + ']';
+                        }
+
+                        form.find(selector).removeClass("is-invalid");
+                        form.find(selector).addClass("is-valid");
+                    });
+
+                }).fail(function(data) {
+                    if (data.status === 406) {
+                        // invalid data
+                        $.each(data['responseJSON']['invalid'], function(key, value) {
+                            var selector;
+                            if (!(key === 'is_final')) {
+                                selector = 'input[name=' + key + ']';
+                            }
+    
+    
+                            form.find(selector).removeClass("is-valid");
+                            form.find(selector).addClass("is-invalid");
+                        });
+    
+                        // valid data
+                        $.each(data['responseJSON']['valid'], function(key, value) {
+                            var selector;
+                            if (!(key === 'is_final')) {
+                                selector = 'input[name=' + key + ']';
+                            }
+    
+                            form.find(selector).removeClass("is-invalid");
+                            form.find(selector).addClass("is-valid");
+                        });
+                    } else {
+                        alert('An error occured. Please refresh the page.');
+                    }
+
+                }).always(function() {
+
+                    console.log('always');
+
+                });
+
+
+            });
+
             console.log(data);
+            loadingDiv.hide();
+            form.show();
+
+            // fill each value
+            $.each( data['quantitative_panelist_grade'], function(key, value) {
+                
+                var selector;
+                
+                if (key === 'is_final') {
+                    // selector = 'input[name=' + key + '][value=' + (value ? '1' : '0') + ']';
+
+                    selector = `input[name='${key}'][value='${value ? '1' : '0'}']`;
+                } else {
+                    selector = `input[name='${key}'][value=${value['grade']}]`;
+                }
+
+                form.find(selector).attr("checked","");
+                
+            });
+
+        }).fail(function(data) {
+            loadingDiv.html('<h3>An error occured. Please refresh the page.</h3>');
         });
 
     });
@@ -478,7 +585,7 @@ $(document).ready(function() {
 
 
         }).fail(function(data) {
-            loadingDiv.html('<h3>An error occured. Please refresh.</h3>');
+            loadingDiv.html('<h3>An error occured. Please refresh the page.</h3>');
         });
 
 

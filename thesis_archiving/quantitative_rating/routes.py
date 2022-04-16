@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, abort
+
+from flask import Blueprint, render_template, request, flash, redirect, url_for, abort, jsonify
 
 from flask_login import login_required, current_user
 from sqlalchemy import and_
@@ -14,7 +15,7 @@ from thesis_archiving.quantitative_rating.validation import CreateQuantitativeRa
 from thesis_archiving.group.utils import check_panelists
 
 from pprint import pprint
-
+import time
 quantitative_rating = Blueprint("quantitative_rating", __name__, url_prefix="/quantitative_rating")
 
 @quantitative_rating.route("/read")
@@ -265,6 +266,8 @@ def ajax_grading(group_id, thesis_id, quantitative_rating_id):
 				)
 			).first()
     
+    is_final = quantitative_panelist_grade_.is_final
+
     quantitative_panelist_grade_ = {
         grade.criteria.name : {
             "grade" : grade.grade,
@@ -277,9 +280,12 @@ def ajax_grading(group_id, thesis_id, quantitative_rating_id):
         for grade in quantitative_panelist_grade_.grades
     }
     
-    return {
+    quantitative_panelist_grade_["is_final"] = is_final
+
+    time.sleep(1)
+    return jsonify({
         "quantitative_panelist_grade" : quantitative_panelist_grade_
-    }
+    })
 
 
 @quantitative_rating.route("/delete/<int:quantitative_rating_id>", methods=['POST'])

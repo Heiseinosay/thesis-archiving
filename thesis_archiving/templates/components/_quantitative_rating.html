@@ -18,6 +18,7 @@
                 <h6>
                     {{ quantitative_rating.name }}
                 </h6>
+                <h3 class="loading">Loading...</h3>
                 <form>
                     <input type="hidden" name="link" value="{{ url_for('quantitative_rating.ajax_grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=quantitative_rating.id) }}">
 
@@ -42,7 +43,7 @@
                                             max_grade=quantitative_rating.max_grade, 
                                             description=criteria.description, 
                                             descriptions=descriptions
-                                            ) 
+                                        ) 
                                     }}
                                 </div>
                             </li>
@@ -50,6 +51,27 @@
                         
                         
                     </ol>
+
+                    <div class="mt-5 mb-3 mx-3 d-flex justify-content-between">
+                                    
+                        
+                        <p><strong>Total Score: </strong> <span id="grading-score">0</span>/<span id="total-items">25</span></p>
+                        
+                        <p><strong>Percentage: </strong> <span id="grading-percent">0</span></p>
+                        
+                        <p><strong>11-Point: </strong> <span id="grading-point">0</span></p>
+                        
+                        <div>
+                            <input class="form-check-input" name="is_final" type="checkbox" value="1">
+                            <label class="form-check-label">
+                                Mark as final to be included for grading.
+                            </label>
+
+                        </div>
+
+                        <button type="submit" class="btn btn-ueccss">Save</button>
+
+                    </div>
                 </form>
 
                 
