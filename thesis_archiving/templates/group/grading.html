@@ -256,12 +256,12 @@ TODO QUANTITATIVE
     // - is_final disable
     //- loading indicator
     //- disable checkbox
-    - success
-        - is-valid
-    - fail
-        - is-invalid
-        - is-valid
-        - gen error
+    //- success
+        //- is-valid
+    //- fail
+        //- is-invalid
+        //- is-valid
+        //- gen error
 - test
     - check if mag generate ng grade pag wala pa
 - 2021 - BSEMC-DA - CEM 4980 not showing description and stuff
@@ -312,9 +312,8 @@ $(document).ready(function() {
                     data[$(value).attr("name")] = $(value).val();
                 });
 
+                data["csrf_token"] = '{{csrf_token()}}'
                 data["is_final"] = Boolean(form.find('input[name="is_final"]:checked').val());
-
-                console.log(data);
                 
                 // disable is final
                 form.find('input[name=is_final]').attr('disabled','');
@@ -326,13 +325,50 @@ $(document).ready(function() {
                         data: data
                     }
                 ).done(function(data) {
+                    console.log(data);
                     
                     // valid data
-                    // IS-VALID
+                    $.each(data['result']['valid'], function(key, value) {
+                        var selector;
+                        if (!(key === 'is_final')) {
+                            selector = `input[name="${key}"]`;
+                        }
+
+                        form.find(selector).removeClass("is-invalid");
+                        form.find(selector).addClass("is-valid");
+                    });
 
                 }).fail(function(data) {
-                    // IS-INVALID and IS-VALID
-                    // GENERAL ERROR
+                    
+
+                    if (data.status === 406) {
+                        alert('Cannot leave an empty field.');
+                        // invalid data
+                        $.each(data['responseJSON']['invalid'], function(key, value) {
+                            var selector;
+                            if (!(key === 'is_final')) {
+                                selector = `input[name="${key}"]`;
+                            }
+    
+    
+                            form.find(selector).removeClass("is-valid");
+                            form.find(selector).addClass("is-invalid");
+                        });
+    
+                        // valid data
+                        $.each(data['responseJSON']['valid'], function(key, value) {
+                            var selector;
+                            if (!(key === 'is_final')) {
+                                selector = `input[name="${key}"]`;
+                            }
+    
+                            form.find(selector).removeClass("is-invalid");
+                            form.find(selector).addClass("is-valid");
+                        });
+                    } else {
+                        // general error
+                        alert('An error occured. Please refresh the page.');
+                    }
 
                 }).always(function() {
 
@@ -489,6 +525,7 @@ $(document).ready(function() {
 
                 }).fail(function(data) {
                     if (data.status === 406) {
+                        alert('Cannot leave an empty field.');
                         // invalid data
                         $.each(data['responseJSON']['invalid'], function(key, value) {
                             var selector;

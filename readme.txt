@@ -22,3 +22,11 @@ pulling w/ db updates:
 Reminders:
     Replace requirements.txt versions to the last working version for packages or you may encounter pip install errors in godaddy
 
+Errors you may encounter in the futre:
+    XAMPP:
+        - Apache shutdown unexpectedly
+            - https://stackoverflow.com/questions/18300377/how-to-solve-error-apache-shutdown-unexpectedly
+        - MySQL shutdown unexpectedly
+            - https://stackoverflow.com/questions/18022809/how-to-solve-error-mysql-shutdown-unexpectedly/61859561#61859561
+            - https://stackoverflow.com/questions/18022809/how-to-solve-error-mysql-shutdown-unexpectedly/67734073#67734073
+        
