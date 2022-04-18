@@ -21,8 +21,12 @@
                 <h3 class="loading">Loading...</h3>
                 <form>
                     <input type="hidden" name="link" value="{{ url_for('quantitative_rating.ajax_grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=quantitative_rating.id) }}">
+                    
+                    <input type="hidden" name="quantitative-rating-done" value="">
+                    <ol>
 
-                    <ol>    
+                        <input type="hidden" name="label" value="{{label}}">
+                        
 
                         {% for criteria in quantitative_rating.criteria %}
                             {% set descriptions = {} %}
@@ -34,6 +38,7 @@
                                 %}
 
                             {% endfor %}
+                            
 
                             <li>
                                 <div class="mt-4 mb-5">

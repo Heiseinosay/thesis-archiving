@@ -4,7 +4,7 @@
 {% extends "base.html" %}
 
 {% block body %}
-
+{% set quantitative_rating_done = {} %}
 <div class="container py-3">
     <div class="row justify-content-center">
         <div class="col-12 col-lg-8 mb-3">
@@ -91,31 +91,38 @@
                                         
                                         <h4>
                                             Quantitative Rating
-                                            <span class="badge bg-{{ 'success' if quantitative_status else 'warning' }}">{{ 'DONE' if quantitative_status else 'ONGOING' }}</span>
+                                            <span class="badge bg-{{ 'success' if quantitative_status else 'warning' }} quantitative-rating-badge">{{ 'DONE' if quantitative_status else 'ONGOING' }}</span>
                                         </h4>
-                                        
+                                        {{quantitative_panelist_grade}}
                                         <div class="border p-3">
                                             <div class="d-grid gap-2">
                                                 {% if thesis.quantitative_rating_id %}
                                                 <a class="btn btn-sm btn-ueccss" href="{{ url_for('quantitative_rating.grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=thesis.quantitative_rating_id) }}" role="button" target="_blank">Manuscript Rating</a>
                                                 
+                                                <input type="hidden" class="quantitative-rating-form" name="Manuscript Rating" value="">
+
                                                 {{quantitative_rating(
                                                     label="Manuscript Rating",
                                                     thesis=thesis,
                                                     quantitative_rating=thesis.manuscript_rating
                                                     )}}
                                                 
+                                                    
 
                                                 {% endif %}
                                                 
                                                 {% if thesis.quantitative_rating_developed_id %}
+
+                                                <input type="hidden" class="quantitative-rating-form" name="Developed Thesis Project Rating" value>
+
                                                 <a class="btn btn-sm btn-ueccss" href="{{ url_for('quantitative_rating.grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=thesis.quantitative_rating_developed_id) }}" role="button" target="_blank">Developed Thesis Project Rating</a>
-                                                    
                                                 {{quantitative_rating(
                                                     label="Developed Thesis Project Rating",
                                                     thesis=thesis,
                                                     quantitative_rating=thesis.developed_thesis_rating
                                                     )}}
+                                                
+                                                
                                                 {% endif %}
                                                 
                                             </div>
@@ -253,6 +260,9 @@ TODO QUANTITATIVE
 - on submit
     - check quanti status, update DONE indicator
         - create a global var for checking
+        - set value for hidden fields in ratings based on is_final <input type="hidden" class="quantitative-rating-form" name="Developed Thesis Project Rating" value>
+            - dahil hindi nagiging DONE unless ma submit mo both forms
+        - loading indicator when not is_final
     // - is_final disable
     //- loading indicator
     //- disable checkbox
@@ -266,11 +276,48 @@ TODO QUANTITATIVE
     - check if mag generate ng grade pag wala pa
 - 2021 - BSEMC-DA - CEM 4980 not showing description and stuff
 - scoring js
+// // hidden input on forms to show done
+// // if all hidden are done, mark done
+// // success and is_final, done, set rating checker to true
+// // success and not is_final, NOT DONE, set rating to false
+// // set class for status
+// // if all true, done and set color
  -->
+
 
 {% block script %}
 $(document).ready(function() {
-    console.log('ready');
+    
+    const quantitativeRatingForms = $("input.quantitative-rating-form");
+    let quantitativeRatingFormsDone = {}
+    
+    // set Quantative Rating forms for checker
+    $.each(quantitativeRatingForms, function(key, value) {
+        let inputObj = $(value);
+        quantitativeRatingFormsDone[inputObj.attr('name')] = inputObj.val();
+    });
+
+    // function to check if all quanti ratings are done and show indicator
+    var checkQuantitativeRating = quantitativeRatingFormsDone => {
+        // usage -> checkQuantitativeRating(quantitativeRatingFormsDone);
+
+        let badge = $("span.quantitative-rating-badge");
+
+        for (const [k, v] of Object.entries(quantitativeRatingFormsDone)) {
+            if (!v) {
+                badge.removeClass('bg-success');
+                badge.addClass('bg-warning');
+                badge.html('ONGOING');
+                return v;
+            }
+        }
+
+        badge.removeClass('bg-warning');
+        badge.addClass('bg-success');
+        badge.html('DONE');
+
+        return true;
+    }
 
     $.ajaxSetup({
         headers: {
@@ -287,6 +334,8 @@ $(document).ready(function() {
         const form = modalBody.find('form');
         const submit_button = form.find("button[type=submit]");
         const link = form.find('input[name="link"]').val();
+        const label = form.find('input[name="label"]').val();
+        const quantitativeRatingDoneField = form.find('input[name="quantitative-rating-done"]');
 
         loadingDiv.html('Loading...');
         loadingDiv.show();
@@ -325,7 +374,6 @@ $(document).ready(function() {
                         data: data
                     }
                 ).done(function(data) {
-                    console.log(data);
                     
                     // valid data
                     $.each(data['result']['valid'], function(key, value) {
@@ -337,6 +385,16 @@ $(document).ready(function() {
                         form.find(selector).removeClass("is-invalid");
                         form.find(selector).addClass("is-valid");
                     });
+                    
+                    if (data['result']['valid']['is_final']) {
+                        quantitativeRatingDoneField.val("DONE");
+                        quantitativeRatingFormsDone[label] = true;
+                    } else {
+                        quantitativeRatingDoneField.val("ONGOING");
+                        quantitativeRatingFormsDone[label] = false;
+                    }
+
+                    checkQuantitativeRating(quantitativeRatingFormsDone);
 
                 }).fail(function(data) {
                     

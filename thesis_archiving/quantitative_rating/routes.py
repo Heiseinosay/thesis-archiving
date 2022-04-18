@@ -290,7 +290,7 @@ def ajax_grading(group_id, thesis_id, quantitative_rating_id):
     if request.method == "POST":
         # contains form data converted to mutable dict
         data = request.form.to_dict()
-        pprint(data)
+        
         data["criteria"] = [ c.name for c in quantitative_rating_.criteria ]
         data["max_grade"] = quantitative_rating_.max_grade
         
