@@ -97,9 +97,17 @@
                                         <div class="border p-3">
                                             <div class="d-grid gap-2">
                                                 {% if thesis.quantitative_rating_id %}
-                                                <a class="btn btn-sm btn-ueccss" href="{{ url_for('quantitative_rating.grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=thesis.quantitative_rating_id) }}" role="button" target="_blank">Manuscript Rating</a>
                                                 
                                                 <input type="hidden" class="quantitative-rating-form" name="Manuscript Rating" value="">
+                                                <input type="hidden" name="quantiative_rating_status" value="
+                                                    {{ 
+                                                        url_for('quantitative_rating.status', 
+                                                        group_id=thesis.group_id, 
+                                                        thesis_id=thesis.id, quantitative_rating_id=thesis.quantitative_rating_id,
+                                                        label='Manuscript Rating') 
+                                                    }}
+                                                ">
+
 
                                                 {{quantitative_rating(
                                                     label="Manuscript Rating",
@@ -113,9 +121,16 @@
                                                 
                                                 {% if thesis.quantitative_rating_developed_id %}
 
-                                                <input type="hidden" class="quantitative-rating-form" name="Developed Thesis Project Rating" value>
+                                                <input type="hidden" class="quantitative-rating-form" name="Developed Thesis Project Rating" value="">
+                                                <input type="hidden" name="quantiative_rating_status" value="
+                                                    {{ 
+                                                        url_for('quantitative_rating.status', 
+                                                        group_id=thesis.group_id, 
+                                                        thesis_id=thesis.id, quantitative_rating_id=thesis.quantitative_rating_developed_id,
+                                                        label='Developed Thesis Project Rating') 
+                                                    }}
+                                                ">
 
-                                                <a class="btn btn-sm btn-ueccss" href="{{ url_for('quantitative_rating.grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=thesis.quantitative_rating_developed_id) }}" role="button" target="_blank">Developed Thesis Project Rating</a>
                                                 {{quantitative_rating(
                                                     label="Developed Thesis Project Rating",
                                                     thesis=thesis,
@@ -257,12 +272,14 @@ TODO QUANTITATIVE
           //  - loop val set in field
         //- fail
           //  - msg
-- on submit
+//- on submit
     - check quanti status, update DONE indicator
-        - create a global var for checking
-        - set value for hidden fields in ratings based on is_final <input type="hidden" class="quantitative-rating-form" name="Developed Thesis Project Rating" value>
+       // - create a global var for checking
+        //- set value for hidden fields in ratings based on is_final <input type="hidden" class="quantitative-rating-form" name="Developed Thesis Project Rating" value>
             - dahil hindi nagiging DONE unless ma submit mo both forms
-        - loading indicator when not is_final
+        // - loading indicator when not is_final hindi na eenable
+        //- test error on ajax status
+        - hindi nag oongoing pag nag not is_final
     // - is_final disable
     //- loading indicator
     //- disable checkbox
@@ -288,7 +305,30 @@ TODO QUANTITATIVE
 {% block script %}
 $(document).ready(function() {
     
-    const quantitativeRatingForms = $("input.quantitative-rating-form");
+    // get links to quanti status checker
+    const quantiativeRatingStatusLinks = $("input[name=quantiative_rating_status");
+
+    // set values for quanti indicators
+    $.each(quantiativeRatingStatusLinks, function(key, value) {
+        let link = $(value).val();
+        
+        $.ajax(
+            link
+        ).done(function(data) {
+            
+            var selector = `input.quantitative-rating-form[name='${data['label']}']` 
+            let field = $(selector);
+            field.val(data['is_final'] ? "DONE" : "ONGOING");
+            
+        }).fail(function(data) {
+            alert("An error occured. Please refresh the page.");
+        })
+
+    });
+
+    // get hidden fields for indicating DONE or ONGOING
+    var quantitativeRatingForms = $("input.quantitative-rating-form");
+    
     let quantitativeRatingFormsDone = {}
     
     // set Quantative Rating forms for checker
@@ -300,11 +340,16 @@ $(document).ready(function() {
     // function to check if all quanti ratings are done and show indicator
     var checkQuantitativeRating = quantitativeRatingFormsDone => {
         // usage -> checkQuantitativeRating(quantitativeRatingFormsDone);
+        quantitativeRatingForms = $("input.quantitative-rating-form");
+        // set Quantative Rating forms for checker
+        $.each(quantitativeRatingForms, function(key, value) {
+            let inputObj = $(value);
+            quantitativeRatingFormsDone[inputObj.attr('name')] = inputObj.val();
+        });
 
         let badge = $("span.quantitative-rating-badge");
-
         for (const [k, v] of Object.entries(quantitativeRatingFormsDone)) {
-            if (!v) {
+            if (v == "ONGOING") {
                 badge.removeClass('bg-success');
                 badge.addClass('bg-warning');
                 badge.html('ONGOING');
@@ -315,9 +360,9 @@ $(document).ready(function() {
         badge.removeClass('bg-warning');
         badge.addClass('bg-success');
         badge.html('DONE');
-
-        return true;
     }
+    
+    
 
     $.ajaxSetup({
         headers: {
@@ -388,9 +433,11 @@ $(document).ready(function() {
                     
                     if (data['result']['valid']['is_final']) {
                         quantitativeRatingDoneField.val("DONE");
+                        $(`input.quantitative-rating-form[name='${label}']`).val("DONE");
                         quantitativeRatingFormsDone[label] = true;
                     } else {
                         quantitativeRatingDoneField.val("ONGOING");
+                        $(`input.quantitative-rating-form[name='${label}']`).val("ONGOING");
                         quantitativeRatingFormsDone[label] = false;
                     }
 
@@ -435,8 +482,6 @@ $(document).ready(function() {
                     submit_button.find('.spinner-border').addClass('visually-hidden');
                     submit_button.find('.status').html('Save');
 
-                    // CODE HERE
-
                     //enable is final
                     form.find('input[name=is_final]').attr('disabled', null);
 
@@ -445,7 +490,6 @@ $(document).ready(function() {
 
             });
 
-            console.log(data);
             loadingDiv.hide();
             form.show();
 
