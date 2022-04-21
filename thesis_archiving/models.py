@@ -117,7 +117,7 @@ class User(db.Model, UserMixin):
 		return User.query.get(_user_id)
 
 	def check_quantitative_panelist_grade(self, thesis, quantitative_rating):
-		
+
 		# fetch the panel's quantatitative grades for the thesis
 		# panelist_grade = self.quantitative_panelist_grades.filter_by(thesis_id=thesis.id).first()
 
