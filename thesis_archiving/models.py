@@ -1,4 +1,4 @@
-from flask import current_app
+from flask import current_app, abort
 from flask.helpers import flash
 from flask_login import UserMixin
 from sqlalchemy.dialects.mysql import INTEGER, BOOLEAN, BIGINT
@@ -117,7 +117,7 @@ class User(db.Model, UserMixin):
 		return User.query.get(_user_id)
 
 	def check_quantitative_panelist_grade(self, thesis, quantitative_rating):
-		
+
 		# fetch the panel's quantatitative grades for the thesis
 		# panelist_grade = self.quantitative_panelist_grades.filter_by(thesis_id=thesis.id).first()
 
@@ -189,9 +189,8 @@ class User(db.Model, UserMixin):
 			try:
 				db.session.add(rating)
 				db.session.commit()
-				flash("Created new individual rating.",'success')
 			except:
-				flash("An error occured.",'danger')
+				abort(500)
 				
 		return rating
 

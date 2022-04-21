@@ -94,7 +94,6 @@ class ManuscriptGradeSchema(Schema):
                     err[c] = ["Field cannot be empty."]
 
         if err:
-            flash("Cannot leave an empty field.", "danger")
             raise ValidationError(err)
 
     @validates_schema

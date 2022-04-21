@@ -1,0 +1,96 @@
+{% from "components/_fields.html" import field_checkbox, field_ajax_quantitative_rating %}
+
+{% macro quantitative_rating(label, group_id, thesis, quantitative_rating) %}
+<button type="button" class="btn btn-sm btn-ueccss quantitative-rating" data-bs-toggle="modal" data-bs-target="#quantitative-rating-{{quantitative_rating.id}}" id="quantitative-rating-button"> {{label}}
+</button>
+
+<div class="modal fade" id="quantitative-rating-{{quantitative_rating.id}}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5>
+                    Quantitative Rating
+                    <span class="text-muted h5">{{thesis.title}}</span>
+                </h5>
+            </div>
+            
+            <div class="modal-body">
+                <h6>
+                    {{ quantitative_rating.name }}
+                </h6>
+                <h3 class="loading">Loading...</h3>
+                <form>
+                    <input type="hidden" name="link" value="{{ url_for('quantitative_rating.ajax_grading', group_id=thesis.group_id, thesis_id=thesis.id, quantitative_rating_id=quantitative_rating.id) }}">
+                    
+                    <input type="hidden" name="quantitative-rating-done" value="">
+                    <ol>
+
+                        <input type="hidden" name="label" value="{{label}}">
+                        
+
+                        {% for criteria in quantitative_rating.criteria %}
+                            {% set descriptions = {} %}
+                            
+                            {% for rating in criteria.ratings %}
+                                {% set descriptions = descriptions.update(
+                                        {rating.rate:rating.description}
+                                    )
+                                %}
+
+                            {% endfor %}
+                            
+
+                            <li>
+                                <div class="mt-4 mb-5">
+                                    {{ 
+                                        field_ajax_quantitative_rating(
+                                            name=criteria.name, 
+                                            max_grade=quantitative_rating.max_grade, 
+                                            description=criteria.description, 
+                                            descriptions=descriptions
+                                        ) 
+                                    }}
+                                </div>
+                            </li>
+                        {% endfor %}
+                        
+                        
+                    </ol>
+
+                    <div class="mt-5 mb-3 mx-3 d-flex justify-content-between">
+                                    
+                        
+                        <p><strong>Total Score: </strong> <span id="grading-score">0</span>/<span id="total-items">25</span></p>
+                        
+                        <p><strong>Percentage: </strong> <span id="grading-percent">0</span></p>
+                        
+                        <p><strong>11-Point: </strong> <span id="grading-point">0</span></p>
+                        
+                        <div>
+                            <input class="form-check-input" name="is_final" type="checkbox" value="1">
+                            <label class="form-check-label">
+                                Mark as final to be included for grading.
+                            </label>
+
+                        </div>
+
+                        <button class="btn btn-sm btn-ueccss" type="submit">
+                            <span class="spinner-border spinner-border-sm visually-hidden" role="status"></span>
+                            <span class="status">Save</span>
+                        </button>
+
+                    </div>
+                </form>
+
+                
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endmacro %}
+

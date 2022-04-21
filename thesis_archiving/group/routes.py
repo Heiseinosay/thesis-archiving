@@ -443,3 +443,4 @@ def grading(group_id, thesis_id):
         group = group_,
         qualitative_ratings = qualitative_ratings
         )
+
