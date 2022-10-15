@@ -29,4 +29,12 @@ Errors you may encounter in the futre:
         - MySQL shutdown unexpectedly
             - https://stackoverflow.com/questions/18022809/how-to-solve-error-mysql-shutdown-unexpectedly/61859561#61859561
             - https://stackoverflow.com/questions/18022809/how-to-solve-error-mysql-shutdown-unexpectedly/67734073#67734073
-        
+        - If the above doesnt work,
+            - Save original mysql/data
+            - Reinstall XAMPP
+            - Copy databases from original mysql/data and paste to new mysql/data (all folders except mysql, performance_schema, phpmyadmin, test)
+            - Copy ibdata1 from original mysql/data to new mysql/data
+            - Start services
+        - MySQL WILL NOT start without the configured ports free!
+            - https://stackoverflow.com/questions/18177148/xampp-mysql-does-not-start
+                -  stop MySQLXX (e.g. MySQL57, MySQL80, etc.) in services

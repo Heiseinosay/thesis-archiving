@@ -222,7 +222,7 @@ class Thesis(db.Model):
 	proposal_form = db.Column(db.String(250), unique=True) 
 	date_registered = db.Column(db.DateTime, nullable=False, default=lambda:datetime.now(tz=pytz.timezone('Asia/Manila')))
 
-	adviser_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=False)
+	adviser_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('user.id'), nullable=True)
 	category_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('category.id'), nullable=False)
 	
 	group_id = db.Column(INTEGER(unsigned=True), db.ForeignKey('group.id'))

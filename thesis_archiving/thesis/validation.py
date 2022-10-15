@@ -14,23 +14,23 @@ class CreateThesisSchema(Schema):
 	
 	is_old = fields.Bool(required=True)
 	
-	overview = fields.Str(required=True, validate=validate.And(
-		validate_empty, validate.Length(1,10000)
-		))
 	
-	area = fields.Str(required=True, validate=validate.And(
-		validate_empty, validate.Length(1,120)
-		))
+	overview = fields.Str(required=False,validate=validate.And(
+		validate_empty, validate.Length(1,10000)))
 	
-	keywords = fields.Str(required=True, validate=validate.And(
-		validate_empty, validate.Length(1,250)
-		))
+	# validate=validate.And(
+	# 	validate_empty, validate.Length(1,120)
+	area = fields.Str(required=False)
+	
+	# validate=validate.And(
+	# 	validate_empty, validate.Length(1,250)
+	keywords = fields.Str(required=False)
 	
 	sy_start = fields.Int(required=True, validate=validate.Range(min=1, max=datetime.now(tz=pytz.timezone('Asia/Manila')).year))
 	
 	semester = fields.Int(required=True, validate=validate.Range(min=1, max=2))
 
-	adviser_id = fields.Int(required=True)
+	adviser_id = fields.Int(required=False)
 	category_id = fields.Int(required=True)
 	program_id = fields.Int(required=True)
 	proponents = fields.Str(required=True, validate=validate_empty)
@@ -38,11 +38,32 @@ class CreateThesisSchema(Schema):
 	@pre_load
 	def strip_fields(self, in_data, **kwargs):
 		# dont strip password kasi baka may mag set ng spaces yung first and last lmao
+		print(type(in_data["adviser_id"]))
+		def str_none_to_none(val):
+			'''
+				Converts str'None' to null None
+			'''
+
+			return None if val.lower() == 'none' else val
+
 		in_data["title"] = in_data["title"].strip()
+		
 		in_data["overview"] = in_data["overview"].strip()
+		if not in_data["overview"]:
+			in_data.pop("overview")
+		
 		in_data["area"] = in_data["area"].strip()
+		if not in_data["area"]:
+			in_data.pop("area")
+
 		in_data["keywords"] = in_data["keywords"].strip()
+		if not in_data["keywords"]:
+			in_data.pop("keywords")
+
 		in_data["proponents"] = in_data["proponents"].strip()
+
+		if not str_none_to_none(in_data["adviser_id"]):
+			in_data.pop("adviser_id")
 		
 		return in_data
 	

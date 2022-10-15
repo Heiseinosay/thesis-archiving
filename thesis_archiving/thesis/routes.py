@@ -162,6 +162,9 @@ def create():
             with db.session.no_autoflush:
                 # values for validated and filtered input
                 data = result['valid']
+                # print(User.query.get(data.get('adviser_id')))
+                # print(data.get('area'), data.get('keywords'), data.get('overview'))
+                # assert False
                 
                 # init model obj + fill in values
                 _thesis = Thesis()
@@ -170,11 +173,11 @@ def create():
                 _thesis.sy_start = data['sy_start']
                 _thesis.semester = data['semester']
                 _thesis.is_old = data['is_old']
-                _thesis.area = data['area']
-                _thesis.keywords = data['keywords']
-                _thesis.overview = data['overview']
+                _thesis.area = data.get('area')
+                _thesis.keywords = data.get('keywords')
+                _thesis.overview = data.get('overview')
 
-                _thesis.adviser = User.query.get(data['adviser_id'])
+                _thesis.adviser = User.query.get(data.get('adviser_id'))
                 _thesis.program = Program.query.get(data['program_id'])
                 _thesis.category = Category.query.get(data['category_id'])
                 
