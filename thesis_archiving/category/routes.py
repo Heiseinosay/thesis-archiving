@@ -6,6 +6,9 @@ from sqlalchemy import or_
 from thesis_archiving import db
 from thesis_archiving.models import Category
 from thesis_archiving.utils import has_roles
+from thesis_archiving.validation import validate_input
+
+from thesis_archiving.category.validation import CreateCategorySchema
 
 category = Blueprint("category", __name__, url_prefix="/category")
 
@@ -24,6 +27,46 @@ def read():
         ).order_by(Category.name).paginate()
 
     return render_template("category/read.html", categories=categories)
+
+@category.route("/create", methods=["POST","GET"])
+@login_required
+@has_roles("is_superuser")
+def create():
+    result = {
+        'valid' : {},
+        'invalid' : {}
+    }
+
+    if request.method == "POST":
+        
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+        
+        # marshmallow validation
+        result = validate_input(data, CreateCategorySchema)
+
+        if not result['invalid']:
+            # prevent premature flushing
+            with db.session.no_autoflush:
+                # values for validated and filtered input
+                data = result['valid']
+                
+                # init model obj + fill in values
+                _category = Category()
+
+                _category.name = data['name']
+                _category.code = data['code']
+
+                try:
+                    db.session.add(_category)
+                    db.session.commit()
+                    flash("Successfully created new category.", "success")
+                    return redirect(url_for('category.read'))
+
+                except:
+                    flash("An error occured", "danger")
+
+    return render_template("category/create.html", result=result)
 
 @category.route("/delete/<int:category_id>", methods=["POST"])
 @login_required
