@@ -1,6 +1,6 @@
 prereqs:
     - pipenv
-    - python 3.7
+    - python 3.7.9
     - XAMPP
 
 setup:

@@ -1,8 +1,9 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, flash, url_for, redirect
 from flask_login import login_required
 
 from sqlalchemy import or_
 
+from thesis_archiving import db
 from thesis_archiving.models import Program
 from thesis_archiving.utils import has_roles
 
@@ -24,3 +25,19 @@ def read():
 
     return render_template("program/read.html", programs=programs)
 
+@program.route("/delete/<int:program_id>", methods=["POST"])
+@login_required
+@has_roles("is_superuser")
+def delete(program_id):
+    _program = Program.query.get_or_404(program_id)
+    
+    try:
+        db.session.delete(_program)
+        db.session.commit()
+        flash("Successfully deleted a program.","success")
+        
+        return redirect(request.referrer)
+    except:
+        flash("An error occured.","danger")
+
+    return redirect(url_for('program.read'))
