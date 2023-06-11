@@ -8,7 +8,7 @@ from thesis_archiving.models import Category
 from thesis_archiving.utils import has_roles
 from thesis_archiving.validation import validate_input
 
-from thesis_archiving.category.validation import CreateCategorySchema
+from thesis_archiving.category.validation import CreateCategorySchema, UpdateCategorySchema
 
 category = Blueprint("category", __name__, url_prefix="/category")
 
@@ -67,6 +67,45 @@ def create():
                     flash("An error occured", "danger")
 
     return render_template("category/create.html", result=result)
+
+@category.route("/update/<int:category_id>", methods=["POST", "GET"])
+@login_required
+@has_roles("is_admin")
+def update(category_id):
+
+    _category = Category.query.get_or_404(category_id)
+
+    result = {
+        'valid' : {},
+        'invalid' : {}
+    }
+
+    if request.method == "POST":
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+        
+        
+        # marshmallow validation
+        result = validate_input(data, UpdateCategorySchema, category_obj=_category)
+
+        if not result['invalid']:
+            # prevent premature flushing
+            with db.session.no_autoflush:
+                # values for validated and filtered input
+                data = result['valid']
+
+                _category.name = data['name']
+                _category.code = data['code']
+
+                try:
+                    db.session.commit()
+                    flash("Successfully updated category.", "success")
+                    return redirect(request.referrer)
+
+                except:
+                    flash("An error occured", "danger")
+
+    return render_template("category/update.html", result=result, category=_category)
 
 @category.route("/delete/<int:category_id>", methods=["POST"])
 @login_required

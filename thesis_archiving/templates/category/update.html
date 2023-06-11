@@ -1,0 +1,54 @@
+{% from "components/_fields.html" import field, field_checkbox %}
+{% from "components/_proponents_update.html" import proponents_update %}
+
+{% extends "base.html" %}
+
+{% block body %}
+
+	<div class="container py-3">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-7 mb-3">
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <h3 class="card-title">
+							Update Category
+						</h3>
+
+                        <form action="" method="POST">
+                            {% 
+                                set category = {
+                                    'name': request.form['name'] if request.form['name'] else category.name,
+                                    'code': request.form['code'] if request.form['code'] else category.code,
+                                }
+                            %}
+                            
+                            {% include "components/csrf_token.html" %}
+                            
+                             <!-- name -->
+                             <div class="mb-3">
+                                <label class="form-label h6">Name</label>
+                                {{ field("text", "name", result, category['name']) }}
+                            </div>
+
+                            <!-- code -->
+                            <div class="mb-3">
+                                <label class="form-label h6">Code</label>
+                                {{ field("text", "code", result, category['code']) }}
+                            </div>
+
+                            <div class="d-grid gap-2 mb-3">
+                                <button class="btn btn-ueccss" type="submit">Update</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>		
+	</div>
+	
+	
+	
+{% endblock %}

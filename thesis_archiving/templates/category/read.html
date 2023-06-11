@@ -48,7 +48,7 @@
 											<td>{{ category.name }}</td>
 											<td>{{ category.code }}</td>
 											<td>
-												<a class="btn btn-sm btn-primary bi bi-pencil align-self-start mr-1" href="#" role="button"></a>
+												<a class="btn btn-sm btn-primary bi bi-pencil align-self-start mr-1" href="{{ url_for('category.update', category_id=category.id) }}" role="button"></a>
 												{{ delete_modal(url_for('category.delete', category_id=category.id), category.id, category.name) }}
 											</td>
 										</tr>
