@@ -8,7 +8,7 @@ from thesis_archiving.models import Program
 from thesis_archiving.utils import has_roles
 from thesis_archiving.validation import validate_input
 
-from thesis_archiving.program.validation import CreateProgramSchema
+from thesis_archiving.program.validation import CreateProgramSchema, UpdateProgramSchema
 
 program = Blueprint("program", __name__, url_prefix="/program")
 
@@ -67,6 +67,45 @@ def create():
                     flash("An error occured", "danger")
 
     return render_template("program/create.html", result=result)
+
+@program.route("/update/<int:program_id>", methods=["POST", "GET"])
+@login_required
+@has_roles("is_admin")
+def update(program_id):
+
+    _program = Program.query.get_or_404(program_id)
+
+    result = {
+        'valid' : {},
+        'invalid' : {}
+    }
+
+    if request.method == "POST":
+        # contains form data converted to mutable dict
+        data = request.form.to_dict()
+        
+        
+        # marshmallow validation
+        result = validate_input(data, UpdateProgramSchema, program_obj=_program)
+
+        if not result['invalid']:
+            # prevent premature flushing
+            with db.session.no_autoflush:
+                # values for validated and filtered input
+                data = result['valid']
+
+                _program.name = data['name']
+                _program.code = data['code']
+
+                try:
+                    db.session.commit()
+                    flash("Successfully updated program.", "success")
+                    return redirect(request.referrer)
+
+                except:
+                    flash("An error occured", "danger")
+
+    return render_template("program/update.html", result=result, program=_program)
 
 @program.route("/delete/<int:program_id>", methods=["POST"])
 @login_required

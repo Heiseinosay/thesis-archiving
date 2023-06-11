@@ -48,7 +48,7 @@
 											<td>{{ program.name }}</td>
 											<td>{{ program.code }}</td>
 											<td>
-												<a class="btn btn-sm btn-primary bi bi-pencil align-self-start mr-1" href="#" role="button"></a>
+												<a class="btn btn-sm btn-primary bi bi-pencil align-self-start mr-1" href="{{ url_for('program.update', program_id=program.id) }}" role="button"></a>
 												{{ delete_modal(url_for('program.delete', program_id=program.id), program.id, program.name) }}
 											</td>
 										</tr>
